@@ -1,6 +1,8 @@
 package cz.vutbr.fit.xflajs00.voicerecognition;
 
+import android.Manifest;
 import android.os.Handler;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -10,23 +12,42 @@ import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
     private boolean recording = false;
+    private boolean created = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, 1);
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.MODIFY_AUDIO_SETTINGS}, 1);
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+
+        createEngine();
     }
 
-    /**
-     * A native method that is implemented by the 'native-lib' native library,
-     * which is packaged with this application.
-     */
-    public native String stringFromJNI();
-
-    // Used to load the 'native-lib' library on application startup.
-    static {
-        System.loadLibrary("native-lib");
+    /** Called when the activity is about to be destroyed. */
+    @Override
+    protected void onDestroy()
+    {
+        shutdown();
+        super.onDestroy();
     }
+
+    private Thread threadAudioRecorder;
+
+    /** Native methods, implemented in jni folder */
+    public static native void createEngine();
+    public static native boolean createAudioRecorder();
+    public static native void startRecording(int max_length_sec);
+    public static native void stopRecording();
+    public static native void shutdown();
+    public static native void createFrames();
+
+    static{
+        System.loadLibrary("raw_audio_recorder");
+    }
+
 
     // Ovládání UI
 
@@ -34,12 +55,19 @@ public class MainActivity extends AppCompatActivity {
         recording = !recording;
        // Button button = (Button) findViewById(R.id.buttonRecognitionControl);
         if(recording){
-            //button.setText(R.string.stopRecording);
+            if (!created) {
+                created = createAudioRecorder();
+            }
+            if(created)
+                startRecording(100);
         }else{
+            stopRecording();
           //  button.setText(R.string.startRecording);
             ProgressBar bar = (ProgressBar) findViewById(R.id.progressBarRecognizing);
             bar.setIndeterminate(true);
             bar.setVisibility(View.VISIBLE);
+
+
 
             final Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
@@ -49,6 +77,9 @@ public class MainActivity extends AppCompatActivity {
                     bar.setVisibility(View.INVISIBLE);
                 }}, 5000);
         }
+    }
 
+    public void createFrames(View view){
+        createFrames();
     }
 }

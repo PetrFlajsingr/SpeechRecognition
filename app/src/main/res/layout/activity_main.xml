@@ -7,41 +7,12 @@
     android:layout_height="match_parent"
     tools:context="cz.vutbr.fit.xflajs00.voicerecognition.MainActivity">
 
-    <ScrollView
-        android:layout_width="0dp"
-        android:layout_height="400dp"
-        tools:layout_editor_absoluteY="-1dp"
-        android:layout_marginRight="0dp"
-        app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginLeft="0dp"
-        app:layout_constraintLeft_toLeftOf="parent">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/textViewRecognitionResult"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_centerHorizontal="true"
-                android:layout_marginLeft="16dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="27dp"
-                android:ellipsize="marquee"
-                android:text="@string/recognizedTextInit"
-                android:textAlignment="textStart"
-                android:textAppearance="@style/TextAppearance.AppCompat"
-                android:visibility="visible"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:layout_constraintLeft_creator="1"
-                tools:layout_constraintTop_creator="1"/>
-        </LinearLayout>
-    </ScrollView>
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="createFrames"
+        android:text="Button"/>
 
     <ToggleButton
         android:id="@+id/buttonRecognitionControl"
@@ -79,5 +50,40 @@
         app:layout_constraintVertical_bias="0.501"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"/>
+
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="400dp"
+        android:layout_marginLeft="0dp"
+        android:layout_marginRight="0dp"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        tools:layout_editor_absoluteY="0dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textViewRecognitionResult"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:ellipsize="marquee"
+                android:text="@string/recognizedTextInit"
+                android:textAlignment="textStart"
+                android:textAllCaps="false"
+                android:textAppearance="@style/TextAppearance.AppCompat"
+                android:visibility="visible"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:layout_constraintLeft_creator="1"
+                tools:layout_constraintTop_creator="1"/>
+        </LinearLayout>
+    </ScrollView>
 
 </android.support.constraint.ConstraintLayout>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Rozpoznávání řeči</string>
+    <string name="startRecording">Začít nahrávat</string>
+    <string name="recognizedTextInit">Zde se zobrazí výsledek rozpoznávání</string>
+    <string name="stopRecording">Ukončit nahrávání</string>
+</resources>
