@@ -42,25 +42,23 @@ void createFrames(){
     short* data = recorder->getRecording(&recordingSize);
     size_t frameCount = recordingSize/FRAME_OVERLAP;
 
-    unsigned int position = 0;
+    unsigned int offset = 0;
 
     AudioFrame::openFile();
 
     AudioFrame* frames = new AudioFrame[frameCount];
 
     //first frame is special
-    for(unsigned int j = 0; j < FRAME_SIZE; ++j) {
+    frames[0].applyHammingWindow(data);
+    /*for(unsigned int j = 0; j < FRAME_SIZE; ++j) {
         frames[0].data[j] = data[j];
-    }
+    }*/
 
 
     for(unsigned int i = 1; i < frameCount; ++i){
-        position += FRAME_OVERLAP;
-        for(unsigned int j = 0; j < FRAME_SIZE; ++j) {
-            frames[i].data[j] = data[position + j];
-        }
-        __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "position: %d, recordSize: %d, frameCount: %d", position, recordingSize, frameCount);
-        frames[i].applyHammingWindow();
+        offset += FRAME_OVERLAP;
+        frames[i].applyHammingWindow(data + offset);
+        //__android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "offset: %d, recordSize: %d, frameCount: %d", offset, recordingSize, frameCount);
     }
 
     AudioFrame::closeFile();

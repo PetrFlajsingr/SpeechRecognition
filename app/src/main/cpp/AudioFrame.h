@@ -13,7 +13,7 @@ class AudioFrame {
 private:
     static const size_t DATA_LENGTH = 200; //< width 200 - sample rate is 8 kHz (8000*0.025(s) = 200)
     // hamming window coeficients
-    static const double ALPHA = 25/46;
+    static const double ALPHA = 25.0/46;
     static const double BETA = (1 - ALPHA);
     static float hammingCoef[DATA_LENGTH];
     static bool hammingCalculated;
@@ -24,14 +24,13 @@ private:
 public:
     AudioFrame();
 
-    short data[DATA_LENGTH]; //< frame data
     float hammingData[DATA_LENGTH]; //< container for hammingWindow transformation
 
     static void openFile();
 
     static void closeFile();
 
-    void applyHammingWindow();
+    void applyHammingWindow(short* data);
 };
 
 
