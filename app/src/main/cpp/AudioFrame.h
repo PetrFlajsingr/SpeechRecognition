@@ -24,7 +24,7 @@ private:
 public:
     AudioFrame();
 
-    float hammingData[DATA_LENGTH]; //< container for hammingWindow transformation
+    short hammingData[DATA_LENGTH]; //< container for hammingWindow transformation
 
     static void openFile();
 
