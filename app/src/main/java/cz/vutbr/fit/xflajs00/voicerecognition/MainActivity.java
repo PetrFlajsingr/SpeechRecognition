@@ -14,6 +14,10 @@ public class MainActivity extends AppCompatActivity {
     private boolean recording = false;
     private boolean created = false;
 
+    /**
+     * Requests permissions on start.
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,25 +53,25 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    // Ovládání UI
-
+    // UI control with a button
     public void recordingControl(View view){
         recording = !recording;
-       // Button button = (Button) findViewById(R.id.buttonRecognitionControl);
         if(recording){
             if (!created) {
                 created = createAudioRecorder();
             }
             if(created)
                 startRecording(100);
+            else
+                recording = false;
         }else{
             stopRecording();
-          //  button.setText(R.string.startRecording);
+
+            //progressbar for later use
+            if(true) return;
             ProgressBar bar = (ProgressBar) findViewById(R.id.progressBarRecognizing);
             bar.setIndeterminate(true);
             bar.setVisibility(View.VISIBLE);
-
-
 
             final Handler handler = new Handler();
             handler.postDelayed(new Runnable() {

@@ -12,20 +12,15 @@
 #include <stdio.h>
 #include <pthread.h>
 
-#define ALLOW_AUDIO_LOG_TO_FILE 1
-
 class RawAudioRecorder {
 private:
-    //TODO remove
-    static FILE* rawFile;
-
-    static const int SAMPLING_RATE = 8000; //kHz
-    static const int SMALL_RECORDER_FRAMES = SAMPLING_RATE; // min length of recorded frame - 100ms
+    static const int SAMPLING_RATE = 48000; //kHz
+    static const int SMALL_RECORDER_FRAMES = SAMPLING_RATE / 10; // min length of recorded frame - 100ms
 
     static short *recorderBuffer; //< buffer for recorded data
     static int max_recording_length_sec; //< maximum allow length for a recording
 
-    static size_t recorderSize; //< size of all recorded data;
+    static int recorderSize; //< size of all recorded data;
 
     // engine interfaces
     SLObjectItf engineObject = NULL;
@@ -58,7 +53,7 @@ public:
 
     void stopRecording();
 
-    short* getRecording(size_t* size);
+    short* getRecording(int* size);
 };
 
 

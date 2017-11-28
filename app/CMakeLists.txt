@@ -12,7 +12,6 @@ cmake_minimum_required(VERSION 3.4.1)
 
 
 
-
 add_library( # Sets the name of the library.
               raw_audio_recorder
 
@@ -26,6 +25,11 @@ add_library( # Sets the name of the library.
               src/main/cpp/AudioSubsampler.h
               src/main/cpp/AudioFrame.cpp
               src/main/cpp/AudioFrame.h
+              src/main/cpp/kissfft/kiss_fft.h
+              src/main/cpp/kissfft/kiss_fft.c
+              src/main/cpp/kissfft/kiss_fftr.h
+              src/main/cpp/kissfft/kiss_fftr.c
+
               src/main/cpp/audio.cpp
 )
 

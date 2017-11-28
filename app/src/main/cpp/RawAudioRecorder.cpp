@@ -4,8 +4,11 @@
 
 #include "RawAudioRecorder.h"
 #include <assert.h>
+#include <android/log.h>
 
 #include "AudioSubsampler.h"
+
+#define APPNAME "cz.vutbr.fit.xflajs00.voicerecognition"
 
 bool RawAudioRecorder::recordingStopBool = false;
 int RawAudioRecorder::capacityCounter = 0;
@@ -15,7 +18,7 @@ SLAndroidSimpleBufferQueueItf RawAudioRecorder::recorderBufferQueue;
 short* RawAudioRecorder::recorderBuffer;
 SLRecordItf RawAudioRecorder::recorderRecord;
 int RawAudioRecorder::max_recording_length_sec;
-size_t RawAudioRecorder::recorderSize;
+int RawAudioRecorder::recorderSize;
 
 /**
  * Prepares the engine for recording audio.
@@ -56,31 +59,26 @@ void RawAudioRecorder::bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void
     SLresult result;
     // recording stopped by user
     if(recordingStopBool) {
+        capacityCounter++;
         // stopping the recording engine
         result = (*recorderRecord)->SetRecordState(recorderRecord, SL_RECORDSTATE_STOPPED);
         // saving the length of recorded data
         if(SL_RESULT_SUCCESS == result) {
-            recorderSize = SAMPLING_RATE * capacityCounter;
+            recorderSize = SMALL_RECORDER_FRAMES * capacityCounter;
         }
-        #if ALLOW_AUDIO_LOG_TO_FILE
-            //TODO remove this
-            short* toWrite = AudioSubsampler::subsample48kHzto8kHz(recorderBuffer, recorderSize);
-            fwrite(toWrite, recorderSize/6, 1, rawFile);
-            fclose(rawFile);
-        #endif
     }else {
         capacityCounter++;
         // checking for max allowed length of the recording
-        if(capacityCounter < max_recording_length_sec) {
+        if(capacityCounter < max_recording_length_sec*10) {
             // queueing the next part of the buffer
-            result = (*recorderBufferQueue)->Enqueue(recorderBufferQueue, recorderBuffer + (capacityCounter * SAMPLING_RATE),
+            result = (*recorderBufferQueue)->Enqueue(recorderBufferQueue, recorderBuffer + (capacityCounter * SMALL_RECORDER_FRAMES),
                                                      SMALL_RECORDER_FRAMES * sizeof(short));
         }else{
             // ending the recording
             result = (*recorderRecord)->SetRecordState(recorderRecord, SL_RECORDSTATE_STOPPED);
             // saving the size of the recorded data
             if(SL_RESULT_SUCCESS == result)
-                recorderSize = max_recording_length_sec * SAMPLING_RATE;
+                recorderSize = capacityCounter * SMALL_RECORDER_FRAMES;
         }
     }
     pthread_mutex_unlock(&audioEngineLock);
@@ -154,9 +152,6 @@ void RawAudioRecorder::stopRecording() {
  * @param max_length_sec maximum length of recorded audio
  */
 void RawAudioRecorder::startRecording(int max_length_sec) {
-    #if ALLOW_AUDIO_LOG_TO_FILE
-        rawFile = fopen("/sdcard/AAA.pcm", "wb");
-    #endif
     if(recorderBuffer != NULL){
         delete[] recorderBuffer;
     }
@@ -217,7 +212,7 @@ RawAudioRecorder::~RawAudioRecorder() {
     pthread_mutex_destroy(&audioEngineLock);
 }
 
-short *RawAudioRecorder::getRecording(size_t *size) {
+short *RawAudioRecorder::getRecording(int *size) {
     *size = recorderSize/6;
     return  AudioSubsampler::subsample48kHzto8kHz(recorderBuffer, recorderSize);
 }

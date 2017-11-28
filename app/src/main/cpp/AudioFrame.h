@@ -8,29 +8,31 @@
 
 #include <stddef.h>
 #include <stdio.h>
+#include "kissfft/kiss_fft.h"
+#include "kissfft/kiss_fftr.h"
 
 class AudioFrame {
 private:
-    static const size_t DATA_LENGTH = 200; //< width 200 - sample rate is 8 kHz (8000*0.025(s) = 200)
+    static const int DATA_LENGTH = 200; //< width 200 - sample rate is 8 kHz (8000*0.025(s) = 200)
     // hamming window coeficients
     static const double ALPHA = 25.0/46;
     static const double BETA = (1 - ALPHA);
     static float hammingCoef[DATA_LENGTH];
     static bool hammingCalculated;
 
-    static FILE* test;
-
     static void calcHammingCoef();
 public:
     AudioFrame();
 
-    short hammingData[DATA_LENGTH]; //< container for hammingWindow transformation
+    virtual ~AudioFrame();
 
-    static void openFile();
+    float* hammingData; //< container for hammingWindow transformation
 
-    static void closeFile();
+    kiss_fft_cpx* fftData;
 
     void applyHammingWindow(short* data);
+
+    void applyFFT(kiss_fftr_cfg* cfg);
 };
 
 

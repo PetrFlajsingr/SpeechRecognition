@@ -5,7 +5,12 @@
 #include <jni.h>
 #include "RawAudioRecorder.h"
 #include "AudioFrame.h"
+#include "kissfft/kiss_fftr.h"
+#include "kissfft/kiss_fft.h"
 #include <android/log.h>
+#include <vector>
+#include <iostream>
+#include <fstream>
 
 #define APPNAME "cz.vutbr.fit.xflajs00.voicerecognition"
 
@@ -17,8 +22,7 @@ void createEngine()
     recorder = new RawAudioRecorder();
 }
 
-// create audio recorder: recorder is not in fast path
-//    like to avoid excessive re-sampling while playing back from Hello & Android clip
+// create audio recorder
 jboolean createAudioRecorder()
 {
     return (jboolean) (recorder->createAudioRecorder() ? JNI_TRUE : JNI_FALSE);
@@ -36,32 +40,42 @@ void startRecording(jint max_length_sec)
 }
 
 void createFrames(){
-    const size_t FRAME_SIZE = 8000*0.025;
-    const size_t FRAME_OVERLAP = FRAME_SIZE/25*15;
-    size_t recordingSize = 0;
+    const int FRAME_SIZE = (const int) (8000 * 0.025);
+    const int FRAME_OVERLAP = FRAME_SIZE/25*15;
+    int recordingSize = 0;
     short* data = recorder->getRecording(&recordingSize);
-    size_t frameCount = recordingSize/FRAME_OVERLAP;
+
+    int frameCount = recordingSize/FRAME_OVERLAP;
 
     unsigned int offset = 0;
 
-    AudioFrame::openFile();
-
     AudioFrame* frames = new AudioFrame[frameCount];
 
-    //first frame is special
-    frames[0].applyHammingWindow(data);
-    /*for(unsigned int j = 0; j < FRAME_SIZE; ++j) {
-        frames[0].data[j] = data[j];
-    }*/
-
-
-    for(unsigned int i = 1; i < frameCount; ++i){
-        offset += FRAME_OVERLAP;
+    for(unsigned int i = 0; i < frameCount; ++i){
         frames[i].applyHammingWindow(data + offset);
-        //__android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "offset: %d, recordSize: %d, frameCount: %d", offset, recordingSize, frameCount);
+        offset += FRAME_OVERLAP;
     }
 
-    AudioFrame::closeFile();
+    std::ofstream out;
+    out.open("/sdcard/AAAafterham.txt");
+    for(int i = 0; i < frameCount; ++i){
+        for(int j = 0; j < 200; ++j){
+            out << frames[i].hammingData[j] << ",";
+        }
+        out << std::endl;
+    }
+    out.close();
+
+    const int FFT_LEN = 200;
+
+    kiss_fftr_cfg cfg = kiss_fftr_alloc(FFT_LEN, 0, NULL, NULL);
+
+    //std::vector<kiss_fft_cpx*> fftFrames;
+    for(unsigned int i = 0; i < frameCount; ++i){
+        //TODO zero fill FFT input?
+        frames[i].applyFFT(&cfg);
+    }
+    free(cfg);
 }
 
 

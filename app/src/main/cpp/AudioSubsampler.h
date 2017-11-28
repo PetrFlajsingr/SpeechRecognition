@@ -12,8 +12,10 @@
  * Wrapper for static classes handling subsamoling to 8kHz sample rate for recognition.
  */
 class AudioSubsampler {
+private:
+    static void lowPassFilter(short* data, int dataLength, int sampleRate);
 public:
-    static short* subsample48kHzto8kHz(short* data, size_t dataLength);
+    static short* subsample48kHzto8kHz(short* data, int dataLength);
 
 };
 
