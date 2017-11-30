@@ -8,9 +8,11 @@
 
 class FeaturesMatrixFloat {
 private:
-    float** featureMatrix = nullptr;
+    float** featuresMatrix = nullptr;
 public:
     void setFeatureMatrix(float **featureMatrix);
+
+    void setFeatureMatrixFrame(int frameNum, float* data);
 
 private:
     int framesNum = 0;
@@ -19,7 +21,7 @@ private:
 public:
     void init(int framesNum, int frameSize);
 
-    float **getFeatureMatrix();
+    float **getFeaturesMatrix();
 };
 
 

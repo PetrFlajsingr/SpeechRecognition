@@ -7,6 +7,7 @@
 
 #include "constants.h"
 #include "FeaturesMatrixFloat.h"
+#include "kissfft/kiss_fft.h"
 
 class MelFilterBank {
 private:
@@ -27,9 +28,11 @@ private:
     static FeaturesMatrixFloat mfb;
 
 public:
-    MelFilterBank(float *melFBin);
+    MelFilterBank();
 
     static void initStatic();
+
+    void calculateMelBanks(int frameCount, kiss_fft_cpx** fftFrames);
 };
 
 

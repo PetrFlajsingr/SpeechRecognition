@@ -3,31 +3,38 @@
 //
 
 #include "FeaturesMatrixFloat.h"
+#include "constants.h"
 
-float **FeaturesMatrixFloat::getFeatureMatrix() {
-    return featureMatrix;
+float **FeaturesMatrixFloat::getFeaturesMatrix() {
+    return featuresMatrix;
 }
 
 void FeaturesMatrixFloat::init(int framesNum, int frameSize) {
-    if(featureMatrix == nullptr || this->framesNum < framesNum || this->frameSize < frameSize){
-        if(featureMatrix != nullptr){
+    if(featuresMatrix == nullptr || this->framesNum < framesNum || this->frameSize < frameSize){
+        if(featuresMatrix != nullptr){
             for(int i = 0; i < framesNum; ++i){
-                delete[] featureMatrix[i];
+                delete[] featuresMatrix[i];
             }
-            delete[] featureMatrix;
+            delete[] featuresMatrix;
         }
 
-        featureMatrix = new float*[framesNum];
+        featuresMatrix = new float*[framesNum];
         for(int i = 0; i < framesNum; ++i){
-            featureMatrix[i] = new float[frameSize];
+            featuresMatrix[i] = new float[frameSize];
         }
     }
 }
 
 void FeaturesMatrixFloat::setFeatureMatrix(float **featureMatrix) {
-    this->featureMatrix = featureMatrix;
-    if(this->featureMatrix == nullptr){
+    this->featuresMatrix = featureMatrix;
+    if(this->featuresMatrix == nullptr){
         this->frameSize = 0;
         this->framesNum = 0;
+    }
+}
+
+void FeaturesMatrixFloat::setFeatureMatrixFrame(int frameNum, float *data) {
+    for(int i = 0; i < MEL_BANK_FRAME_LENGTH; ++i) {
+        this->featuresMatrix[frameNum][i] = data[i];
     }
 }

@@ -22,16 +22,16 @@ void MelFilterBank::initStatic() {
 
     for(int i = 0; i < MEL_BANK_FRAME_LENGTH; ++i){
         for(int j = melCinD[i]; j < melCinD[i + 1]; ++j){
-            mfb.getFeatureMatrix()[j][i] = (melCBin[i] - melFBin[j]) / (melCBin[i] - melCBin[i + 1]);
+            mfb.getFeaturesMatrix()[j][i] = (melCBin[i] - melFBin[j]) / (melCBin[i] - melCBin[i + 1]);
         }
         for(int j = melCinD[i + 1]; j < melCinD[i + 2]; ++j){
-            mfb.getFeatureMatrix()[j][i] = (melCBin[i + 2] - melFBin[j]) / (melCBin[i + 2] - melCBin[i + 1]);
+            mfb.getFeaturesMatrix()[j][i] = (melCBin[i + 2] - melFBin[j]) / (melCBin[i + 2] - melCBin[i + 1]);
         }
     }
 
     if(LOW_FREQ > 0.0 && (LOW_FREQ / TARGET_SAMPLING_RATE * FFT_FRAME_LENGTH + 0.5) > melCinD[0]){
         for(int i = 0; i < MEL_BANK_FRAME_LENGTH; ++i){
-            mfb.getFeatureMatrix()[melCinD[0]][i] = 0.0f;
+            mfb.getFeaturesMatrix()[melCinD[0]][i] = 0.0f;
         }
     }
 }
@@ -60,8 +60,48 @@ float MelFilterBank::melInvPoint(float x) {
 }
 //\STATIC
 
-MelFilterBank::MelFilterBank(float *melFBin) : melFBin(melFBin) {
+MelFilterBank::MelFilterBank(){
 
 }
+
+void MelFilterBank::calculateMelBanks(int frameCount, kiss_fft_cpx** fftFrames) {
+    FeaturesMatrixFloat* melBankFrames = new FeaturesMatrixFloat();
+
+    melBankFrames->init(frameCount, MEL_BANK_FRAME_LENGTH);
+
+    float melBankFramesSum[MEL_BANK_FRAME_LENGTH] = {0.0};
+
+    float melBankFrame[MEL_BANK_FRAME_LENGTH];
+
+    for(int frameNum = 0; frameNum < frameCount; ++frameNum){
+        for(int i = 0; i < MEL_BANK_FRAME_LENGTH; ++i){
+            for(int j = 0; j < FFT_FRAME_LENGTH / 2 + 1; ++j){
+                melBankFrame[i] +=
+                        mfb.getFeaturesMatrix()[j][i] * (float)((pow(fftFrames[frameNum][j].r, 2))
+                        + (pow(fftFrames[frameNum][j].i, 2)));
+            }
+
+            if(melBankFrame[i] < 1){
+                melBankFrame[i] = 0.0;
+            } else{
+                melBankFrame[i] = (float)(log(melBankFrame[i]));
+            }
+            melBankFramesSum[i] += melBankFrame[i];
+        }
+        melBankFrames->setFeatureMatrixFrame(frameNum, melBankFrame);
+    }
+
+    for(int i = 0; i < MEL_BANK_FRAME_LENGTH; ++i){
+        melBankFramesSum[i] /= frameCount;
+    }
+
+    for(int frameNum = 0; frameNum < frameCount; ++frameNum){
+        for(int i = 0; i < MEL_BANK_FRAME_LENGTH; ++i){
+            melBankFrames->getFeaturesMatrix()[frameNum][i] -= melBankFramesSum[i];
+        }
+    }
+}
+
+
 
 
