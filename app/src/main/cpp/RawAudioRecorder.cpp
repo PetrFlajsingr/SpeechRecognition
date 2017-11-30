@@ -13,7 +13,6 @@
 bool RawAudioRecorder::recordingStopBool = false;
 int RawAudioRecorder::capacityCounter = 0;
 pthread_mutex_t RawAudioRecorder::audioEngineLock = PTHREAD_MUTEX_INITIALIZER;
-FILE* RawAudioRecorder::rawFile;
 SLAndroidSimpleBufferQueueItf RawAudioRecorder::recorderBufferQueue;
 short* RawAudioRecorder::recorderBuffer;
 SLRecordItf RawAudioRecorder::recorderRecord;

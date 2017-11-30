@@ -11,8 +11,7 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
-
-#define APPNAME "cz.vutbr.fit.xflajs00.voicerecognition"
+#include "constants.h"
 
 RawAudioRecorder* recorder;
 
@@ -49,33 +48,24 @@ void createFrames(){
 
     unsigned int offset = 0;
 
+    AudioFrame::calcHammingCoef();
+
     AudioFrame* frames = new AudioFrame[frameCount];
 
     for(unsigned int i = 0; i < frameCount; ++i){
         frames[i].applyHammingWindow(data + offset);
         offset += FRAME_OVERLAP;
     }
+    free(data);
 
-    std::ofstream out;
-    out.open("/sdcard/AAAafterham.txt");
-    for(int i = 0; i < frameCount; ++i){
-        for(int j = 0; j < 200; ++j){
-            out << frames[i].hammingData[j] << ",";
-        }
-        out << std::endl;
-    }
-    out.close();
+    kiss_fftr_cfg cfg = kiss_fftr_alloc(FFT_FRAME_LENGTH, 0, NULL, NULL);
 
-    const int FFT_LEN = 200;
-
-    kiss_fftr_cfg cfg = kiss_fftr_alloc(FFT_LEN, 0, NULL, NULL);
-
-    //std::vector<kiss_fft_cpx*> fftFrames;
     for(unsigned int i = 0; i < frameCount; ++i){
-        //TODO zero fill FFT input?
         frames[i].applyFFT(&cfg);
     }
     free(cfg);
+
+    delete[] frames;
 }
 
 

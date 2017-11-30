@@ -7,12 +7,9 @@
 
 #include <string.h>
 #include <android/log.h>
+#include <vector>
+#include <iterator>
 
-#define APPNAME "cz.vutbr.fit.xflajs00.voicerecognition"
-
-#define SHORT_MAX_FLOAT (32768.0f)
-
-float AudioFrame::hammingCoef[DATA_LENGTH];
 bool AudioFrame::hammingCalculated = false;
 
 /**
@@ -21,7 +18,7 @@ bool AudioFrame::hammingCalculated = false;
  * @param data input data
  */
 void AudioFrame::applyHammingWindow(short* data) {
-    for(int i = 0; i < DATA_LENGTH; ++i){
+    for(int i = 0; i < AUDIO_FRAME_LENGTH; ++i){
         hammingData[i] = hammingCoef[i] * (data[i]/SHORT_MAX_FLOAT);
     }
 }
@@ -30,20 +27,16 @@ void AudioFrame::applyHammingWindow(short* data) {
  * Calculates static hamming coefficients when the first object is created.
  */
 AudioFrame::AudioFrame() {
-    hammingData = new float[DATA_LENGTH];
+    hammingData = new float[AUDIO_FRAME_LENGTH];
     fftData = NULL;
-    if(!hammingCalculated){
-        hammingCalculated = true;
-        calcHammingCoef();
-    }
 }
 
 void AudioFrame::calcHammingCoef() {
     __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "calcHammingCoef(): calculating hamming coefs");
     const double PI_MUL_2 = M_PI*2;
 
-    for(int i = 0; i < DATA_LENGTH; ++i){
-        hammingCoef[i] = (float) ( ALPHA - (BETA * cos(PI_MUL_2 * (double)i / (double)(DATA_LENGTH - 1))));
+    for(int i = 0; i < AUDIO_FRAME_LENGTH; ++i){
+        hammingCoef[i] = (float) ( ALPHA - (BETA * cos(PI_MUL_2 * (double)i / (double)(AUDIO_FRAME_LENGTH - 1))));
     }
     __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "calcHammingCoef(): calculating hamming coefs DONE");
 }
@@ -54,8 +47,18 @@ AudioFrame::~AudioFrame() {
 }
 
 void AudioFrame::applyFFT(kiss_fftr_cfg *cfg) {
-    this->fftData = (kiss_fft_cpx*)malloc((DATA_LENGTH/2+1) * sizeof(kiss_fft_cpx));
-    kiss_fftr(*cfg, this->hammingData, this->fftData);
+    this->fftData = (kiss_fft_cpx*)malloc((FFT_FRAME_LENGTH/2+1) * sizeof(kiss_fft_cpx));
+
+    // adding padding to the fft input
+    float fftInput[FFT_FRAME_LENGTH];
+    for(int i = 0; i < AUDIO_FRAME_LENGTH; ++i)
+        fftInput[i] = hammingData[i];
+    for(int i = AUDIO_FRAME_LENGTH; i < FFT_FRAME_LENGTH; ++i)
+        fftInput[i] = 0;
+
+    kiss_fftr(*cfg, fftInput, this->fftData);
+
+    // freeing not needed data
     delete[] hammingData;
     hammingData = NULL;
 }
