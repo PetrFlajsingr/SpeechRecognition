@@ -27,10 +27,16 @@ private:
 
     static FeaturesMatrixFloat mfb;
 
+    FeaturesMatrixFloat* melBankFrames;
+
 public:
     MelFilterBank();
 
+    virtual ~MelFilterBank();
+
     static void initStatic();
+
+    static void deleteStatic();
 
     void calculateMelBanks(int frameCount, kiss_fft_cpx** fftFrames);
 };

@@ -9,6 +9,11 @@ float **FeaturesMatrixFloat::getFeaturesMatrix() {
     return featuresMatrix;
 }
 
+/**
+ * Allocates memory.
+ * @param framesNum Number of frames
+ * @param frameSize Size of each frame
+ */
 void FeaturesMatrixFloat::init(int framesNum, int frameSize) {
     if(featuresMatrix == nullptr || this->framesNum < framesNum || this->frameSize < frameSize){
         if(featuresMatrix != nullptr){
@@ -36,5 +41,11 @@ void FeaturesMatrixFloat::setFeatureMatrix(float **featureMatrix) {
 void FeaturesMatrixFloat::setFeatureMatrixFrame(int frameNum, float *data) {
     for(int i = 0; i < MEL_BANK_FRAME_LENGTH; ++i) {
         this->featuresMatrix[frameNum][i] = data[i];
+    }
+}
+
+FeaturesMatrixFloat::~FeaturesMatrixFloat() {
+    for(int i = 0; i < framesNum; ++i){
+        delete[] featuresMatrix[i];
     }
 }

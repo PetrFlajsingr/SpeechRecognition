@@ -7,10 +7,6 @@
 
 #include <string.h>
 #include <android/log.h>
-#include <vector>
-#include <iterator>
-
-bool AudioFrame::hammingCalculated = false;
 
 /**
  * Applies hamming window to the given data. Length of data is defined by DATA_LENGTH.
@@ -24,13 +20,17 @@ void AudioFrame::applyHammingWindow(short* data) {
 }
 
 /**
- * Calculates static hamming coefficients when the first object is created.
+ * Allocates memory for first operation (hamming window).
  */
 AudioFrame::AudioFrame() {
     hammingData = new float[AUDIO_FRAME_LENGTH];
-    fftData = NULL;
+    fftData = nullptr;
 }
 
+/**
+ * Calculates hamming window coefficients.
+ * coef(n) = alpha - beta * cos((2*pi*n)/(N - 1))
+ */
 void AudioFrame::calcHammingCoef() {
     __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "calcHammingCoef(): calculating hamming coefs");
     const double PI_MUL_2 = M_PI*2;
@@ -46,6 +46,11 @@ AudioFrame::~AudioFrame() {
     free(fftData);
 }
 
+/**
+ * Allocates memory for results of FFT. Calculates only first half of the data due to FFT symetry.
+ * Deletes no longer necessary audio data.
+ * @param cfg configuration for kiss_fftr function
+ */
 void AudioFrame::applyFFT(kiss_fftr_cfg *cfg) {
     this->fftData = (kiss_fft_cpx*)malloc((FFT_FRAME_LENGTH/2+1) * sizeof(kiss_fft_cpx));
 
@@ -61,4 +66,12 @@ void AudioFrame::applyFFT(kiss_fftr_cfg *cfg) {
     // freeing not needed data
     delete[] hammingData;
     hammingData = NULL;
+}
+
+kiss_fft_cpx *AudioFrame::getFftData() const {
+    return fftData;
+}
+
+float *AudioFrame::getHammingData() const {
+    return hammingData;
 }

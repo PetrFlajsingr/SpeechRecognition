@@ -12,6 +12,7 @@
 #include <iostream>
 #include <fstream>
 #include "constants.h"
+#include "MelFilterBank.h"
 
 RawAudioRecorder* recorder;
 
@@ -60,12 +61,24 @@ void createFrames(){
 
     kiss_fftr_cfg cfg = kiss_fftr_alloc(FFT_FRAME_LENGTH, 0, NULL, NULL);
 
+    kiss_fft_cpx** fftFrames = new kiss_fft_cpx*[];
+
     for(unsigned int i = 0; i < frameCount; ++i){
         frames[i].applyFFT(&cfg);
+        fftFrames[i] = frames[i].getFftData();
     }
     free(cfg);
 
+    MelFilterBank::initStatic();
+
+    MelFilterBank* melBank = new MelFilterBank();
+
+    melBank->calculateMelBanks(frameCount, fftFrames);
+
+    delete[] fftFrames;
     delete[] frames;
+    delete melBank;
+    MelFilterBank::deleteStatic();
 }
 
 

@@ -8,20 +8,20 @@
 
 class FeaturesMatrixFloat {
 private:
-    float** featuresMatrix = nullptr;
-public:
-    void setFeatureMatrix(float **featureMatrix);
+    float** featuresMatrix = nullptr; //< matrix data
 
-    void setFeatureMatrixFrame(int frameNum, float* data);
-
-private:
-    int framesNum = 0;
-    int frameSize = 0;
-
+    int framesNum = 0; //< height
+    int frameSize = 0; //< width
 public:
     void init(int framesNum, int frameSize);
 
     float **getFeaturesMatrix();
+
+    void setFeatureMatrix(float **featureMatrix);
+
+    void setFeatureMatrixFrame(int frameNum, float* data);
+
+    virtual ~FeaturesMatrixFloat();
 };
 
 

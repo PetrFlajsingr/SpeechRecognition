@@ -29,6 +29,10 @@ add_library( # Sets the name of the library.
               src/main/cpp/kissfft/kiss_fft.c
               src/main/cpp/kissfft/kiss_fftr.h
               src/main/cpp/kissfft/kiss_fftr.c
+              src/main/cpp/MelFilterBank.cpp
+              src/main/cpp/MelFilterBank.h
+              src/main/cpp/FeaturesMatrixFloat.cpp
+              src/main/cpp/FeaturesMatrixFloat.h
 
               src/main/cpp/audio.cpp
 )

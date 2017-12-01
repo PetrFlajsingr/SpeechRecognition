@@ -19,14 +19,17 @@ private:
     static const double BETA = (1 - ALPHA);
     static float hammingCoef[AUDIO_FRAME_LENGTH];
 
+    float* hammingData; //< data after using hamming window
+
+    kiss_fft_cpx* fftData;
 public:
+    float *getHammingData() const;
+
+    kiss_fft_cpx *getFftData() const;
+
     AudioFrame();
 
     virtual ~AudioFrame();
-
-    float* hammingData; //< container for hammingWindow transformation
-
-    kiss_fft_cpx* fftData;
 
     void applyHammingWindow(short* data);
 

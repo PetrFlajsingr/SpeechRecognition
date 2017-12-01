@@ -36,6 +36,13 @@ void MelFilterBank::initStatic() {
     }
 }
 
+
+void MelFilterBank::deleteStatic() {
+    delete[] melFBin;
+    delete[] melCBin;
+    delete[] melCinD;
+}
+
 float* MelFilterBank::initLinSpace(float min, float max, int n) {
     float* space = new float[n];
     for(int i = 0; i < n - 1; ++i){
@@ -65,7 +72,7 @@ MelFilterBank::MelFilterBank(){
 }
 
 void MelFilterBank::calculateMelBanks(int frameCount, kiss_fft_cpx** fftFrames) {
-    FeaturesMatrixFloat* melBankFrames = new FeaturesMatrixFloat();
+    melBankFrames = new FeaturesMatrixFloat();
 
     melBankFrames->init(frameCount, MEL_BANK_FRAME_LENGTH);
 
@@ -100,6 +107,10 @@ void MelFilterBank::calculateMelBanks(int frameCount, kiss_fft_cpx** fftFrames) 
             melBankFrames->getFeaturesMatrix()[frameNum][i] -= melBankFramesSum[i];
         }
     }
+}
+
+MelFilterBank::~MelFilterBank() {
+    delete melBankFrames;
 }
 
 
