@@ -11,10 +11,13 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include "constants.h"
 #include "MelFilterBank.h"
 
 RawAudioRecorder* recorder;
+
+short* readAudioFromFile(std::string filepath, int* recordingSize);
 
 // create the engine and output mix objects
 void createEngine()
@@ -43,7 +46,17 @@ void createFrames(){
     const int FRAME_SIZE = (const int) (8000 * 0.025);
     const int FRAME_OVERLAP = FRAME_SIZE/25*15;
     int recordingSize = 0;
-    short* data = recorder->getRecording(&recordingSize);
+    //short* data = recorder->getRecording(&recordingSize);
+    short* data = readAudioFromFile("/sdcard/AAAaudiofile.pcm", &recordingSize);
+
+    std::ofstream out;
+    out.open("/sdcard/AAAaudiofile.txt");
+    for(int i = 0; i < recordingSize; ++i){
+        std::stringstream ss;
+        ss << (data[i]/SHORT_MAX_FLOAT);
+        out.write((ss.str() + ",").c_str(), ss.str().size()+1);
+    }
+    out.close();
 
     int frameCount = recordingSize/FRAME_OVERLAP;
 
@@ -53,32 +66,58 @@ void createFrames(){
 
     AudioFrame* frames = new AudioFrame[frameCount];
 
+    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "hamming window start");
     for(unsigned int i = 0; i < frameCount; ++i){
         frames[i].applyHammingWindow(data + offset);
         offset += FRAME_OVERLAP;
     }
     free(data);
+    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "hamming window end");
 
+    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "fft start");
     kiss_fftr_cfg cfg = kiss_fftr_alloc(FFT_FRAME_LENGTH, 0, NULL, NULL);
 
-    kiss_fft_cpx** fftFrames = new kiss_fft_cpx*[];
+    kiss_fft_cpx** fftFrames = new kiss_fft_cpx*[frameCount];
 
     for(unsigned int i = 0; i < frameCount; ++i){
         frames[i].applyFFT(&cfg);
         fftFrames[i] = frames[i].getFftData();
     }
     free(cfg);
-
+    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "fft end");
+    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "mel bank start");
     MelFilterBank::initStatic();
 
     MelFilterBank* melBank = new MelFilterBank();
 
     melBank->calculateMelBanks(frameCount, fftFrames);
+    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "mel bank end");
+
+    melBank->dumpResultToFile("/sdcard/AAAmelbank.txt");
 
     delete[] fftFrames;
     delete[] frames;
     delete melBank;
     MelFilterBank::deleteStatic();
+}
+
+/**
+ * Reads raw audio file from storage. Expects little endian 16 bit signed audio
+ * @param filepath
+ * @param recordingSize
+ * @return
+ */
+short* readAudioFromFile(std::string filepath, int* recordingSize){
+    std::ifstream in(filepath.c_str(), std::ifstream::binary);
+
+    in.seekg(0, std::ios::end);
+    long fileSize = in.tellg();
+    in.seekg(0, std::ios::beg);
+
+    short* data = new short[fileSize];
+    in.read((char*) data, fileSize);
+    *recordingSize = (int) (fileSize / 2);
+    return data;
 }
 
 

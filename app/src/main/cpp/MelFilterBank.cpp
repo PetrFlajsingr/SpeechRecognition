@@ -4,19 +4,59 @@
 
 #include "MelFilterBank.h"
 #include <cmath>
+#include <fstream>
+#include <sstream>
 
 //STATIC
+float* MelFilterBank::melFBin = NULL;
+
+float* MelFilterBank::melCBin = NULL;
+
+int* MelFilterBank::melCinD = NULL;
+
+FeaturesMatrixFloat MelFilterBank::mfb;
+
+void dumpFloatArray(float* array, std::string path, int length){
+    std::ofstream out;
+    out.open(path.c_str());
+
+    for(int i = 0; i < length; ++i){
+        std::stringstream ss;
+        ss << array[i];
+        out.write((ss.str() + ",").c_str(), ss.str().size()+1);
+        out.write("\n", 1);
+    }
+    out.close();
+}
+
+void dumpIntArray(int* array, std::string path, int length){
+    std::ofstream out;
+    out.open(path.c_str());
+
+    for(int i = 0; i < length; ++i){
+        std::stringstream ss;
+        ss << array[i];
+        out.write((ss.str() + ",").c_str(), ss.str().size()+1);
+        out.write("\n", 1);
+    }
+    out.close();
+}
+
 void MelFilterBank::initStatic() {
     melFBin = initLinSpace(0, TARGET_SAMPLING_RATE / 2, FFT_FRAME_LENGTH / 2 + 1);
+    dumpFloatArray(melFBin, "/sdcard/pokus/melfbin.txt", FFT_FRAME_LENGTH / 2 + 1);
     melVect(melFBin, FFT_FRAME_LENGTH / 2 + 1);
+    dumpFloatArray(melFBin, "/sdcard/pokus/melfbin1.txt", FFT_FRAME_LENGTH / 2 + 1);
 
     melCBin = initLinSpace(melPoint(LOW_FREQ), melPoint(HIGH_FREQ), MEL_BANK_FRAME_LENGTH + 2);
+    dumpFloatArray(melCBin, "/sdcard/pokus/melcbin.txt", MEL_BANK_FRAME_LENGTH + 2);
 
     melCinD = new int[MEL_BANK_FRAME_LENGTH + 2];
 
     for(int i = 0; i < MEL_BANK_FRAME_LENGTH + 2; ++i){
         melCinD[i] = (int)floor(melInvPoint(melCBin[i]) / TARGET_SAMPLING_RATE * FFT_FRAME_LENGTH) + 1;
     }
+    dumpIntArray(melCinD, "/sdcard/pokus/melcind.txt", MEL_BANK_FRAME_LENGTH + 2);
 
     mfb.init(FFT_FRAME_LENGTH / 2 + 1, MEL_BANK_FRAME_LENGTH);
 
@@ -34,6 +74,8 @@ void MelFilterBank::initStatic() {
             mfb.getFeaturesMatrix()[melCinD[0]][i] = 0.0f;
         }
     }
+
+    mfb.dumpResultToFile("/sdcard/pokus/melmfb.txt");
 }
 
 
@@ -82,7 +124,7 @@ void MelFilterBank::calculateMelBanks(int frameCount, kiss_fft_cpx** fftFrames) 
 
     for(int frameNum = 0; frameNum < frameCount; ++frameNum){
         for(int i = 0; i < MEL_BANK_FRAME_LENGTH; ++i){
-            for(int j = 0; j < FFT_FRAME_LENGTH / 2 + 1; ++j){
+            for(int j = 0; j < FFT_FRAME_LENGTH / 2; ++j){
                 melBankFrame[i] +=
                         mfb.getFeaturesMatrix()[j][i] * (float)((pow(fftFrames[frameNum][j].r, 2))
                         + (pow(fftFrames[frameNum][j].i, 2)));
@@ -111,6 +153,10 @@ void MelFilterBank::calculateMelBanks(int frameCount, kiss_fft_cpx** fftFrames) 
 
 MelFilterBank::~MelFilterBank() {
     delete melBankFrames;
+}
+
+void MelFilterBank::dumpResultToFile(std::string path) {
+    melBankFrames->dumpResultToFile(path);
 }
 
 

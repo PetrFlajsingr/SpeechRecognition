@@ -5,17 +5,18 @@
 #ifndef VOICERECOGNITION_MELFILTERBANK_H
 #define VOICERECOGNITION_MELFILTERBANK_H
 
+#include <string>
 #include "constants.h"
 #include "FeaturesMatrixFloat.h"
 #include "kissfft/kiss_fft.h"
 
 class MelFilterBank {
 private:
-    static float* melFBin = nullptr;
+    static float* melFBin;
 
-    static float* melCBin = nullptr;
+    static float* melCBin;
 
-    static int* melCinD = nullptr;
+    static int* melCinD;
 
     static float* initLinSpace(float min, float max, int n);
 
@@ -39,6 +40,8 @@ public:
     static void deleteStatic();
 
     void calculateMelBanks(int frameCount, kiss_fft_cpx** fftFrames);
+
+    void dumpResultToFile(std::string path);
 };
 
 

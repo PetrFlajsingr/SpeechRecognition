@@ -2,6 +2,8 @@
 // Created by Petr Flajsingr on 30/11/2017.
 //
 
+#include <fstream>
+#include <sstream>
 #include "FeaturesMatrixFloat.h"
 #include "constants.h"
 
@@ -15,8 +17,8 @@ float **FeaturesMatrixFloat::getFeaturesMatrix() {
  * @param frameSize Size of each frame
  */
 void FeaturesMatrixFloat::init(int framesNum, int frameSize) {
-    if(featuresMatrix == nullptr || this->framesNum < framesNum || this->frameSize < frameSize){
-        if(featuresMatrix != nullptr){
+    if(featuresMatrix == NULL || this->framesNum < framesNum || this->frameSize < frameSize){
+        if(featuresMatrix != NULL){
             for(int i = 0; i < framesNum; ++i){
                 delete[] featuresMatrix[i];
             }
@@ -28,11 +30,13 @@ void FeaturesMatrixFloat::init(int framesNum, int frameSize) {
             featuresMatrix[i] = new float[frameSize];
         }
     }
+    this->framesNum = framesNum;
+    this->frameSize = frameSize;
 }
 
 void FeaturesMatrixFloat::setFeatureMatrix(float **featureMatrix) {
     this->featuresMatrix = featureMatrix;
-    if(this->featuresMatrix == nullptr){
+    if(this->featuresMatrix == NULL){
         this->frameSize = 0;
         this->framesNum = 0;
     }
@@ -48,4 +52,27 @@ FeaturesMatrixFloat::~FeaturesMatrixFloat() {
     for(int i = 0; i < framesNum; ++i){
         delete[] featuresMatrix[i];
     }
+}
+
+int FeaturesMatrixFloat::getFramesNum() const {
+    return framesNum;
+}
+
+int FeaturesMatrixFloat::getFrameSize() const {
+    return frameSize;
+}
+
+void FeaturesMatrixFloat::dumpResultToFile(std::string path) {
+    std::ofstream out;
+    out.open(path.c_str());
+
+    for(int i = 0; i < this->getFramesNum(); ++i){
+        for(int j = 0; j < this->getFrameSize(); ++j){
+            std::stringstream ss;
+            ss << this->getFeaturesMatrix()[i][j];
+            out.write((ss.str() + ",").c_str(), ss.str().size()+1);
+        }
+        out.write("\n", 1);
+    }
+    out.close();
 }

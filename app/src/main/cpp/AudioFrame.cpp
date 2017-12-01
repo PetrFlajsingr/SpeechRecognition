@@ -8,6 +8,8 @@
 #include <string.h>
 #include <android/log.h>
 
+float AudioFrame::hammingCoef[AUDIO_FRAME_LENGTH];
+
 /**
  * Applies hamming window to the given data. Length of data is defined by DATA_LENGTH.
  * Saves the data in hammingData array.
@@ -24,7 +26,7 @@ void AudioFrame::applyHammingWindow(short* data) {
  */
 AudioFrame::AudioFrame() {
     hammingData = new float[AUDIO_FRAME_LENGTH];
-    fftData = nullptr;
+    fftData = NULL;
 }
 
 /**
