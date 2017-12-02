@@ -5,7 +5,9 @@
 #include <stdio.h>
 #include <cmath>
 #include <android/log.h>
+#include <fstream>
 #include "AudioSubsampler.h"
+#include "firfilter/filt.h"
 
 #define APPNAME "cz.vutbr.fit.xflajs00.voicerecognition"
 
@@ -17,11 +19,25 @@
  * @return data in 8 kHz sample rate
  */
 short *AudioSubsampler::subsample48kHzto8kHz(short *data, int dataLength) {
+    std::ofstream out;
+    out.open("/sdcard/AAA/AAAAorigaudio.pcm");
+    out.write((char*)data, dataLength* sizeof(short));
+    out.close();
     // apply low pass filter to minimize aliasing
-    lowPassFilter(data, dataLength, 48000);
+    //lowPassFilter(data, dataLength, 48000);
+
+    Filter* lpFIRFiler = new Filter(LPF, 128, 48.0, 4.0);
+    for(int i = 0; i < dataLength; ++i){
+        data[i] = (short)lpFIRFiler->do_sample((double) data[i]);
+    }
+    delete lpFIRFiler;
+
+    out.open("/sdcard/AAA/AAAAorigaudioLP.pcm");
+    out.write((char*)data, dataLength* sizeof(short));
+    out.close();
 
     const size_t RATIO = 6; // ratio for size difference
-    size_t newDataLength = dataLength/RATIO + 1; //length of new array, +1 because of integer division
+    int newDataLength = dataLength/RATIO + 1; //length of new array, +1 because of integer division
 
     short* resultArray = new short[newDataLength];
 
@@ -31,6 +47,9 @@ short *AudioSubsampler::subsample48kHzto8kHz(short *data, int dataLength) {
         resultArray[arrayIterator] = data[i];
         arrayIterator++;
     }
+    out.open("/sdcard/AAA/AAAA8khzLP.pcm");
+    out.write((char*)resultArray, newDataLength* sizeof(short));
+    out.close();
 
     return resultArray;
 }
@@ -39,7 +58,6 @@ short *AudioSubsampler::subsample48kHzto8kHz(short *data, int dataLength) {
  * Applies low pass filter to avoid aliasing while downsampling.
  * @param data data in any sample rate
  * @param dataLength length of data in an array
- * y[i] := ß * x[i] + (1-ß) * y[i-1]
  */
 void AudioSubsampler::lowPassFilter(short *data, int dataLength, int sampleRate) {
     const int CUTOFF = 4000;

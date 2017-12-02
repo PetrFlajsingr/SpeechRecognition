@@ -4,6 +4,8 @@
 
 #include <fstream>
 #include <sstream>
+#include <cmath>
+#include <android/log.h>
 #include "FeaturesMatrixFloat.h"
 #include "constants.h"
 
@@ -27,7 +29,7 @@ void FeaturesMatrixFloat::init(int framesNum, int frameSize) {
 
         featuresMatrix = new float*[framesNum];
         for(int i = 0; i < framesNum; ++i){
-            featuresMatrix[i] = new float[frameSize];
+            featuresMatrix[i] = new float[frameSize]();
         }
     }
     this->framesNum = framesNum;

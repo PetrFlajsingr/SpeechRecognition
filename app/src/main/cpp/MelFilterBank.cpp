@@ -6,6 +6,7 @@
 #include <cmath>
 #include <fstream>
 #include <sstream>
+#include <android/log.h>
 
 //STATIC
 float* MelFilterBank::melFBin = NULL;
@@ -120,7 +121,7 @@ void MelFilterBank::calculateMelBanks(int frameCount, kiss_fft_cpx** fftFrames) 
 
     float melBankFramesSum[MEL_BANK_FRAME_LENGTH] = {0.0};
 
-    float melBankFrame[MEL_BANK_FRAME_LENGTH];
+    float melBankFrame[MEL_BANK_FRAME_LENGTH] = {0.0};
 
     for(int frameNum = 0; frameNum < frameCount; ++frameNum){
         for(int i = 0; i < MEL_BANK_FRAME_LENGTH; ++i){
@@ -137,6 +138,7 @@ void MelFilterBank::calculateMelBanks(int frameCount, kiss_fft_cpx** fftFrames) 
             }
             melBankFramesSum[i] += melBankFrame[i];
         }
+
         melBankFrames->setFeatureMatrixFrame(frameNum, melBankFrame);
     }
 

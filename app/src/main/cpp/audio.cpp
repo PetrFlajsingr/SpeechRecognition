@@ -43,8 +43,10 @@ void startRecording(jint max_length_sec)
 }
 
 void createFrames(){
+   // int a;
+    //recorder->getRecording(&a);
     const int FRAME_SIZE = (const int) (8000 * 0.025);
-    const int FRAME_OVERLAP = FRAME_SIZE/25*15;
+    const int FRAME_OVERLEAP = (const int) (8000 * 0.010);
     int recordingSize = 0;
     //short* data = recorder->getRecording(&recordingSize);
     short* data = readAudioFromFile("/sdcard/AAAaudiofile.pcm", &recordingSize);
@@ -58,18 +60,15 @@ void createFrames(){
     }
     out.close();
 
-    int frameCount = recordingSize/FRAME_OVERLAP;
-
-    unsigned int offset = 0;
+    int frameCount = (recordingSize - FRAME_SIZE) / FRAME_OVERLEAP;
 
     AudioFrame::calcHammingCoef();
 
     AudioFrame* frames = new AudioFrame[frameCount];
 
     __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "hamming window start");
-    for(unsigned int i = 0; i < frameCount; ++i){
-        frames[i].applyHammingWindow(data + offset);
-        offset += FRAME_OVERLAP;
+    for(unsigned int frame = 0; frame < frameCount; ++frame){
+        frames[frame].applyHammingWindow(data + frame*FRAME_OVERLEAP);
     }
     free(data);
     __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "hamming window end");
@@ -81,10 +80,27 @@ void createFrames(){
 
     for(unsigned int i = 0; i < frameCount; ++i){
         frames[i].applyFFT(&cfg);
+        if(i == 0){
+            std::ofstream out;
+            out.open("/sdcard/AAAfft.txt");
+            for(int j = 0; j < FFT_FRAME_LENGTH / 2 + 1; ++j){
+                std::stringstream ss;
+                ss << frames[i].getFftData()[j].r;
+                out.write((ss.str() + ",").c_str(), ss.str().size()+1);
+            }
+            out.write("\n", 1);
+            for(int j = 0; j < FFT_FRAME_LENGTH / 2 + 1; ++j){
+                std::stringstream ss;
+                ss << frames[i].getFftData()[j].i;
+                out.write((ss.str() + ",").c_str(), ss.str().size()+1);
+            }
+            out.close();
+        }
         fftFrames[i] = frames[i].getFftData();
     }
     free(cfg);
     __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "fft end");
+
     __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "mel bank start");
     MelFilterBank::initStatic();
 

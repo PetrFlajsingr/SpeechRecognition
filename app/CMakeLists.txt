@@ -33,7 +33,8 @@ add_library( # Sets the name of the library.
               src/main/cpp/MelFilterBank.h
               src/main/cpp/FeaturesMatrixFloat.cpp
               src/main/cpp/FeaturesMatrixFloat.h
-
+              src/main/cpp/firfilter/filt.h
+              src/main/cpp/firfilter/filt.cpp
               src/main/cpp/audio.cpp
 )
 
