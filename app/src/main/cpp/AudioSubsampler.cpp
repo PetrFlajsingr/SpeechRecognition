@@ -20,23 +20,16 @@
  */
 short *AudioSubsampler::subsample48kHzto8kHz(short *data, int dataLength) {
     std::ofstream out;
-    out.open("/sdcard/AAA/AAAAorigaudio.pcm");
-    out.write((char*)data, dataLength* sizeof(short));
-    out.close();
-    // apply low pass filter to minimize aliasing
-    //lowPassFilter(data, dataLength, 48000);
 
-    Filter* lpFIRFiler = new Filter(LPF, 128, 48.0, 4.0);
+    // apply low pass filter to minimize aliasing
+
+    Filter* lpFIRFiler = new Filter(LPF, 32, 48.0, 4.0);
     for(int i = 0; i < dataLength; ++i){
         data[i] = (short)lpFIRFiler->do_sample((double) data[i]);
     }
     delete lpFIRFiler;
 
-    out.open("/sdcard/AAA/AAAAorigaudioLP.pcm");
-    out.write((char*)data, dataLength* sizeof(short));
-    out.close();
-
-    const size_t RATIO = 6; // ratio for size difference
+    const int RATIO = 6; // ratio for size difference
     int newDataLength = dataLength/RATIO + 1; //length of new array, +1 because of integer division
 
     short* resultArray = new short[newDataLength];
@@ -47,9 +40,6 @@ short *AudioSubsampler::subsample48kHzto8kHz(short *data, int dataLength) {
         resultArray[arrayIterator] = data[i];
         arrayIterator++;
     }
-    out.open("/sdcard/AAA/AAAA8khzLP.pcm");
-    out.write((char*)resultArray, newDataLength* sizeof(short));
-    out.close();
 
     return resultArray;
 }

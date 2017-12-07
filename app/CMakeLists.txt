@@ -35,6 +35,8 @@ add_library( # Sets the name of the library.
               src/main/cpp/FeaturesMatrixFloat.h
               src/main/cpp/firfilter/filt.h
               src/main/cpp/firfilter/filt.cpp
+              src/main/cpp/NeuralNetwork.h
+              src/main/cpp/NeuralNetwork.cpp
               src/main/cpp/audio.cpp
 )
 
