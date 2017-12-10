@@ -161,6 +161,10 @@ void MelFilterBank::dumpResultToFile(std::string path) {
     melBankFrames->dumpResultToFile(path);
 }
 
+FeaturesMatrixFloat *MelFilterBank::getMelBankFrames() const {
+    return melBankFrames;
+}
+
 
 
 

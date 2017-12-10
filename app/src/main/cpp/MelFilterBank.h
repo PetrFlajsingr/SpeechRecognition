@@ -29,6 +29,8 @@ private:
     static FeaturesMatrixFloat mfb;
 
     FeaturesMatrixFloat* melBankFrames;
+public:
+    FeaturesMatrixFloat *getMelBankFrames() const;
 
 public:
     MelFilterBank();

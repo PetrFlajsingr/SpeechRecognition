@@ -10,7 +10,7 @@
 
 struct NNInitInfo{
     unsigned int layerCount;
-    unsigned int neuronCounts[];
+    unsigned int* neuronCounts;
 };
 
 class NeuralNetwork {
@@ -47,9 +47,9 @@ private:
     unsigned int layerCount;
 
     float** layerData;
-public:
-    NeuralNetwork(NNInitInfo initInfo);
 
+    void allocateMemory(NNInitInfo initInfo);
+public:
     NeuralNetwork(std::string filepath);
 
     void forward();

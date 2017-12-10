@@ -84,6 +84,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void createFrames(View view){
-        createFrames();
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                createFrames();
+            }
+        };
+        thread.start();
+
     }
 }

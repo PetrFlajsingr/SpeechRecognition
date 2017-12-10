@@ -14,6 +14,7 @@
 #include <sstream>
 #include "constants.h"
 #include "MelFilterBank.h"
+#include "NeuralNetwork.h"
 
 RawAudioRecorder* recorder;
 
@@ -111,6 +112,16 @@ void createFrames(){
 
     melBank->dumpResultToFile("/sdcard/AAAmelbank.txt");
 
+    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "NN load");
+    NeuralNetwork* nn = new NeuralNetwork("/sdcard/voicerecognition/nn.bin");
+    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "NN load done");
+
+    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "NN forward");
+    nn->setFeatureMatrix(melBank->getMelBankFrames());
+    nn->forward();
+    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "NN forward done");
+
+    delete nn;
     delete[] fftFrames;
     delete[] frames;
     delete melBank;
