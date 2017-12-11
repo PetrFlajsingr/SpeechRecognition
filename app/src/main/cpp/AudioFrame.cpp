@@ -9,6 +9,8 @@
 #include <android/log.h>
 
 float AudioFrame::hammingCoef[AUDIO_FRAME_LENGTH];
+const double AudioFrame::ALPHA = 0.54;
+const double AudioFrame::BETA = (1 - ALPHA);
 
 /**
  * Applies hamming window to the given data. Length of data is defined by DATA_LENGTH.

@@ -15,8 +15,8 @@
 class AudioFrame {
 private:
     // hamming window coeficients
-    static const double ALPHA = 0.54;
-    static const double BETA = (1 - ALPHA);
+    static const double ALPHA;
+    static const double BETA;
     static float hammingCoef[AUDIO_FRAME_LENGTH];
 
     float* hammingData; //< data after using hamming window

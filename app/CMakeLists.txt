@@ -5,11 +5,27 @@
 
 cmake_minimum_required(VERSION 3.4.1)
 
+
+
 # Creates and names a library, sets it as either STATIC
 # or SHARED, and provides the relative paths to its source code.
 # You can define multiple libraries, and CMake builds them for you.
 # Gradle automatically packages shared libraries with your APK.
 
+SET(RENDER_SCRIPT_HEADERS_PATH
+ ${ANDROID_NDK}/toolchains/renderscript/prebuilt/${ANDROID_HOST_TAG}/platform/rs
+)
+SET(ANDROID_TOOLCHAIN gcc)
+INCLUDE_DIRECTORIES(
+    ${RENDER_SCRIPT_HEADERS_PATH}/cpp
+    ${RENDER_SCRIPT_HEADERS_PATH}/scriptc
+    ${RENDER_SCRIPT_HEADERS_PATH}
+    src/main/cpp/audio.cpp
+    src/main/cpp
+     ${ANDROID_NDK}/sources/android/cpufeatures
+    )
+
+    link_directories( ${ANDROID_NDK}/toolchains/renderscript/prebuilt/${ANDROID_HOST_TAG}/platform/${ANDROID_SYSROOT_ABI})
 
 
 add_library( # Sets the name of the library.
@@ -62,6 +78,7 @@ find_library( # Sets the name of the path variable.
 target_link_libraries( # Specifies the target library.
                        raw_audio_recorder
                        OpenSLES
+                       RScpp_static
 
                        # Links the target library to the log library
                        # included in the NDK.

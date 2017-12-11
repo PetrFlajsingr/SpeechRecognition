@@ -15,6 +15,7 @@
 #include "constants.h"
 #include "MelFilterBank.h"
 #include "NeuralNetwork.h"
+#include "RenderScript.h"
 
 RawAudioRecorder* recorder;
 
@@ -44,6 +45,8 @@ void startRecording(jint max_length_sec)
 }
 
 void createFrames(){
+
+    return;
    // int a;
     //recorder->getRecording(&a);
     const int FRAME_SIZE = (const int) (8000 * 0.025);
