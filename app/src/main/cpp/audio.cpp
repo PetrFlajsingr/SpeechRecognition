@@ -15,11 +15,18 @@
 #include "constants.h"
 #include "MelFilterBank.h"
 #include "NeuralNetwork.h"
-#include "RenderScript.h"
+#include <RenderScript.h>
+
+//#include "ScriptC_test.h"
+#include "../../../build/generated/source/rs/debug/ScriptC_test.h"
+
+using namespace android::RSC;
 
 RawAudioRecorder* recorder;
 
 short* readAudioFromFile(std::string filepath, int* recordingSize);
+
+const char* cacheDir;
 
 // create the engine and output mix objects
 void createEngine()
@@ -45,7 +52,31 @@ void startRecording(jint max_length_sec)
 }
 
 void createFrames(){
+    sp<RS> rs = new RS();
+    rs->init(cacheDir);
 
+    uint32_t arr1[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    uint32_t arr2[10];
+
+    sp<const Element> e = Element::U32(rs);
+    sp<const Type> t = Type::create(rs, e, 10, 0, 0);
+
+    sp<Allocation> inputAlloc = Allocation::createTyped(
+            rs, t);
+    sp<Allocation> outputAlloc = Allocation::createTyped(
+            rs, t);
+
+    inputAlloc->copy1DFrom(arr1);
+
+    ScriptC_test* sc = new ScriptC_test(rs);
+
+    sc->forEach_root(inputAlloc, outputAlloc);
+
+    outputAlloc->copy1DTo(arr2);
+
+    for(int i = 0; i < 10; ++i){
+        __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "I: %d", arr2[i]);
+    }
     return;
    // int a;
     //recorder->getRecording(&a);
@@ -157,7 +188,15 @@ void shutdown()
     delete recorder;
 }
 
+void setCacheDir(const char* cDir){
+    cacheDir = cDir;
+}
+
 extern "C"{
+    JNIEXPORT void JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_MainActivity_setCacheDir(JNIEnv* env, jclass clazz, jstring pathObj){
+        setCacheDir(env->GetStringUTFChars(pathObj, NULL));
+    }
+
     JNIEXPORT void JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_MainActivity_createEngine(JNIEnv* env, jclass clazz){
         createEngine();
     }

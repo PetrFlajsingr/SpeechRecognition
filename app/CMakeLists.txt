@@ -6,27 +6,49 @@
 cmake_minimum_required(VERSION 3.4.1)
 
 
+# set some var
+set(DEBUG_MODEL 1)
+set(CPP_SOURCE_FILES "")
+set(CPP_HEADER_FILES "")
+set(RS_FILES "")
+set(RS_OBJ_FILES "")
+set(RENDER_SCRIPT_HEADERS_PATH ${ANDROID_NDK}/toolchains/renderscript/prebuilt/${ANDROID_HOST_TAG}/platform/rs)
+
+# create the jniLibs
+execute_process(COMMAND mkdir -p "${PROJECT_SOURCE_DIR}/src/main/jniLibs/${ANDROID_ABI}")
+
+include_directories(src/main/cpp/include)
+include_directories(${RENDER_SCRIPT_HEADERS_PATH}/cpp
+                    ${RENDER_SCRIPT_HEADERS_PATH}/scriptc
+                    ${RENDER_SCRIPT_HEADERS_PATH})
+link_directories(${ANDROID_NDK}/toolchains/renderscript/prebuilt/${ANDROID_HOST_TAG}/platform/${ANDROID_SYSROOT_ABI})
+
+file(GLOB_RECURSE CPP_SOURCE_FILES src/main/cpp/src/*)
+file(GLOB_RECURSE KISS_FFT_FILES src/main/cpp/src/kissfft/*)
+file(GLOB_RECURSE FIR_FILTER_FILES src/main/cpp/src/firfilter/*)
+file(GLOB_RECURSE CPP_HEADER_FILES src/main/cpp/include/*)
+file(GLOB_RECURSE RS_FILES src/main/rs/*)
+
+if(DEBUG_MODEL)
+    include_directories(app/build/generated/source/rs/debug)
+    file(GLOB_RECURSE RS_CPP_FILES build/generated/source/rs/debug/*)
+else()
+    include_directories(build/generated/source/rs/release)
+    file(GLOB_RECURSE RS_CPP_FILES build/generated/source/rs/release/*)
+endif()
+
+foreach(rs_file ${RS_FILES})
+    get_filename_component(name ${rs_file} NAME_WE)
+    list(APPEND RS_OBJ_FILES ${PROJECT_SOURCE_DIR}/src/main/obj/local/${ANDROID_ABI}/objs/voicerecognition/${name}.o)
+    configure_file(${PROJECT_SOURCE_DIR}/src/main/obj/local/${ANDROID_ABI}/librs.${name}.so ${PROJECT_SOURCE_DIR}/src/main/jniLibs/${ANDROID_ABI} COPYONLY)
+endforeach()
 
 # Creates and names a library, sets it as either STATIC
 # or SHARED, and provides the relative paths to its source code.
 # You can define multiple libraries, and CMake builds them for you.
 # Gradle automatically packages shared libraries with your APK.
 
-SET(RENDER_SCRIPT_HEADERS_PATH
- ${ANDROID_NDK}/toolchains/renderscript/prebuilt/${ANDROID_HOST_TAG}/platform/rs
-)
-SET(ANDROID_TOOLCHAIN gcc)
-INCLUDE_DIRECTORIES(
-    ${RENDER_SCRIPT_HEADERS_PATH}/cpp
-    ${RENDER_SCRIPT_HEADERS_PATH}/scriptc
-    ${RENDER_SCRIPT_HEADERS_PATH}
-    src/main/cpp/audio.cpp
-    src/main/cpp
-     ${ANDROID_NDK}/sources/android/cpufeatures
-    )
-
-    link_directories( ${ANDROID_NDK}/toolchains/renderscript/prebuilt/${ANDROID_HOST_TAG}/platform/${ANDROID_SYSROOT_ABI})
-
+MESSAGE(STATUS " kurva do pice ${RS_CPP_FILES} ")
 
 add_library( # Sets the name of the library.
               raw_audio_recorder
@@ -35,25 +57,30 @@ add_library( # Sets the name of the library.
               SHARED
 
               # Provides a relative path to your source file(s).
+              #${RS_CPP_FILES}
+
               src/main/cpp/RawAudioRecorder.cpp
-              src/main/cpp/RawAudioRecorder.h
+              src/main/cpp/include/RawAudioRecorder.h
               src/main/cpp/AudioSubsampler.cpp
-              src/main/cpp/AudioSubsampler.h
+              src/main/cpp/include/AudioSubsampler.h
               src/main/cpp/AudioFrame.cpp
-              src/main/cpp/AudioFrame.h
+              src/main/cpp/include/AudioFrame.h
               src/main/cpp/kissfft/kiss_fft.h
               src/main/cpp/kissfft/kiss_fft.c
               src/main/cpp/kissfft/kiss_fftr.h
               src/main/cpp/kissfft/kiss_fftr.c
               src/main/cpp/MelFilterBank.cpp
-              src/main/cpp/MelFilterBank.h
+              src/main/cpp/include/MelFilterBank.h
               src/main/cpp/FeaturesMatrixFloat.cpp
-              src/main/cpp/FeaturesMatrixFloat.h
+              src/main/cpp/include/FeaturesMatrixFloat.h
               src/main/cpp/firfilter/filt.h
               src/main/cpp/firfilter/filt.cpp
-              src/main/cpp/NeuralNetwork.h
+              src/main/cpp/include/NeuralNetwork.h
               src/main/cpp/NeuralNetwork.cpp
               src/main/cpp/audio.cpp
+
+              ${RS_OBJ_FILES}
+              ${RS_FILES}
 )
 
 

@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.MODIFY_AUDIO_SETTINGS}, 1);
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
 
+        setCacheDir(this.getCacheDir().toString());
         createEngine();
     }
 
@@ -41,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
     private Thread threadAudioRecorder;
 
     /** Native methods, implemented in jni folder */
+    public static native void setCacheDir(String cacheDir);
     public static native void createEngine();
     public static native boolean createAudioRecorder();
     public static native void startRecording(int max_length_sec);
