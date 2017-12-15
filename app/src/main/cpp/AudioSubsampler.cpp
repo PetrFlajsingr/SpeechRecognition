@@ -23,38 +23,24 @@ short *AudioSubsampler::subsample48kHzto8kHz(short *data, int dataLength) {
 
     // apply low pass filter to minimize aliasing
 
-    Filter* lpFIRFiler = new Filter(LPF, 32, 48.0, 4.0);
-    for(int i = 0; i < dataLength; ++i){
-        data[i] = (short)lpFIRFiler->do_sample((double) data[i]);
+    Filter *lpFIRFiler = new Filter(LPF, 32, 48.0, 4.0);
+    for(int i = 0; i < dataLength; ++i) {
+        data[i] = (short) lpFIRFiler->do_sample((double) data[i]);
     }
     delete lpFIRFiler;
 
     const int RATIO = 6; // ratio for size difference
-    int newDataLength = dataLength/RATIO + 1; //length of new array, +1 because of integer division
+    int newDataLength =
+            dataLength / RATIO + 1; //length of new array, +1 because of integer division
 
-    short* resultArray = new short[newDataLength];
+    short *resultArray = new short[newDataLength];
 
     int arrayIterator = 0;
     // copying every important data(short), given by RATIO
-    for(int i = 0; i < dataLength; i += RATIO){
+    for(int i = 0; i < dataLength; i += RATIO) {
         resultArray[arrayIterator] = data[i];
         arrayIterator++;
     }
 
     return resultArray;
-}
-
-/**
- * Applies low pass filter to avoid aliasing while downsampling.
- * @param data data in any sample rate
- * @param dataLength length of data in an array
- */
-void AudioSubsampler::lowPassFilter(short *data, int dataLength, int sampleRate) {
-    const int CUTOFF = 4000;
-    float RC = 1.0/(CUTOFF * 2 * M_PI);
-    float dt = 1.0/sampleRate;
-    float alpha = dt/(RC + dt);
-    for(size_t i = 1; i < dataLength; ++i) {
-        data[i] = (short) (data[i - 1] + (alpha * (data[i] - data[i - 1])));
-    }
 }

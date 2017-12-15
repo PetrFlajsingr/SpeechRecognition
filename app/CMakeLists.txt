@@ -30,7 +30,7 @@ file(GLOB_RECURSE CPP_HEADER_FILES src/main/cpp/include/*)
 file(GLOB_RECURSE RS_FILES src/main/rs/*)
 
 if(DEBUG_MODEL)
-    include_directories(app/build/generated/source/rs/debug)
+    include_directories(build/generated/source/rs/debug)
     file(GLOB_RECURSE RS_CPP_FILES build/generated/source/rs/debug/*)
 else()
     include_directories(build/generated/source/rs/release)
@@ -43,12 +43,12 @@ foreach(rs_file ${RS_FILES})
     configure_file(${PROJECT_SOURCE_DIR}/src/main/obj/local/${ANDROID_ABI}/librs.${name}.so ${PROJECT_SOURCE_DIR}/src/main/jniLibs/${ANDROID_ABI} COPYONLY)
 endforeach()
 
+MESSAGE(STATUS "-------------------------------${RS_FILES}")
+
 # Creates and names a library, sets it as either STATIC
 # or SHARED, and provides the relative paths to its source code.
 # You can define multiple libraries, and CMake builds them for you.
 # Gradle automatically packages shared libraries with your APK.
-
-MESSAGE(STATUS " kurva do pice ${RS_CPP_FILES} ")
 
 add_library( # Sets the name of the library.
               raw_audio_recorder
@@ -60,27 +60,20 @@ add_library( # Sets the name of the library.
               #${RS_CPP_FILES}
 
               src/main/cpp/RawAudioRecorder.cpp
-              src/main/cpp/include/RawAudioRecorder.h
               src/main/cpp/AudioSubsampler.cpp
-              src/main/cpp/include/AudioSubsampler.h
               src/main/cpp/AudioFrame.cpp
-              src/main/cpp/include/AudioFrame.h
-              src/main/cpp/kissfft/kiss_fft.h
               src/main/cpp/kissfft/kiss_fft.c
-              src/main/cpp/kissfft/kiss_fftr.h
               src/main/cpp/kissfft/kiss_fftr.c
               src/main/cpp/MelFilterBank.cpp
-              src/main/cpp/include/MelFilterBank.h
               src/main/cpp/FeaturesMatrixFloat.cpp
-              src/main/cpp/include/FeaturesMatrixFloat.h
-              src/main/cpp/firfilter/filt.h
               src/main/cpp/firfilter/filt.cpp
-              src/main/cpp/include/NeuralNetwork.h
               src/main/cpp/NeuralNetwork.cpp
-              src/main/cpp/audio.cpp
-
+              src/main/cpp/RSMelFilterBank.cpp
               ${RS_OBJ_FILES}
               ${RS_FILES}
+              src/main/cpp/audio.cpp
+
+
 )
 
 

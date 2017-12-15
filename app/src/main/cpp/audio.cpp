@@ -17,8 +17,7 @@
 #include "NeuralNetwork.h"
 #include <RenderScript.h>
 
-//#include "ScriptC_test.h"
-#include "../../../build/generated/source/rs/debug/ScriptC_test.h"
+#include "RSMelFilterBank.h"
 
 using namespace android::RSC;
 
@@ -52,32 +51,25 @@ void startRecording(jint max_length_sec)
 }
 
 void createFrames(){
-    sp<RS> rs = new RS();
-    rs->init(cacheDir);
 
-    uint32_t arr1[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-    uint32_t arr2[10];
 
-    sp<const Element> e = Element::U32(rs);
-    sp<const Type> t = Type::create(rs, e, 10, 0, 0);
 
-    sp<Allocation> inputAlloc = Allocation::createTyped(
-            rs, t);
-    sp<Allocation> outputAlloc = Allocation::createTyped(
-            rs, t);
+    /*Element::Builder* elBuilderin = new Element::Builder(rs);
+    sp<const Element> floatElement = Element::F32(rs);
+    elBuilderin->add(floatElement, "inputFrame", FFT_FRAME_LENGTH/2);
+    sp<const Type> melInputType = Type::create(rs, elBuilderin->create(), frameCount, 0, 0);
+    sp<Allocation> melInputAlloc = Allocation::createTyped(rs, melInputType);
 
-    inputAlloc->copy1DFrom(arr1);
+    Element::Builder* elBuilderOut = new Element::Builder(rs);
+    elBuilderOut->add(floatElement, "outputFrame", MEL_BANK_FRAME_LENGTH);
+    elBuilderOut->add(floatElement, "")
+    sp<const Type> melOutputType = Type::create(rs, elBuilderOut->create(), frameCount, 0, 0);
 
-    ScriptC_test* sc = new ScriptC_test(rs);
+    sp<Allocation> melOutputAlloc = Allocation::createTyped(rs, melOutputType);*/
 
-    sc->forEach_root(inputAlloc, outputAlloc);
 
-    outputAlloc->copy1DTo(arr2);
+    //sc->forEach_root(melInputAlloc, melOutputAlloc);
 
-    for(int i = 0; i < 10; ++i){
-        __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "I: %d", arr2[i]);
-    }
-    return;
    // int a;
     //recorder->getRecording(&a);
     const int FRAME_SIZE = (const int) (8000 * 0.025);
@@ -111,42 +103,103 @@ void createFrames(){
     __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "fft start");
     kiss_fftr_cfg cfg = kiss_fftr_alloc(FFT_FRAME_LENGTH, 0, NULL, NULL);
 
+    /*sp<RS> rs = new RS();
+    rs->init(cacheDir);
+
+    ScriptC_RSmelfilterbank* sc = new ScriptC_RSmelfilterbank(rs);
+
+
+    Element::Builder* elBuilder = new Element::Builder(rs);
+    elBuilder->add(Element::F32(rs), "", FFT_FRAME_LENGTH);
+    sp<const Type> fftFrameType = Type::create(rs, elBuilder->create(), 1, 0, 0);
+    sp<Allocation> fftFrameAllocation = Allocation::createTyped(rs, fftFrameType);
+
+    sp<Allocation> melIterationAllocation = Allocation::createSized(rs, Element::U32(rs), MEL_BANK_FRAME_LENGTH);
+
+    uint32_t iter[MEL_BANK_FRAME_LENGTH];
+    for(uint32_t i = 0; i < MEL_BANK_FRAME_LENGTH; ++i)
+        iter[i] = i;*/
+
+    //melIterationAllocation->copy1DFrom(iter);
+
+
+    //sp<Allocation> melBankAllocation = Allocation::createSized(rs, Element::F32(rs), MEL_BANK_FRAME_LENGTH);
+
     kiss_fft_cpx** fftFrames = new kiss_fft_cpx*[frameCount];
+    /*FeaturesMatrixFloat rsMelMatrix;
+    rsMelMatrix.init(frameCount, MEL_BANK_FRAME_LENGTH);*/
 
     for(unsigned int i = 0; i < frameCount; ++i){
         frames[i].applyFFT(&cfg);
-        if(i == 0){
-            std::ofstream out;
-            out.open("/sdcard/AAAfft.txt");
-            for(int j = 0; j < FFT_FRAME_LENGTH / 2 + 1; ++j){
-                std::stringstream ss;
-                ss << frames[i].getFftData()[j].r;
-                out.write((ss.str() + ",").c_str(), ss.str().size()+1);
-            }
-            out.write("\n", 1);
-            for(int j = 0; j < FFT_FRAME_LENGTH / 2 + 1; ++j){
-                std::stringstream ss;
-                ss << frames[i].getFftData()[j].i;
-                out.write((ss.str() + ",").c_str(), ss.str().size()+1);
-            }
-            out.close();
-        }
+        //fftFrameAllocation->copy1DFrom(frames[i].getFftData());
+
+        //sc->set_fftFrame(fftFrameAllocation);
+
+        //sc->forEach_melBank(melIterationAllocation, melBankAllocation);
+
+        //rs->finish();
+
+        //melBankAllocation->copy1DTo(rsMelMatrix.getFeaturesMatrix()[i]);
         fftFrames[i] = frames[i].getFftData();
     }
     free(cfg);
+
+    /*sc->set_frameCount(frameCount);
+
+    sp<Allocation> melCalcFramesAllocation = Allocation::createSized(rs, Element::F32(rs), frameCount * MEL_BANK_FRAME_LENGTH);
+
+    for(int i = 0; i < rsMelMatrix.getFramesNum(); i++)
+        melCalcFramesAllocation->copy1DRangeFrom(i * rsMelMatrix.getFrameSize(),
+                                                 rsMelMatrix.getFrameSize(),
+                                                 rsMelMatrix.getFeaturesMatrix()[i]);
+    //melCalcFramesAllocation->copy1DFrom(rsMelMatrix.getFeaturesMatrix()[0]);
+
+    sc->set_melCalculatedFrames(melCalcFramesAllocation);
+
+    //sc->invoke_checkAllocation();
+
+    rs->finish();
+
+    sc->forEach_substractMean(melIterationAllocation);
+
+    rs->finish();
+
+    for(int i = 0; i < rsMelMatrix.getFramesNum(); i++)
+        melCalcFramesAllocation->copy1DRangeTo(i * rsMelMatrix.getFrameSize(),
+                                                 rsMelMatrix.getFrameSize(),
+                                                 rsMelMatrix.getFeaturesMatrix()[i]);
+
+    rsMelMatrix.dumpResultToFile("/sdcard/AAAAAAwat.txt");*/
+
     __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "fft end");
 
-    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "mel bank start");
-    MelFilterBank::initStatic();
+    for(int i = 0; i < 10; ++i) {
+        __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "RS mel bank start");
+        RSMelFilterBank *rsMelBank = new RSMelFilterBank(cacheDir);
+        FeaturesMatrixFloat rsMelBankResults;
+        rsMelBankResults.init(frameCount, MEL_BANK_FRAME_LENGTH);
+        for(unsigned int i = 0; i < frameCount; ++i) {
+            rsMelBankResults.getFeaturesMatrix()[i] = rsMelBank->calculateMelBank(fftFrames[i]);
+        }
+        rsMelBank->substractMean(&rsMelBankResults);
 
-    MelFilterBank* melBank = new MelFilterBank();
+        __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "RS mel bank end");
+        //rsMelBankResults.dumpResultToFile("/sdcard/AAAmelbankRS.txt");
 
-    melBank->calculateMelBanks(frameCount, fftFrames);
-    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "mel bank end");
+        __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "mel bank start");
+        MelFilterBank::initStatic();
 
-    melBank->dumpResultToFile("/sdcard/AAAmelbank.txt");
+        MelFilterBank *melBank = new MelFilterBank();
 
-    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "NN load");
+        melBank->calculateMelBanks(frameCount, fftFrames);
+        __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "mel bank end");
+    }
+
+    //melBank->dumpResultToFile("/sdcard/AAAmelbank.txt");
+
+    return;
+
+    /*__android_log_print(ANDROID_LOG_DEBUG, APPNAME, "NN load");
     NeuralNetwork* nn = new NeuralNetwork("/sdcard/voicerecognition/nn.bin");
     __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "NN load done");
 
@@ -159,7 +212,7 @@ void createFrames(){
     delete[] fftFrames;
     delete[] frames;
     delete melBank;
-    MelFilterBank::deleteStatic();
+    MelFilterBank::deleteStatic();*/
 }
 
 /**

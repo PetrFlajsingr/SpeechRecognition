@@ -45,19 +45,19 @@ void dumpIntArray(int* array, std::string path, int length){
 
 void MelFilterBank::initStatic() {
     melFBin = initLinSpace(0, TARGET_SAMPLING_RATE / 2, FFT_FRAME_LENGTH / 2 + 1);
-    dumpFloatArray(melFBin, "/sdcard/pokus/melfbin.txt", FFT_FRAME_LENGTH / 2 + 1);
+    //dumpFloatArray(melFBin, "/sdcard/pokus/melfbin.txt", FFT_FRAME_LENGTH / 2 + 1);
     melVect(melFBin, FFT_FRAME_LENGTH / 2 + 1);
-    dumpFloatArray(melFBin, "/sdcard/pokus/melfbin1.txt", FFT_FRAME_LENGTH / 2 + 1);
+    //dumpFloatArray(melFBin, "/sdcard/pokus/melfbin1.txt", FFT_FRAME_LENGTH / 2 + 1);
 
     melCBin = initLinSpace(melPoint(LOW_FREQ), melPoint(HIGH_FREQ), MEL_BANK_FRAME_LENGTH + 2);
-    dumpFloatArray(melCBin, "/sdcard/pokus/melcbin.txt", MEL_BANK_FRAME_LENGTH + 2);
+    //dumpFloatArray(melCBin, "/sdcard/pokus/melcbin.txt", MEL_BANK_FRAME_LENGTH + 2);
 
     melCinD = new int[MEL_BANK_FRAME_LENGTH + 2];
 
     for(int i = 0; i < MEL_BANK_FRAME_LENGTH + 2; ++i){
         melCinD[i] = (int)floor(melInvPoint(melCBin[i]) / TARGET_SAMPLING_RATE * FFT_FRAME_LENGTH) + 1;
     }
-    dumpIntArray(melCinD, "/sdcard/pokus/melcind.txt", MEL_BANK_FRAME_LENGTH + 2);
+    //dumpIntArray(melCinD, "/sdcard/pokus/melcind.txt", MEL_BANK_FRAME_LENGTH + 2);
 
     mfb.init(FFT_FRAME_LENGTH / 2 + 1, MEL_BANK_FRAME_LENGTH);
 
@@ -76,7 +76,7 @@ void MelFilterBank::initStatic() {
         }
     }
 
-    mfb.dumpResultToFile("/sdcard/pokus/melmfb.txt");
+    //mfb.dumpResultToFile("/sdcard/pokus/melmfb.txt");
 }
 
 
