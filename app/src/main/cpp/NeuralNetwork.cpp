@@ -181,17 +181,17 @@ void NeuralNetwork::forward() {
         mulVectors(this->dataVector, this->layerVars[0], this->dataVectorLength);
         vectorMulMatrix(this->dataVector, this->dataVectorLength,
                         this->layerWeights[0], this->weightCounts[0], this->layerData[0]);
+        addVectors(this->dataVector, this->layerBiases[0], this->dataVectorLength);
         //inner layers
         unsigned int layerIterator;
         for(layerIterator = 1; layerIterator < this->layerCount - 1; ++layerIterator) {
-            addVectors(this->layerData[layerIterator - 1], this->layerBiases[layerIterator], this->dataVectorLength);
             sigmoid(this->layerData[layerIterator - 1], this->dataVectorLength);
             vectorMulMatrix(this->layerData[layerIterator - 1], this->dataVectorLength,
                             this->layerWeights[layerIterator], this->weightCounts[layerIterator], this->layerData[layerIterator]);
+            addVectors(this->layerData[layerIterator - 1], this->layerBiases[layerIterator], this->dataVectorLength);
         }
 
         //output layer
-        addVectors(this->layerData[layerIterator - 1], this->layerBiases[layerIterator - 1], this->dataVectorLength);
         sigmoid(this->layerData[layerIterator - 1], this->dataVectorLength);
         vectorMulMatrix(this->layerData[layerIterator - 1], this->dataVectorLength,
                         this->layerWeights[layerIterator], this->weightCounts[layerIterator],

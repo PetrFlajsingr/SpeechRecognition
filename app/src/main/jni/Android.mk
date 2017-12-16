@@ -19,7 +19,7 @@ LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := voicerecognition
-LOCAL_SRC_FILES := voicerecognition_Jni.cpp  RSmelfilterbank.rs
+LOCAL_SRC_FILES := voicerecognition_Jni.cpp  RSmelfilterbank.rs RSneuralnetwork.rs
 LOCAL_C_INCLUDES := $(LOCAL_PATH)../cpp/include
 LOCAL_CLANG := true
 
