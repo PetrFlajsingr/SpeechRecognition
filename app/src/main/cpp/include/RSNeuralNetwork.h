@@ -6,13 +6,11 @@
 #define VOICERECOGNITION_RSNEURALNETWORK_H
 
 #include "ScriptC_RSneuralnetwork.h"
+#include "NeuralNetwork.h"
 #include <RenderScript.h>
+#include <vector>
 
 using namespace android::RSC;
-struct NNInitInfo{
-    unsigned int layerCount;
-    unsigned int* neuronCounts;
-};
 
 class RSNeuralNetwork {
 private:
@@ -22,6 +20,8 @@ private:
 
     void prepareAllocations();
 
+    NNInitInfo info;
+
     unsigned int outputNodeCount = 0;
 
     float** layerBiases;
@@ -29,17 +29,22 @@ private:
     float** layerMeans;
     float*** layerWeights;
 
-    unsigned int* weightCounts;
     unsigned int layerCount;
 
-    void allocateMemory(NNInitInfo initInfo);
+    void allocateMemory();
 
     void loadFromFile(std::string filepath);
 
+    void prepareInput(FeaturesMatrixFloat*data, int centerFrame, float* out);
+
 public:
-    RSNeuralNetwork(std::string filepath);
+    RSNeuralNetwork(std::string filepath, const char* cacheDir);
 
     virtual ~RSNeuralNetwork();
+
+    float* forward(float* data);
+
+    FeaturesMatrixFloat* forwardAll(FeaturesMatrixFloat* data);
 };
 
 

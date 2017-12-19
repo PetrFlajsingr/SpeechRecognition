@@ -36,7 +36,6 @@ static float melInvPoint(float x) {
     return ((exp((float)(x / 1127.0)) - 1.0) * 700.0);
 }
 
-// problem je tu
 void init(){
     initLinSpace(melFBin, 0, TARGET_SAMPLING_RATE / 2, FFT_FRAME_LENGTH / 2 + 1);
 
@@ -69,8 +68,8 @@ rs_allocation fftFrame;
 void melBank(const uint32_t* in, float* melBankFrame) {
     *melBankFrame = 0;
     for(int j = 0; j < FFT_FRAME_LENGTH / 2; ++j){
-        *melBankFrame +=
-                melFilterBank[j][*in]
+        *melBankFrame = *melBankFrame
+                + melFilterBank[j][*in]
                 * ((pow((float)rsGetElementAt_float(fftFrame, j * 2), 2))
                 + (pow((float)rsGetElementAt_float(fftFrame, j * 2 + 1), 2)));
     }

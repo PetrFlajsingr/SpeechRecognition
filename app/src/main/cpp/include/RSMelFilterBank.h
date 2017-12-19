@@ -18,8 +18,6 @@ private:
 
     ScriptC_RSmelfilterbank* melRSinstance;
 
-    FeaturesMatrixFloat rsMelMatrix;
-
     void prepareAllocations();
 
     // Allocations

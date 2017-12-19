@@ -58,23 +58,21 @@ void RSMelFilterBank::substractMean(FeaturesMatrixFloat *featuresMatrix) {
                                                                      Element::F32(renderScriptObject),
                                                                      featuresMatrix->getFramesNum() * MEL_BANK_FRAME_LENGTH);
 
-    for(int i = 0; i < rsMelMatrix.getFramesNum(); i++)
-        melCalcFramesAllocation->copy1DRangeFrom(i * rsMelMatrix.getFrameSize(),
-                                                 rsMelMatrix.getFrameSize(),
-                                                 rsMelMatrix.getFeaturesMatrix()[i]);
+    for(int i = 0; i < featuresMatrix->getFramesNum(); i++)
+        melCalcFramesAllocation->copy1DRangeFrom(i * featuresMatrix->getFrameSize(),
+                                                 featuresMatrix->getFrameSize(),
+                                                 featuresMatrix->getFeaturesMatrix()[i]);
 
     this->melRSinstance->set_melCalculatedFrames(melCalcFramesAllocation);
 
-
-    renderScriptObject->finish();
 
     this->melRSinstance->forEach_substractMean(melIterationAllocation);
 
     renderScriptObject->finish();
 
-    for(int i = 0; i < rsMelMatrix.getFramesNum(); i++)
-        melCalcFramesAllocation->copy1DRangeTo(i * rsMelMatrix.getFrameSize(),
-                                               rsMelMatrix.getFrameSize(),
-                                               rsMelMatrix.getFeaturesMatrix()[i]);
+    for(int i = 0; i < featuresMatrix->getFramesNum(); i++)
+        melCalcFramesAllocation->copy1DRangeTo(i * featuresMatrix->getFrameSize(),
+                                               featuresMatrix->getFrameSize(),
+                                               featuresMatrix->getFeaturesMatrix()[i]);
 
 }
