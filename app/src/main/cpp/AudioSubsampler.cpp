@@ -20,18 +20,22 @@
  */
 short *AudioSubsampler::subsample48kHzto8kHz(short *data, int dataLength) {
     // apply low pass filter to minimize aliasing
+    const int RATIO = 6; // ratio for size difference
+    int newDataLength = dataLength;
+            //dataLength / RATIO + 1; //length of new array, +1 because of integer division
+
+    short *resultArray = new short[newDataLength];
+    for(int i = 0; i < dataLength; ++i) {
+        resultArray[i] = data[i];
+    }
+
+    return resultArray;
 
     Filter *lpFIRFiler = new Filter(LPF, 32, 48.0, 4.0);
     for(int i = 0; i < dataLength; ++i) {
-        data[i] = (short) lpFIRFiler->do_sample((double) data[i]);
+        resultArray[i] = (short) lpFIRFiler->do_sample((double) data[i]);
     }
     delete lpFIRFiler;
-
-    const int RATIO = 6; // ratio for size difference
-    int newDataLength =
-            dataLength / RATIO + 1; //length of new array, +1 because of integer division
-
-    short *resultArray = new short[newDataLength];
 
     int arrayIterator = 0;
     // copying every important data(short), given by RATIO

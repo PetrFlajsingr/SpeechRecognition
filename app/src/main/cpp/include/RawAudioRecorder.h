@@ -16,7 +16,7 @@
 
 class RawAudioRecorder {
 private:
-    static const int SMALL_RECORDER_FRAMES = SAMPLING_RATE * 0.015; // min length of recorded frame - 100ms
+    static const int SMALL_RECORDER_FRAMES = SAMPLING_RATE * 0.010; // min length of recorded frame - 100ms
 
     static short *recorderBuffer; //< buffer for recorded data
 

@@ -60,12 +60,11 @@ void startRecording()
     audioData = new short[MAX_AUDIO_LENGTH];
     recorder->setSharedAudioData(audioData);
     recorder->setCv(&cv);
-    recorder->setSharedAudioData(audioData);
     recorder->startRecording();
 }
 
 void calculateMelbanksThread(){
-    const int ORIG_FRAME_OVERLAP = ORIG_FRAME_LENGTH * 0.010;
+    const int ORIG_FRAME_OVERLAP = SAMPLING_RATE * 0.010;
     std::mutex mtx;
     std::unique_lock<std::mutex> lock(mtx);
 
@@ -82,9 +81,9 @@ void calculateMelbanksThread(){
 
     int frameCounter = 0;
 
-    while(recorder->isRecording()){
+    while(recorder->isRecording() || recorder->getDataCounter() - ORIG_FRAME_OVERLAP >= dataStart){
         if(recorder->getDataCounter() > ORIG_FRAME_LENGTH){
-            short* subsampledData = AudioSubsampler::subsample48kHzto8kHz(audioData + dataStart, ORIG_FRAME_LENGTH);
+            short* subsampledData = AudioSubsampler::subsample48kHzto8kHz(audioData + dataStart, ORIG_FRAME_LENGTH); //<<<< tu
             AudioFrame frame;
             frame.applyHammingWindow(subsampledData);
             delete[] subsampledData;
@@ -99,10 +98,26 @@ void calculateMelbanksThread(){
 
             frameCounter++;
         }
-        cv.wait(lock);
+        if(recorder->isRecording())
+            cv.wait(lock);
     }
 
+    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "test: %d", (recorder->getDataCounter() - ORIG_FRAME_LENGTH) / ORIG_FRAME_OVERLAP);
+
+    melBankResults.setFramesNum(frameCounter);
+
+    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "recording done, total: %d, mine: %d, frames: %d", recorder->getDataCounter(), dataStart, frameCounter);
+
     rsMelBank->substractMean(&melBankResults);
+
+    std::ofstream out;
+    out.open("/sdcard/AAA_AUDIOTEST.raw", std::ios::out | std::ios::binary);
+
+    out.write((char*)AudioSubsampler::subsample48kHzto8kHz(audioData, recorder->getDataCounter()), recorder->getDataCounter()*2);
+    out.close();
+
+    melBankResults.dumpResultToFile("/sdcard/AAA_MELBANKRESULT.TXT");
+
 
     free(cfg);
 }
@@ -120,16 +135,7 @@ void createFrames(){
     const int FRAME_OVERLEAP = (const int) (8000 * 0.010);
     int recordingSize = 0;
     //short* data = recorder->getRecording(&recordingSize);
-    short* data = readAudioFromFile("/sdcard/AAAaudiofile.pcm", &recordingSize);
-
-    std::ofstream out;
-    out.open("/sdcard/AAAaudiofile.txt");
-    for(int i = 0; i < recordingSize; ++i){
-        std::stringstream ss;
-        ss << (data[i]/SHORT_MAX_FLOAT);
-        out.write((ss.str() + ",").c_str(), ss.str().size()+1);
-    }
-    out.close();
+    short* data = readAudioFromFile("/sdcard/AAA_AUDIOTEST.raw", &recordingSize);
 
     int frameCount = (recordingSize - FRAME_SIZE) / FRAME_OVERLEAP;
 
@@ -167,6 +173,7 @@ void createFrames(){
     }
     rsMelBank->substractMean(&rsMelBankResults);
     __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "RS mel bank end");
+    rsMelBankResults.dumpResultToFile("/sdcard/___RES.txt");
 
     //RSNeuralNetwork RSNN("/sdcard/voicerecognition/nn.bin", cacheDir);
     __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "RS NN start");
@@ -175,25 +182,27 @@ void createFrames(){
     __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "RS NN end");
     //NNoutput->dumpResultToFile("/sdcard/AAAAANNNNNN.txt");
 
+    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "frames2: %d", frameCount);
 
-    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "NN load");
-    NeuralNetwork* nn = new NeuralNetwork("/sdcard/voicerecognition/nn.bin");
-    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "NN load done");
+//
+//    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "NN load");
+//    NeuralNetwork* nn = new NeuralNetwork("/sdcard/voicerecognition/nn.bin");
+//    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "NN load done");
+//
+//    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "NN forward");
+//
+//    auto start = std::chrono::steady_clock::now();
+//    for(int i = 0; i < 50; ++i){
+//        nn->setFeatureMatrix(&rsMelBankResults);
+//        nn->forward();
+//    }
+//    auto end = std::chrono::steady_clock::now();
+//    std::chrono::duration<double> elapsed = end - start;
+//    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "NN: %g", elapsed.count());
+//
+//    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "NN forward done");
 
-    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "NN forward");
-
-    auto start = std::chrono::steady_clock::now();
-    for(int i = 0; i < 50; ++i){
-        nn->setFeatureMatrix(&rsMelBankResults);
-        nn->forward();
-    }
-    auto end = std::chrono::steady_clock::now();
-    std::chrono::duration<double> elapsed = end - start;
-    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "NN: %g", elapsed.count());
-
-    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "NN forward done");
-
-    delete nn;
+    //delete nn;
     delete[] fftFrames;
     delete[] frames;
     //delete melBank;

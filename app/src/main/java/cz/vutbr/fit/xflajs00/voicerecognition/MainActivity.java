@@ -64,20 +64,21 @@ public class MainActivity extends AppCompatActivity {
             if (!created) {
                 created = createAudioRecorder();
             }
-            if(created)
-                startRecording();
-            else
+            if(created){
+                Thread thread = new Thread() {
+                    @Override
+                    public void run() {
+                        threadTest();
+                    }
+                };
+                thread.start();
+            }else
                 recording = false;
         }else{
             stopRecording();
         }
     }
 
-    // UI control with a button
-    public void threadTest(View view){
-        createAudioRecorder();
-        threadTest();
-    }
 
     public void createFrames(View view){
         Thread thread = new Thread() {

@@ -78,3 +78,7 @@ void FeatureMatrix::dumpResultToFile(std::string path) {
     }
     out.close();
 }
+
+void FeatureMatrix::setFramesNum(int framesNum) {
+    FeatureMatrix::framesNum = framesNum;
+}

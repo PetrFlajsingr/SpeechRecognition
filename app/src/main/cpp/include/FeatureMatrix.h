@@ -13,7 +13,12 @@ class FeatureMatrix {
 private:
     float** featuresMatrix = NULL; //< matrix data
 
-    int framesNum = 0; //< height
+    int framesNum = 0;
+public:
+    void setFramesNum(int framesNum);
+
+private:
+    //< height
     int frameSize = 0; //< width
 public:
     int getFrameSize() const;
