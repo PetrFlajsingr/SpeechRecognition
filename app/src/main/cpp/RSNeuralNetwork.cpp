@@ -5,11 +5,14 @@
 #include <string>
 #include <fstream>
 #include <RenderScript.h>
-#include <android/log.h>
 #include <sstream>
 #include "RSNeuralNetwork.h"
 #include "constants.h"
 
+/**
+ * Requires cache directory of the application for Renderscript.
+ * @param filepath path to neural network file
+ */
 RSNeuralNetwork::RSNeuralNetwork(std::string filepath, const char* cacheDir) {
     NNInitInfo initInfo;
     initInfo.layerCount = 3;
@@ -32,6 +35,9 @@ RSNeuralNetwork::RSNeuralNetwork(std::string filepath, const char* cacheDir) {
     this->prepareAllocations();
 }
 
+/**
+ * Memory allocation for neural network
+ */
 void RSNeuralNetwork::allocateMemory() {
     //layers init
     this->layerBiases = new float*[info.layerCount];
@@ -50,27 +56,6 @@ void RSNeuralNetwork::allocateMemory() {
         //weight allocation for dense NN
         for(unsigned int j = 0; j < info.neuronCounts[i + 1]; ++j) {
             this->layerWeights[i][j] = new float[info.neuronCounts[i]];
-        }
-    }
-
-
-    //neuron init
-    return;
-    this->layerVars[0] = new float[info.neuronCounts[0]];
-    this->layerMeans[0] = new float[info.neuronCounts[0]];
-    for(unsigned int i = 0; i < info.layerCount; ++i){
-        this->layerBiases[i] = new float[info.neuronCounts[i]];
-        this->layerWeights[i] = new float*[info.neuronCounts[i]];
-        //weight allocation for dense NN
-        if(i < info.layerCount - 1) {
-            for(unsigned int j = 0; j < info.neuronCounts[i]; ++j) {
-                this->layerWeights[i][j] = new float[info.neuronCounts[i + 1]];
-            }
-        }else{
-            // 1 for output neurons
-            for(unsigned int j = 0; j < info.neuronCounts[i]; ++j) {
-                this->layerWeights[i][j] = new float[30];
-            }
         }
     }
 }
@@ -92,6 +77,10 @@ RSNeuralNetwork::~RSNeuralNetwork() {
     delete[] this->layerWeights;
 }
 
+/**
+ * Loading of NN from file
+ * @param filepath path to file
+ */
 void RSNeuralNetwork::loadFromFile(std::string filepath) {
     std::ifstream file;
     file.open(filepath.c_str(), std::ios::in|std::ios::binary);
@@ -200,6 +189,9 @@ void RSNeuralNetwork::loadFromFile(std::string filepath) {
     }
 }
 
+/**
+ * Memory allocation for RenderScript
+ */
 void RSNeuralNetwork::prepareAllocations() {
     sp<Allocation> meansAllocation = Allocation::createSized(this->renderScriptObject,
                                                              Element::F32(this->renderScriptObject),
@@ -265,6 +257,11 @@ void dumpArray(std::string path, float* arr, int size){
     out.close();
 }
 
+/**
+ * Forward data through NN.
+ * @param data input data
+ * @return NN output
+ */
 float* RSNeuralNetwork::forward(float* data) {
     sp<Allocation> dataAllocation = Allocation::createSized(this->renderScriptObject,
                                                             Element::F32(this->renderScriptObject),
@@ -347,6 +344,12 @@ FeatureMatrix *RSNeuralNetwork::forwardAll(FeatureMatrix *data) {
     return result;
 }
 
+/**
+ * Data preparation for input
+ * @param data
+ * @param centerFrame
+ * @param out
+ */
 void RSNeuralNetwork::prepareInput(FeatureMatrix *data, int centerFrame, float* out) {
     const int neig = 7;
     int frameNum = 0;
