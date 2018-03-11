@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
     public static native void setCacheDir(String cacheDir);
     public static native void createEngine();
     public static native boolean createAudioRecorder();
-    public static native void startRecording(int max_length_sec);
+    public static native void startRecording();
     public static native void stopRecording();
     public static native void shutdown();
     public static native void createFrames();
@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
                 created = createAudioRecorder();
             }
             if(created)
-                startRecording(100);
+                startRecording();
             else
                 recording = false;
         }else{

@@ -19,6 +19,12 @@ private:
 
     static short *recorderBuffer; //< buffer for recorded data
 
+    static short *sharedAudioData;
+public:
+    static void setSharedAudioData(short *sharedAudioData);
+
+private:
+
     // engine interfaces
     SLObjectItf engineObject = NULL;
     SLEngineItf engineEngine;

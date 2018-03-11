@@ -48,9 +48,9 @@ void stopRecording(){
 
 
 // set the recording state for the audio recorder
-void startRecording(jint max_length_sec)
+void startRecording()
 {
-    recorder->startRecording(max_length_sec);
+    recorder->startRecording();
 }
 
 void createFrames(){
@@ -187,8 +187,8 @@ extern "C"{
         stopRecording();
     }
 
-    JNIEXPORT void JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_MainActivity_startRecording(JNIEnv* env, jclass clazz, jint max_length_sec){
-        startRecording(max_length_sec);
+    JNIEXPORT void JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_MainActivity_startRecording(JNIEnv* env, jclass clazz){
+        startRecording();
     }
 
     JNIEXPORT void Java_cz_vutbr_fit_xflajs00_voicerecognition_MainActivity_shutdown(JNIEnv* env, jclass clazz){

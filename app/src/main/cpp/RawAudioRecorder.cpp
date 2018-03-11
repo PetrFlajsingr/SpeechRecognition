@@ -189,3 +189,7 @@ RawAudioRecorder::~RawAudioRecorder() {
 
     pthread_mutex_destroy(&audioEngineLock);
 }
+
+void RawAudioRecorder::setSharedAudioData(short *sharedAudioData) {
+    RawAudioRecorder::sharedAudioData = sharedAudioData;
+}
