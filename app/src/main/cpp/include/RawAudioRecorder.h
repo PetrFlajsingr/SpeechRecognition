@@ -19,8 +19,6 @@ private:
 
     static short *recorderBuffer; //< buffer for recorded data
 
-    static int recorderSize; //< size of all recorded data;
-
     // engine interfaces
     SLObjectItf engineObject = NULL;
     SLEngineItf engineEngine;
@@ -49,8 +47,6 @@ public:
     void startRecording();
 
     void stopRecording();
-
-    short* getRecording(int* size);
 };
 
 

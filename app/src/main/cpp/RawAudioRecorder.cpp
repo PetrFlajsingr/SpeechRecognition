@@ -15,8 +15,6 @@ pthread_mutex_t RawAudioRecorder::audioEngineLock = PTHREAD_MUTEX_INITIALIZER;
 SLAndroidSimpleBufferQueueItf RawAudioRecorder::recorderBufferQueue;
 short* RawAudioRecorder::recorderBuffer;
 SLRecordItf RawAudioRecorder::recorderRecord;
-int RawAudioRecorder::max_recording_length_sec;
-int RawAudioRecorder::recorderSize;
 
 /**
  * Prepares the engine for recording audio.
@@ -59,10 +57,6 @@ void RawAudioRecorder::bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void
     if(recordingStopBool) {
         // stopping the recording engine
         result = (*recorderRecord)->SetRecordState(recorderRecord, SL_RECORDSTATE_STOPPED);
-        // saving the length of recorded data
-        if(SL_RESULT_SUCCESS == result) {
-            recorderSize = SMALL_RECORDER_FRAMES;
-        }
     }else {
         result = (*recorderBufferQueue)->Enqueue(recorderBufferQueue, recorderBuffer,
                                                      SMALL_RECORDER_FRAMES * sizeof(short));
@@ -194,9 +188,4 @@ RawAudioRecorder::~RawAudioRecorder() {
         delete[] recorderBuffer;
 
     pthread_mutex_destroy(&audioEngineLock);
-}
-
-short *RawAudioRecorder::getRecording(int *size) {
-    *size = recorderSize/6;
-    return  AudioSubsampler::subsample48kHzto8kHz(recorderBuffer, recorderSize);
 }
