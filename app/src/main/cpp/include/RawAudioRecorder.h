@@ -15,10 +15,9 @@
 class RawAudioRecorder {
 private:
     static const int SAMPLING_RATE = 48000; //kHz
-    static const int SMALL_RECORDER_FRAMES = SAMPLING_RATE / 10; // min length of recorded frame - 100ms
+    static const int SMALL_RECORDER_FRAMES = SAMPLING_RATE * 0.015; // min length of recorded frame - 100ms
 
     static short *recorderBuffer; //< buffer for recorded data
-    static int max_recording_length_sec; //< maximum allow length for a recording
 
     static int recorderSize; //< size of all recorded data;
 
@@ -28,8 +27,6 @@ private:
 
     //stops the recording when user requests it
     static bool recordingStopBool;
-
-    static int capacityCounter;
 
     // recorder interfaces
     SLObjectItf recorderObject = NULL;
@@ -49,7 +46,7 @@ public:
 
     virtual ~RawAudioRecorder();
 
-    void startRecording(int max_length_sec);
+    void startRecording();
 
     void stopRecording();
 

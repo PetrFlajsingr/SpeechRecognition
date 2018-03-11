@@ -11,7 +11,6 @@
 #define APPNAME "cz.vutbr.fit.xflajs00.voicerecognition"
 
 bool RawAudioRecorder::recordingStopBool = false;
-int RawAudioRecorder::capacityCounter = 0;
 pthread_mutex_t RawAudioRecorder::audioEngineLock = PTHREAD_MUTEX_INITIALIZER;
 SLAndroidSimpleBufferQueueItf RawAudioRecorder::recorderBufferQueue;
 short* RawAudioRecorder::recorderBuffer;
@@ -58,27 +57,15 @@ void RawAudioRecorder::bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void
     SLresult result;
     // recording stopped by user
     if(recordingStopBool) {
-        capacityCounter++;
         // stopping the recording engine
         result = (*recorderRecord)->SetRecordState(recorderRecord, SL_RECORDSTATE_STOPPED);
         // saving the length of recorded data
         if(SL_RESULT_SUCCESS == result) {
-            recorderSize = SMALL_RECORDER_FRAMES * capacityCounter;
+            recorderSize = SMALL_RECORDER_FRAMES;
         }
     }else {
-        capacityCounter++;
-        // checking for max allowed length of the recording
-        if(capacityCounter < max_recording_length_sec*10) {
-            // queueing the next part of the buffer
-            result = (*recorderBufferQueue)->Enqueue(recorderBufferQueue, recorderBuffer + (capacityCounter * SMALL_RECORDER_FRAMES),
+        result = (*recorderBufferQueue)->Enqueue(recorderBufferQueue, recorderBuffer,
                                                      SMALL_RECORDER_FRAMES * sizeof(short));
-        }else{
-            // ending the recording
-            result = (*recorderRecord)->SetRecordState(recorderRecord, SL_RECORDSTATE_STOPPED);
-            // saving the size of the recorded data
-            if(SL_RESULT_SUCCESS == result)
-                recorderSize = capacityCounter * SMALL_RECORDER_FRAMES;
-        }
     }
     pthread_mutex_unlock(&audioEngineLock);
 }
@@ -150,20 +137,18 @@ void RawAudioRecorder::stopRecording() {
  * Starts recording. Allocates the necessary memory, sets the OPENSL parameters.
  * @param max_length_sec maximum length of recorded audio
  */
-void RawAudioRecorder::startRecording(int max_length_sec) {
+void RawAudioRecorder::startRecording() {
     if(recorderBuffer != NULL){
         delete[] recorderBuffer;
     }
-    max_recording_length_sec = max_length_sec;
 
-    recorderBuffer = new short[max_recording_length_sec * SAMPLING_RATE];
+    recorderBuffer = new short[0.1 * SAMPLING_RATE];
     SLresult result;
 
     if (pthread_mutex_trylock(&audioEngineLock)) {
         return;
     }
     recordingStopBool = false;
-    capacityCounter = 0;
     // in case already recording, stop recording and clear buffer queue
     result = (*recorderRecord)->SetRecordState(recorderRecord, SL_RECORDSTATE_STOPPED);
     assert(SL_RESULT_SUCCESS == result);
