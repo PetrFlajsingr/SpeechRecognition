@@ -17,8 +17,11 @@
 #include "NeuralNetwork.h"
 #include <RenderScript.h>
 #include <RSNeuralNetwork.h>
+#include <thread>
+#include <condition_variable>
 
 #include <chrono>
+#include <AudioSubsampler.h>
 
 #include "RSMelFilterBank.h"
 
@@ -29,6 +32,10 @@ RawAudioRecorder* recorder;
 short* readAudioFromFile(std::string filepath, int* recordingSize);
 
 const char* cacheDir;
+
+std::condition_variable cv;
+
+short* audioData;
 
 // create the engine and output mix objects
 void createEngine()
@@ -50,7 +57,60 @@ void stopRecording(){
 // set the recording state for the audio recorder
 void startRecording()
 {
+    audioData = new short[MAX_AUDIO_LENGTH];
+    recorder->setSharedAudioData(audioData);
+    recorder->setCv(&cv);
+    recorder->setSharedAudioData(audioData);
     recorder->startRecording();
+}
+
+void calculateMelbanksThread(){
+    const int ORIG_FRAME_OVERLAP = ORIG_FRAME_LENGTH * 0.010;
+    std::mutex mtx;
+    std::unique_lock<std::mutex> lock(mtx);
+
+    AudioFrame::calcHammingCoef();
+
+    kiss_fftr_cfg cfg = kiss_fftr_alloc(FFT_FRAME_LENGTH, 0, NULL, NULL);
+
+    FeatureMatrix melBankResults;
+    melBankResults.init(MAX_FRAME_COUNT, MEL_BANK_FRAME_LENGTH);
+
+    RSMelFilterBank *rsMelBank = new RSMelFilterBank(cacheDir);
+
+    int dataStart = 0;
+
+    int frameCounter = 0;
+
+    while(recorder->isRecording()){
+        if(recorder->getDataCounter() > ORIG_FRAME_LENGTH){
+            short* subsampledData = AudioSubsampler::subsample48kHzto8kHz(audioData + dataStart, ORIG_FRAME_LENGTH);
+            AudioFrame frame;
+            frame.applyHammingWindow(subsampledData);
+            delete[] subsampledData;
+
+            frame.applyFFT(&cfg);
+
+            kiss_fft_cpx* fftFrame = frame.getFftData();
+
+            melBankResults.getFeaturesMatrix()[frameCounter] = rsMelBank->calculateMelBank(fftFrame);
+
+            dataStart += ORIG_FRAME_OVERLAP;
+
+            frameCounter++;
+        }
+        cv.wait(lock);
+    }
+
+    rsMelBank->substractMean(&melBankResults);
+
+    free(cfg);
+}
+
+void threadTest(){
+    startRecording();
+    std::thread testThread(calculateMelbanksThread);
+    testThread.join();
 }
 
 void createFrames(){
@@ -174,6 +234,10 @@ extern "C"{
     JNIEXPORT void JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_MainActivity_setCacheDir(JNIEnv* env, jclass clazz, jstring pathObj){
         setCacheDir(env->GetStringUTFChars(pathObj, NULL));
     }
+
+JNIEXPORT void JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_MainActivity_threadTest(JNIEnv* env, jclass clazz){
+    threadTest();
+}
 
     JNIEXPORT void JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_MainActivity_createEngine(JNIEnv* env, jclass clazz){
         createEngine();

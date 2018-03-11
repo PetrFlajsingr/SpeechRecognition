@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
 
         setCacheDir(this.getCacheDir().toString());
         createEngine();
+
     }
 
     /** Called when the activity is about to be destroyed. */
@@ -49,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
     public static native void stopRecording();
     public static native void shutdown();
     public static native void createFrames();
+    public static native void threadTest();
 
     static{
         System.loadLibrary("raw_audio_recorder");
@@ -69,6 +71,12 @@ public class MainActivity extends AppCompatActivity {
         }else{
             stopRecording();
         }
+    }
+
+    // UI control with a button
+    public void threadTest(View view){
+        createAudioRecorder();
+        threadTest();
     }
 
     public void createFrames(View view){

@@ -15,6 +15,10 @@ pthread_mutex_t RawAudioRecorder::audioEngineLock = PTHREAD_MUTEX_INITIALIZER;
 SLAndroidSimpleBufferQueueItf RawAudioRecorder::recorderBufferQueue;
 short* RawAudioRecorder::recorderBuffer;
 SLRecordItf RawAudioRecorder::recorderRecord;
+bool RawAudioRecorder::recording = false;
+unsigned int RawAudioRecorder::dataCounter = 0;
+short* RawAudioRecorder::sharedAudioData;
+std::condition_variable* RawAudioRecorder::cv;
 
 /**
  * Prepares the engine for recording audio.
@@ -57,10 +61,17 @@ void RawAudioRecorder::bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void
     if(recordingStopBool) {
         // stopping the recording engine
         result = (*recorderRecord)->SetRecordState(recorderRecord, SL_RECORDSTATE_STOPPED);
+        recording = false;
     }else {
         result = (*recorderBufferQueue)->Enqueue(recorderBufferQueue, recorderBuffer,
                                                      SMALL_RECORDER_FRAMES * sizeof(short));
     }
+    for(int i = 0; i < SMALL_RECORDER_FRAMES; ++i){
+       sharedAudioData[dataCounter + i] = recorderBuffer[i];
+    }
+
+    dataCounter += SMALL_RECORDER_FRAMES;
+    cv->notify_all();
     pthread_mutex_unlock(&audioEngineLock);
 }
 
@@ -136,7 +147,7 @@ void RawAudioRecorder::startRecording() {
         delete[] recorderBuffer;
     }
 
-    recorderBuffer = new short[0.1 * SAMPLING_RATE];
+    recorderBuffer = new short[(int)(SAMPLING_RATE * 0.015)];
     SLresult result;
 
     if (pthread_mutex_trylock(&audioEngineLock)) {
@@ -163,6 +174,8 @@ void RawAudioRecorder::startRecording() {
     result = (*recorderRecord)->SetRecordState(recorderRecord, SL_RECORDSTATE_RECORDING);
     assert(SL_RESULT_SUCCESS == result);
     (void)result;
+
+    recording = true;
 }
 
 /**
@@ -192,4 +205,16 @@ RawAudioRecorder::~RawAudioRecorder() {
 
 void RawAudioRecorder::setSharedAudioData(short *sharedAudioData) {
     RawAudioRecorder::sharedAudioData = sharedAudioData;
+}
+
+void RawAudioRecorder::setCv(std::condition_variable *cv) {
+    RawAudioRecorder::cv = cv;
+}
+
+bool RawAudioRecorder::isRecording() {
+    return recording;
+}
+
+unsigned int RawAudioRecorder::getDataCounter() {
+    return dataCounter;
 }
