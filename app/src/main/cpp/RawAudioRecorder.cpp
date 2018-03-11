@@ -85,7 +85,7 @@ void RawAudioRecorder::bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void
 
 /**
  * Prepares audio recorder with OPENSL.
- * Settings: 44.1 kHz sample rate, little endian, 16 bit, raw data (PCM)
+ * Settings: 48 kHz sample rate, little endian, 16 bit, raw data (PCM)
  * @return true if OK, otherwise false
  */
 bool RawAudioRecorder::createAudioRecorder() {

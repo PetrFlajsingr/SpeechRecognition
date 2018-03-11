@@ -68,20 +68,6 @@ public class MainActivity extends AppCompatActivity {
                 recording = false;
         }else{
             stopRecording();
-
-            //progressbar for later use
-            if(true) return;
-            ProgressBar bar = (ProgressBar) findViewById(R.id.progressBarRecognizing);
-            bar.setIndeterminate(true);
-            bar.setVisibility(View.VISIBLE);
-
-            final Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    ProgressBar bar = (ProgressBar) findViewById(R.id.progressBarRecognizing);
-                    bar.setVisibility(View.INVISIBLE);
-                }}, 5000);
         }
     }
 

@@ -104,16 +104,6 @@ void createFrames(){
 
     for(int i = 0; i < frameCount; ++i) {
         rsMelBankResults.getFeaturesMatrix()[i] = rsMelBank->calculateMelBank(fftFrames[i]);
-        /*
-
-        __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "mel bank start");
-        MelFilterBank::initStatic();
-
-        MelFilterBank *melBank = new MelFilterBank();
-
-        melBank->calculateMelBanks(frameCount, fftFrames);
-        __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "mel bank end");
-         */
     }
     rsMelBank->substractMean(&rsMelBankResults);
     __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "RS mel bank end");
