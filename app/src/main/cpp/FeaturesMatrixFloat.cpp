@@ -68,11 +68,8 @@ void FeaturesMatrixFloat::dumpResultToFile(std::string path) {
     std::ofstream out;
     out.open(path.c_str());
 
-    float temp;
-
     for(int i = 0; i < this->getFramesNum(); ++i){
         for(int j = 0; j < this->getFrameSize(); ++j){
-            temp = this->getFeaturesMatrix()[i][j];
             std::stringstream ss;
             ss << this->getFeaturesMatrix()[i][j];
             out.write((ss.str() + ",").c_str(), ss.str().size()+1);

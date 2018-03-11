@@ -19,8 +19,6 @@
  * @return data in 8 kHz sample rate
  */
 short *AudioSubsampler::subsample48kHzto8kHz(short *data, int dataLength) {
-    std::ofstream out;
-
     // apply low pass filter to minimize aliasing
 
     Filter *lpFIRFiler = new Filter(LPF, 32, 48.0, 4.0);
