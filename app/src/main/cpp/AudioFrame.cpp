@@ -19,7 +19,7 @@ const double AudioFrame::BETA = (1 - ALPHA);
  */
 void AudioFrame::applyHammingWindow(short* data) {
     for(int i = 0; i < AUDIO_FRAME_LENGTH; ++i){
-        hammingData[i] = hammingCoef[i] * (data[i]/*SHORT_MAX_FLOAT*/);
+        hammingData[i] = hammingCoef[i] * (data[i]);
     }
 }
 
@@ -70,11 +70,6 @@ void AudioFrame::applyFFT(kiss_fftr_cfg *cfg) {
     // freeing not needed data
     delete[] hammingData;
     hammingData = NULL;
-
-    /*for(int i = 0; i < FFT_FRAME_LENGTH / 2 + 1; ++i){
-        fftData[i].r *= SHORT_MAX_FLOAT;
-        fftData[i].i *= SHORT_MAX_FLOAT;
-    }*/
 }
 
 kiss_fft_cpx *AudioFrame::getFftData() const {

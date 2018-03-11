@@ -175,7 +175,7 @@ void NeuralNetwork::forward() {
     memcpy(this->dataVector, this->dataVectorNext, this->dataVectorLength * sizeof(float));
 
     for(int currentFrame = 0; currentFrame < frameCount; ++currentFrame){
-        __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "NN: curFrame: %d", currentFrame);
+        //__android_log_print(ANDROID_LOG_DEBUG, APPNAME, "NN: curFrame: %d", currentFrame);
         //input layer
         addVectors(this->dataVector, this->layerMeans[0], this->dataVectorLength);
         mulVectors(this->dataVector, this->layerVars[0], this->dataVectorLength);
@@ -210,7 +210,7 @@ void NeuralNetwork::forward() {
         }
         memcpy(this->dataVectorNext, this->dataVector, this->dataVectorLength);
     }
-    bottleneckMatrix->dumpResultToFile("/sdcard/AAAAnnoutput.txt");
+    //bottleneckMatrix->dumpResultToFile("/sdcard/AAAAnnoutput.txt");
 }
 
 void NeuralNetwork::addVectors(float *dest, float *toAdd, unsigned int arrayLength) {

@@ -18,6 +18,8 @@
 #include <RenderScript.h>
 #include <RSNeuralNetwork.h>
 
+#include <chrono>
+
 #include "RSMelFilterBank.h"
 
 using namespace android::RSC;
@@ -99,6 +101,7 @@ void createFrames(){
     RSMelFilterBank *rsMelBank = new RSMelFilterBank(cacheDir);
     rsMelBankResults.init(frameCount, MEL_BANK_FRAME_LENGTH);
     __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "RS mel bank start");
+
     for(int i = 0; i < frameCount; ++i) {
         rsMelBankResults.getFeaturesMatrix()[i] = rsMelBank->calculateMelBank(fftFrames[i]);
         /*
@@ -115,29 +118,36 @@ void createFrames(){
     rsMelBank->substractMean(&rsMelBankResults);
     __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "RS mel bank end");
 
-    RSNeuralNetwork RSNN("/sdcard/voicerecognition/nn.bin", cacheDir);
+    //RSNeuralNetwork RSNN("/sdcard/voicerecognition/nn.bin", cacheDir);
     __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "RS NN start");
-    FeaturesMatrixFloat* NNoutput = RSNN.forwardAll(&rsMelBankResults);
+    //FeaturesMatrixFloat* NNoutput = RSNN.forwardAll(&rsMelBankResults);
 
     __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "RS NN end");
-    NNoutput->dumpResultToFile("/sdcard/AAAAANNNNNN.txt");
+    //NNoutput->dumpResultToFile("/sdcard/AAAAANNNNNN.txt");
 
-    return;
 
-    /*__android_log_print(ANDROID_LOG_DEBUG, APPNAME, "NN load");
+    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "NN load");
     NeuralNetwork* nn = new NeuralNetwork("/sdcard/voicerecognition/nn.bin");
     __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "NN load done");
 
     __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "NN forward");
-    nn->setFeatureMatrix(melBank->getMelBankFrames());
-    nn->forward();
+
+    auto start = std::chrono::steady_clock::now();
+    for(int i = 0; i < 50; ++i){
+        nn->setFeatureMatrix(&rsMelBankResults);
+        nn->forward();
+    }
+    auto end = std::chrono::steady_clock::now();
+    std::chrono::duration<double> elapsed = end - start;
+    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "NN: %g", elapsed.count());
+
     __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "NN forward done");
 
     delete nn;
     delete[] fftFrames;
     delete[] frames;
-    delete melBank;
-    MelFilterBank::deleteStatic();*/
+    //delete melBank;
+    //MelFilterBank::deleteStatic();
 }
 
 /**
