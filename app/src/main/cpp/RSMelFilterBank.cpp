@@ -5,6 +5,10 @@
 #include <constants.h>
 #include "RSMelFilterBank.h"
 
+/**
+ * Requires cache directory of the application for use in RenderScript
+ * @param cacheDir cache directory of the application
+ */
 RSMelFilterBank::RSMelFilterBank(const char* cacheDir) {
     this->renderScriptObject = new RS();
     this->renderScriptObject->init(cacheDir);
@@ -13,6 +17,9 @@ RSMelFilterBank::RSMelFilterBank(const char* cacheDir) {
     this->prepareAllocations();
 }
 
+/**
+ * Prepares allocations for Renderscript.
+ */
 void RSMelFilterBank::prepareAllocations() {
     Element::Builder* elBuilder = new Element::Builder(this->renderScriptObject);
     elBuilder->add(Element::F32(this->renderScriptObject), "", FFT_FRAME_LENGTH);
@@ -35,6 +42,9 @@ void RSMelFilterBank::prepareAllocations() {
                                                       MEL_BANK_FRAME_LENGTH);
 }
 
+/**
+ * Calculates mel bank filters for given data.
+ */
 float *RSMelFilterBank::calculateMelBank(kiss_fft_cpx *fftData) {
     fftFrameAllocation->copy1DFrom(fftData);
 
@@ -51,6 +61,9 @@ float *RSMelFilterBank::calculateMelBank(kiss_fft_cpx *fftData) {
     return returnMelValues;
 }
 
+/**
+ * Mean normalization
+ */
 void RSMelFilterBank::substractMean(FeatureMatrix *featuresMatrix) {
     this->melRSinstance->set_frameCount(featuresMatrix->getFramesNum());
 
