@@ -35,7 +35,7 @@ private:
 
     void loadFromFile(std::string filepath);
 
-    void prepareInput(FeaturesMatrixFloat*data, int centerFrame, float* out);
+    void prepareInput(FeatureMatrix*data, int centerFrame, float* out);
 
 public:
     RSNeuralNetwork(std::string filepath, const char* cacheDir);
@@ -44,7 +44,7 @@ public:
 
     float* forward(float* data);
 
-    FeaturesMatrixFloat* forwardAll(FeaturesMatrixFloat* data);
+    FeatureMatrix* forwardAll(FeatureMatrix* data);
 };
 
 

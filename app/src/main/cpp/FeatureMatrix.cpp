@@ -6,10 +6,10 @@
 #include <sstream>
 #include <cmath>
 #include <android/log.h>
-#include "FeaturesMatrixFloat.h"
+#include "FeatureMatrix.h"
 #include "constants.h"
 
-float **FeaturesMatrixFloat::getFeaturesMatrix() {
+float **FeatureMatrix::getFeaturesMatrix() {
     return featuresMatrix;
 }
 
@@ -18,7 +18,7 @@ float **FeaturesMatrixFloat::getFeaturesMatrix() {
  * @param framesNum Number of frames
  * @param frameSize Size of each frame
  */
-void FeaturesMatrixFloat::init(int framesNum, int frameSize) {
+void FeatureMatrix::init(int framesNum, int frameSize) {
     if(featuresMatrix == NULL || this->framesNum < framesNum || this->frameSize < frameSize){
         if(featuresMatrix != NULL){
             for(int i = 0; i < framesNum; ++i){
@@ -36,7 +36,7 @@ void FeaturesMatrixFloat::init(int framesNum, int frameSize) {
     this->frameSize = frameSize;
 }
 
-void FeaturesMatrixFloat::setFeatureMatrix(float **featureMatrix) {
+void FeatureMatrix::setFeatureMatrix(float **featureMatrix) {
     this->featuresMatrix = featureMatrix;
     if(this->featuresMatrix == NULL){
         this->frameSize = 0;
@@ -44,27 +44,27 @@ void FeaturesMatrixFloat::setFeatureMatrix(float **featureMatrix) {
     }
 }
 
-void FeaturesMatrixFloat::setFeatureMatrixFrame(int frameNum, float *data) {
+void FeatureMatrix::setFeatureMatrixFrame(int frameNum, float *data) {
     for(int i = 0; i < MEL_BANK_FRAME_LENGTH; ++i) {
         this->featuresMatrix[frameNum][i] = data[i];
     }
 }
 
-FeaturesMatrixFloat::~FeaturesMatrixFloat() {
+FeatureMatrix::~FeatureMatrix() {
     for(int i = 0; i < framesNum; ++i){
         delete[] featuresMatrix[i];
     }
 }
 
-int FeaturesMatrixFloat::getFramesNum() const {
+int FeatureMatrix::getFramesNum() const {
     return framesNum;
 }
 
-int FeaturesMatrixFloat::getFrameSize() const {
+int FeatureMatrix::getFrameSize() const {
     return frameSize;
 }
 
-void FeaturesMatrixFloat::dumpResultToFile(std::string path) {
+void FeatureMatrix::dumpResultToFile(std::string path) {
     std::ofstream out;
     out.open(path.c_str());
 

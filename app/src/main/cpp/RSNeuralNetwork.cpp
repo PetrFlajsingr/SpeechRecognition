@@ -334,8 +334,8 @@ float* RSNeuralNetwork::forward(float* data) {
     return result;
 }
 
-FeaturesMatrixFloat *RSNeuralNetwork::forwardAll(FeaturesMatrixFloat *data) {
-    FeaturesMatrixFloat* result = new FeaturesMatrixFloat();
+FeatureMatrix *RSNeuralNetwork::forwardAll(FeatureMatrix *data) {
+    FeatureMatrix* result = new FeatureMatrix();
     result->init(data->getFramesNum(), 30);
 
     float* inputData = new float[360];
@@ -347,7 +347,7 @@ FeaturesMatrixFloat *RSNeuralNetwork::forwardAll(FeaturesMatrixFloat *data) {
     return result;
 }
 
-void RSNeuralNetwork::prepareInput(FeaturesMatrixFloat *data, int centerFrame, float* out) {
+void RSNeuralNetwork::prepareInput(FeatureMatrix *data, int centerFrame, float* out) {
     const int neig = 7;
     int frameNum = 0;
     for(int i = 0; i < neig * 2 + 1; i++){

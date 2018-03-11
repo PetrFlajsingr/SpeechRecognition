@@ -97,7 +97,7 @@ void createFrames(){
 
     __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "fft end");
 
-    FeaturesMatrixFloat rsMelBankResults;
+    FeatureMatrix rsMelBankResults;
     RSMelFilterBank *rsMelBank = new RSMelFilterBank(cacheDir);
     rsMelBankResults.init(frameCount, MEL_BANK_FRAME_LENGTH);
     __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "RS mel bank start");
@@ -120,7 +120,7 @@ void createFrames(){
 
     //RSNeuralNetwork RSNN("/sdcard/voicerecognition/nn.bin", cacheDir);
     __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "RS NN start");
-    //FeaturesMatrixFloat* NNoutput = RSNN.forwardAll(&rsMelBankResults);
+    //FeatureMatrix* NNoutput = RSNN.forwardAll(&rsMelBankResults);
 
     __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "RS NN end");
     //NNoutput->dumpResultToFile("/sdcard/AAAAANNNNNN.txt");

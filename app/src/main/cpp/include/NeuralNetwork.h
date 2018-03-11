@@ -6,7 +6,7 @@
 #define VOICERECOGNITION_NEURALNETWORK_H
 
 #include <fstream>
-#include "FeaturesMatrixFloat.h"
+#include "FeatureMatrix.h"
 
 struct NNInitInfo{
     unsigned int layerCount;
@@ -17,7 +17,7 @@ class NeuralNetwork {
 private:
     NNInitInfo info;
 
-    FeaturesMatrixFloat* frames;
+    FeatureMatrix* frames;
 
     unsigned int frameCount = 0;
 
@@ -56,7 +56,7 @@ public:
 
     virtual ~NeuralNetwork();
 
-    void setFeatureMatrix(FeaturesMatrixFloat* frames);
+    void setFeatureMatrix(FeatureMatrix* frames);
 };
 
 

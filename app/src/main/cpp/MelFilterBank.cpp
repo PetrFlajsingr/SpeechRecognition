@@ -15,7 +15,7 @@ float* MelFilterBank::melCBin = NULL;
 
 int* MelFilterBank::melCinD = NULL;
 
-FeaturesMatrixFloat MelFilterBank::mfb;
+FeatureMatrix MelFilterBank::mfb;
 
 void dumpFloatArray(float* array, std::string path, int length){
     std::ofstream out;
@@ -115,7 +115,7 @@ MelFilterBank::MelFilterBank(){
 }
 
 void MelFilterBank::calculateMelBanks(int frameCount, kiss_fft_cpx** fftFrames) {
-    melBankFrames = new FeaturesMatrixFloat();
+    melBankFrames = new FeatureMatrix();
 
     melBankFrames->init(frameCount, MEL_BANK_FRAME_LENGTH);
 
@@ -161,7 +161,7 @@ void MelFilterBank::dumpResultToFile(std::string path) {
     melBankFrames->dumpResultToFile(path);
 }
 
-FeaturesMatrixFloat *MelFilterBank::getMelBankFrames() const {
+FeatureMatrix *MelFilterBank::getMelBankFrames() const {
     return melBankFrames;
 }
 

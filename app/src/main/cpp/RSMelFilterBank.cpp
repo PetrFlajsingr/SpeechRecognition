@@ -51,7 +51,7 @@ float *RSMelFilterBank::calculateMelBank(kiss_fft_cpx *fftData) {
     return returnMelValues;
 }
 
-void RSMelFilterBank::substractMean(FeaturesMatrixFloat *featuresMatrix) {
+void RSMelFilterBank::substractMean(FeatureMatrix *featuresMatrix) {
     this->melRSinstance->set_frameCount(featuresMatrix->getFramesNum());
 
     sp<Allocation> melCalcFramesAllocation = Allocation::createSized(renderScriptObject,

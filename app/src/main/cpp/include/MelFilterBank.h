@@ -7,7 +7,7 @@
 
 #include <string>
 #include "constants.h"
-#include "FeaturesMatrixFloat.h"
+#include "FeatureMatrix.h"
 #include "../kissfft/kiss_fft.h"
 
 class MelFilterBank {
@@ -26,11 +26,11 @@ private:
 
     static float melInvPoint(float x);
 
-    static FeaturesMatrixFloat mfb;
+    static FeatureMatrix mfb;
 
-    FeaturesMatrixFloat* melBankFrames;
+    FeatureMatrix* melBankFrames;
 public:
-    FeaturesMatrixFloat *getMelBankFrames() const;
+    FeatureMatrix *getMelBankFrames() const;
 
 public:
     MelFilterBank();

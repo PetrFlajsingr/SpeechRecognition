@@ -9,7 +9,7 @@
 #include <cstdio>
 #include <string>
 
-class FeaturesMatrixFloat {
+class FeatureMatrix {
 private:
     float** featuresMatrix = NULL; //< matrix data
 
@@ -29,7 +29,7 @@ public:
 
     void setFeatureMatrixFrame(int frameNum, float* data);
 
-    virtual ~FeaturesMatrixFloat();
+    virtual ~FeatureMatrix();
 
     void dumpResultToFile(std::string path);
 };

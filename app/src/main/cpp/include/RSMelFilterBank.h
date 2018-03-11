@@ -6,7 +6,7 @@
 #define VOICERECOGNITION_RSMELFILTERBANK_H
 
 #include <RenderScript.h>
-#include <FeaturesMatrixFloat.h>
+#include <FeatureMatrix.h>
 #include "ScriptC_RSmelfilterbank.h"
 #include "../kissfft/kiss_fft.h"
 
@@ -29,7 +29,7 @@ public:
 
     float* calculateMelBank(kiss_fft_cpx* fftData);
 
-    void substractMean(FeaturesMatrixFloat* featuresMatrix);
+    void substractMean(FeatureMatrix* featuresMatrix);
 };
 
 

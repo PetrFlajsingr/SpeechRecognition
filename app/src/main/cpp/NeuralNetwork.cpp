@@ -149,13 +149,13 @@ NeuralNetwork::~NeuralNetwork() {
     delete[] this->layerWeights;
 }
 
-void NeuralNetwork::setFeatureMatrix(FeaturesMatrixFloat *frames) {
+void NeuralNetwork::setFeatureMatrix(FeatureMatrix *frames) {
     this->frames = frames;
     this->frameCount = frames->getFramesNum();
 }
 
 void NeuralNetwork::forward() {
-    FeaturesMatrixFloat* bottleneckMatrix = new FeaturesMatrixFloat();
+    FeatureMatrix* bottleneckMatrix = new FeatureMatrix();
     bottleneckMatrix->init(this->frameCount, this->outputNodeCount);
 
     int frameNum = 0;

@@ -65,7 +65,7 @@ add_library( # Sets the name of the library.
               src/main/cpp/kissfft/kiss_fft.c
               src/main/cpp/kissfft/kiss_fftr.c
               src/main/cpp/MelFilterBank.cpp
-              src/main/cpp/FeaturesMatrixFloat.cpp
+              src/main/cpp/FeatureMatrix.cpp
               src/main/cpp/firfilter/filt.cpp
               src/main/cpp/NeuralNetwork.cpp
               src/main/cpp/RSMelFilterBank.cpp
