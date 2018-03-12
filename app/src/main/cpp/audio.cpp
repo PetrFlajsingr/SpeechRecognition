@@ -63,6 +63,10 @@ void startRecording()
     recorder->startRecording();
 }
 
+/**
+ * Function called from a thread to calculate mel banks on data provided by recorder thread.
+ * It is being controlled by a condition_variable unlocking the thread from recorder thread.
+ */
 void calculateMelbanksThread(){
     const int ORIG_FRAME_OVERLAP = SAMPLING_RATE * 0.010;
     std::mutex mtx;
@@ -70,30 +74,38 @@ void calculateMelbanksThread(){
 
     AudioFrame::calcHammingCoef();
 
-    kiss_fftr_cfg cfg = kiss_fftr_alloc(FFT_FRAME_LENGTH, 0, NULL, NULL);
+    kiss_fftr_cfg cfg = kiss_fftr_alloc(FFT_FRAME_LENGTH, 0, NULL, NULL); //< configuration for kissfft
+
 
     FeatureMatrix melBankResults;
     melBankResults.init(MAX_FRAME_COUNT, MEL_BANK_FRAME_LENGTH);
 
     RSMelFilterBank *rsMelBank = new RSMelFilterBank(cacheDir);
 
-    int dataStart = 0;
+    int dataStart = 0; //< offset for data provided by recorder thread
 
     int frameCounter = 0;
 
+    // thread continues to calculate mel banks as long as the recording is active or there are
+    // data to work through
     while(recorder->isRecording() || recorder->getDataCounter() - ORIG_FRAME_OVERLAP >= dataStart){
         if(recorder->getDataCounter() > ORIG_FRAME_LENGTH){
             short* subsampledData = AudioSubsampler::subsample48kHzto8kHz(audioData + dataStart, ORIG_FRAME_LENGTH);
+
             AudioFrame frame;
             frame.applyHammingWindow(subsampledData);
+
+            // deletion of not needed memory
             delete[] subsampledData;
 
             frame.applyFFT(&cfg);
 
             kiss_fft_cpx* fftFrame = frame.getFftData();
 
+            // saving the data into matrix
             melBankResults.getFeaturesMatrix()[frameCounter] = rsMelBank->calculateMelBank(fftFrame);
 
+            //increasing offset
             dataStart += ORIG_FRAME_OVERLAP;
 
             frameCounter++;
