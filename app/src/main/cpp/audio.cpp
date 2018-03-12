@@ -83,7 +83,7 @@ void calculateMelbanksThread(){
 
     while(recorder->isRecording() || recorder->getDataCounter() - ORIG_FRAME_OVERLAP >= dataStart){
         if(recorder->getDataCounter() > ORIG_FRAME_LENGTH){
-            short* subsampledData = AudioSubsampler::subsample48kHzto8kHz(audioData + dataStart, ORIG_FRAME_LENGTH); //<<<< tu
+            short* subsampledData = AudioSubsampler::subsample48kHzto8kHz(audioData + dataStart, ORIG_FRAME_LENGTH);
             AudioFrame frame;
             frame.applyHammingWindow(subsampledData);
             delete[] subsampledData;
@@ -98,7 +98,7 @@ void calculateMelbanksThread(){
 
             frameCounter++;
         }
-        if(recorder->isRecording())
+        if(recorder->isRecording() && recorder->getDataCounter() < dataStart + ORIG_FRAME_LENGTH);
             cv.wait(lock);
     }
 
