@@ -31,7 +31,7 @@ short *AudioSubsampler::subsample48kHzto8kHz(short *data, int dataLength) {
 
     return resultArray;
 
-    Filter *lpFIRFiler = new Filter(LPF, 32, 48.0, 4.0);
+    Filter *lpFIRFiler = new Filter(LPF, 16, 8.0, 4.0);
     for(int i = 0; i < dataLength; ++i) {
         resultArray[i] = (short) lpFIRFiler->do_sample((double) data[i]);
     }
