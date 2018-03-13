@@ -91,9 +91,7 @@ void calculateMelbanksThread(){
     while(recorder->isRecording() || recorder->getDataCounter() - ORIG_FRAME_OVERLAP > dataStart){
 
         if(recorder->isRecording() && recorder->getDataCounter() < dataStart + ORIG_FRAME_LENGTH){
-            __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "lock");
             cv.wait(lock);
-            __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "unlock");
             continue;
         }
         short *subsampledData = AudioSubsampler::subsample48kHzto8kHz(audioData + dataStart,
