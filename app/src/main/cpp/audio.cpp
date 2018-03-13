@@ -88,30 +88,42 @@ void calculateMelbanksThread(){
 
     // thread continues to calculate mel banks as long as the recording is active or there are
     // data to work through
-    while(recorder->isRecording() || recorder->getDataCounter() - ORIG_FRAME_OVERLAP >= dataStart){
-        if(recorder->getDataCounter() > ORIG_FRAME_LENGTH){
-            short* subsampledData = AudioSubsampler::subsample48kHzto8kHz(audioData + dataStart, ORIG_FRAME_LENGTH);
+    while(recorder->isRecording() || recorder->getDataCounter() - ORIG_FRAME_OVERLAP > dataStart){
 
-            AudioFrame frame;
-            frame.applyHammingWindow(subsampledData);
-
-            // deletion of not needed memory
-            delete[] subsampledData;
-
-            frame.applyFFT(&cfg);
-
-            kiss_fft_cpx* fftFrame = frame.getFftData();
-
-            // saving the data into matrix
-            melBankResults.getFeaturesMatrix()[frameCounter] = rsMelBank->calculateMelBank(fftFrame);
-
-            //increasing offset
-            dataStart += ORIG_FRAME_OVERLAP;
-
-            frameCounter++;
-        }
-        if(recorder->isRecording() && recorder->getDataCounter() < dataStart + ORIG_FRAME_LENGTH);
+        if(recorder->isRecording() && recorder->getDataCounter() < dataStart + ORIG_FRAME_LENGTH){
+            __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "lock");
             cv.wait(lock);
+            __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "unlock");
+            continue;
+        }
+        short *subsampledData = AudioSubsampler::subsample48kHzto8kHz(audioData + dataStart,
+                                                                      ORIG_FRAME_LENGTH);
+
+        if(frameCounter == 0){
+            std::ofstream out;
+            out.open("/sdcard/AAA_AUDIOTEST1.raw", std::ios::out | std::ios::binary);
+
+            out.write((char*)subsampledData, 400);
+            out.close();
+        }
+
+        AudioFrame frame;
+        frame.applyHammingWindow(subsampledData);
+
+        // deletion of not needed memory
+        delete[] subsampledData;
+
+        frame.applyFFT(&cfg);
+
+        kiss_fft_cpx *fftFrame = frame.getFftData();
+
+        // saving the data into matrix
+        melBankResults.getFeaturesMatrix()[frameCounter] = rsMelBank->calculateMelBank(fftFrame);
+
+        //increasing offset
+        dataStart += ORIG_FRAME_OVERLAP;
+
+        frameCounter++;
     }
 
     __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "test: %d", (recorder->getDataCounter() - ORIG_FRAME_LENGTH) / ORIG_FRAME_OVERLAP);
@@ -125,7 +137,7 @@ void calculateMelbanksThread(){
     std::ofstream out;
     out.open("/sdcard/AAA_AUDIOTEST.raw", std::ios::out | std::ios::binary);
 
-    out.write((char*)AudioSubsampler::subsample48kHzto8kHz(audioData, recorder->getDataCounter()), recorder->getDataCounter()*2);
+    out.write((char*)AudioSubsampler::subsample48kHzto8kHz(audioData, recorder->getDataCounter()), recorder->getDataCounter()/6*2);
     out.close();
 
     melBankResults.dumpResultToFile("/sdcard/AAA_MELBANKRESULT.TXT");

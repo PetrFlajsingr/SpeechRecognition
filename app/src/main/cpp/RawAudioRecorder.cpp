@@ -90,7 +90,7 @@ bool RawAudioRecorder::createAudioRecorder() {
 
     // configure audio sink
     SLDataLocator_AndroidSimpleBufferQueue loc_bq = {SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE, 2};
-    SLDataFormat_PCM format_pcm = {SL_DATAFORMAT_PCM, 1, SL_SAMPLINGRATE_8,
+    SLDataFormat_PCM format_pcm = {SL_DATAFORMAT_PCM, 1, SL_SAMPLINGRATE_48,
                                    SL_PCMSAMPLEFORMAT_FIXED_16, SL_PCMSAMPLEFORMAT_FIXED_16,
                                    SL_SPEAKER_FRONT_CENTER, SL_BYTEORDER_LITTLEENDIAN};
     SLDataSink audioSnk = {&loc_bq, &format_pcm};
@@ -176,6 +176,7 @@ void RawAudioRecorder::startRecording() {
     (void)result;
 
     recording = true;
+    dataCounter = 0;
 }
 
 /**

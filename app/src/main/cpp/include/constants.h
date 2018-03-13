@@ -14,7 +14,7 @@ const int FFT_FRAME_LENGTH = 256;
 const int MEL_BANK_FRAME_LENGTH = 24;
 
 const int TARGET_SAMPLING_RATE = 8000;
-const int SAMPLING_RATE = 8000;
+const int SAMPLING_RATE = 48000;
 
 const int ORIG_FRAME_LENGTH = SAMPLING_RATE * 0.025;
 
