@@ -12,18 +12,27 @@ static float sigmoid(float* x){
     return 1.0 / (1 + exp(-(*x)));
 }
 
-//rs_allocation data;
+float softmaxDivider;
+float* outputs;
+float initSoftmax(int vectorLength){
+    softmaxDivider = 0;
+    for(int i = 0; i < vectorLength; i++)
+        softmaxDivider += exp(outputs[i]);
+}
+
+float softmax(int index){
+    return exp(outputs[index]) / softmaxDivider;
+}
+
 float* data;
 
 void globalMeansVars(const uint32_t* neuronIterator){
-    //float dataValue = rsGetElementAt_float(data, *neuronIterator);
     float dataValue = data[*neuronIterator];
     // means
     dataValue = dataValue + rsGetElementAt_float(means, *neuronIterator);
 
     // vars
     dataValue = dataValue * rsGetElementAt_float(vars, *neuronIterator);
-    //rsSetElementAt_float(data, dataValue, *neuronIterator);
     data[*neuronIterator] = dataValue;
 }
 
