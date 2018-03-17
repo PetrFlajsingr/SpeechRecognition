@@ -6,7 +6,7 @@
 #include <fstream>
 #include <RenderScript.h>
 #include <sstream>
-#include "RSNeuralNetwork.h"
+#include "RSNeuralNetworkOld.h"
 #include "constants.h"
 
 /**

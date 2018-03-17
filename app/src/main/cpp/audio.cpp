@@ -16,7 +16,7 @@
 #include "MelFilterBank.h"
 #include "NeuralNetwork.h"
 #include <RenderScript.h>
-#include <RSNeuralNetwork.h>
+#include <RSNeuralNetworkOld.h>
 #include <thread>
 #include <condition_variable>
 
