@@ -7,11 +7,7 @@
 
 #include <fstream>
 #include "FeatureMatrix.h"
-
-struct NNInitInfo{
-    unsigned int layerCount;
-    unsigned int* neuronCounts;
-};
+#include "NNInitInfo.h"
 
 class NeuralNetwork {
 private:

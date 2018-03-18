@@ -6,25 +6,36 @@ rs_allocation means;
 rs_allocation biases;
 rs_allocation weights;
 
+// 0 - nothing
+// 1 - sigmoid
+// 2 - softmax
+rs_allocation functions;
+
 rs_allocation neuronCounts;
 
 static float sigmoid(float* x){
     return 1.0 / (1 + exp(-(*x)));
 }
 
-float softmaxDivider;
-float* outputs;
-float initSoftmax(int vectorLength){
-    softmaxDivider = 0;
-    for(int i = 0; i < vectorLength; i++)
-        softmaxDivider += exp(outputs[i]);
-}
-
-float softmax(int index){
-    return exp(outputs[index]) / softmaxDivider;
-}
-
 float* data;
+static float dataBuffer[500];
+
+static float softmaxExpSumCalc(int vectorLength){
+    float softmaxDivider = 0;
+    for(int i = 0; i < vectorLength; i++)
+        softmaxDivider += exp(data[i]);
+
+    return softmaxDivider;
+}
+
+
+void calculateSoftmax(int vectorLength){
+    float expSum = softmaxExpSumCalc(vectorLength);
+    for(int i = 0; i < vectorLength; ++i){
+        data[i] = exp(dataBuffer[i]) / expSum;
+    }
+}
+
 
 void globalMeansVars(const uint32_t* neuronIterator){
     float dataValue = data[*neuronIterator];
@@ -41,9 +52,6 @@ uint32_t biasOffset = 0;
 
 uint32_t layerNumber; // pro adresovani hodnot v alokacich
 
-
-static float dataBuffer[360];
-
 void forwardWeights(const uint32_t* neuronIterator){
     // weights
     float neuronLayerCount = rsGetElementAt_uint(neuronCounts, layerNumber);
@@ -59,7 +67,7 @@ void forwardWeights(const uint32_t* neuronIterator){
 void forwardBias(const uint32_t* neuronIterator){
     // biases
     dataBuffer[*neuronIterator] = dataBuffer[*neuronIterator] + rsGetElementAt_float(biases, biasOffset + *neuronIterator);
-    if(layerNumber < 2)
+    if(rsGetElementAt_int(functions, layerNumber) == 1)
         data[*neuronIterator] = sigmoid(&dataBuffer[*neuronIterator]);
     else
         data[*neuronIterator] = dataBuffer[*neuronIterator];

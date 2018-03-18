@@ -14,14 +14,13 @@
 #include <sstream>
 #include "constants.h"
 #include "MelFilterBank.h"
-#include "NeuralNetwork.h"
 #include <RenderScript.h>
-#include <RSNeuralNetworkOld.h>
 #include <thread>
 #include <condition_variable>
 
 #include <chrono>
 #include <AudioSubsampler.h>
+#include <RSNeuralNetwork.h>
 
 #include "RSMelFilterBank.h"
 
@@ -150,6 +149,34 @@ void threadTest(){
     testThread.join();
 }
 
+void nntest(){
+    RSNeuralNetwork nn("/sdcard/NNnew.bin", cacheDir);
+
+    float data[360] = {
+            10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    };
+    float* result = nn.forward(data);
+
+    for(int i = 0; i < 46; ++i){
+        __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "%d: %g", i, result[i]);
+    }
+
+}
+
 void createFrames(){
    // int a;
     //recorder->getRecording(&a);
@@ -197,7 +224,7 @@ void createFrames(){
     __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "RS mel bank end");
     rsMelBankResults.dumpResultToFile("/sdcard/___RES.txt");
 
-    //RSNeuralNetwork RSNN("/sdcard/voicerecognition/nn.bin", cacheDir);
+    //RSNeuralNetworkOld RSNN("/sdcard/voicerecognition/nn.bin", cacheDir);
     __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "RS NN start");
     //FeatureMatrix* NNoutput = RSNN.forwardAll(&rsMelBankResults);
 
@@ -291,6 +318,7 @@ JNIEXPORT void JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_MainActivity_
     }
 
     JNIEXPORT void Java_cz_vutbr_fit_xflajs00_voicerecognition_MainActivity_createFrames(JNIEnv* env, jclass clazz){
-         createFrames();
+         //createFrames();
+        nntest();
     }
 }

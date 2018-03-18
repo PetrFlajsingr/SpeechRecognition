@@ -1,18 +1,24 @@
 //
-// Created by Petr Flajsingr on 16/12/2017.
+// Created by Petr Flajsingr on 17/03/2018.
 //
 
 #ifndef VOICERECOGNITION_RSNEURALNETWORK_H
 #define VOICERECOGNITION_RSNEURALNETWORK_H
 
 #include "ScriptC_RSneuralnetwork.h"
-#include "NeuralNetwork.h"
+#include "constants.h"
+#include "NNInitInfo.h"
+#include "FeatureMatrix.h"
 #include <RenderScript.h>
 #include <vector>
+#include <string>
 
-using namespace android::RSC;
-
-class RSNeuralNetworkOld {
+class RSNeuralNetwork {
+    enum ACTIVATION_FUNCTIONS{
+        NOTHING,
+        SIGMOID,
+        SOFTMAX
+    };
 private:
     sp<RS> renderScriptObject;
 
@@ -22,29 +28,31 @@ private:
 
     NNInitInfo info;
 
-    unsigned int outputNodeCount = 0;
-
     float** layerBiases;
     float** layerVars;
     float** layerMeans;
     float*** layerWeights;
 
-    unsigned int layerCount;
+    unsigned int totalNeuronCount = 0;
 
-    void allocateMemory();
+    ACTIVATION_FUNCTIONS* layerFunction;
 
     void loadFromFile(std::string filepath);
 
-    void prepareInput(FeatureMatrix*data, int centerFrame, float* out);
+    void prepareInput(FeatureMatrix*data, int index, float* out);
 
 public:
-    RSNeuralNetworkOld(std::string filepath, const char* cacheDir);
+    RSNeuralNetwork(std::string filepath, const char* cacheDir);
 
-    virtual ~RSNeuralNetworkOld();
+    virtual ~RSNeuralNetwork();
 
     float* forward(float* data);
 
     FeatureMatrix* forwardAll(FeatureMatrix* data);
+
+    unsigned int getTotalNeuronCount();
+
+    unsigned int getTotalWeightsCount();
 };
 
 

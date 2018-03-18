@@ -13,7 +13,7 @@
  * Requires cache directory of the application for Renderscript.
  * @param filepath path to neural network file
  */
-RSNeuralNetwork::RSNeuralNetwork(std::string filepath, const char* cacheDir) {
+RSNeuralNetworkOld::RSNeuralNetworkOld(std::string filepath, const char* cacheDir) {
     NNInitInfo initInfo;
     initInfo.layerCount = 3;
     initInfo.neuronCounts = new unsigned int[initInfo.layerCount];
@@ -38,7 +38,7 @@ RSNeuralNetwork::RSNeuralNetwork(std::string filepath, const char* cacheDir) {
 /**
  * Memory allocation for neural network
  */
-void RSNeuralNetwork::allocateMemory() {
+void RSNeuralNetworkOld::allocateMemory() {
     //layers init
     this->layerBiases = new float*[info.layerCount];
     this->layerVars = new float*[1];
@@ -60,7 +60,7 @@ void RSNeuralNetwork::allocateMemory() {
     }
 }
 
-RSNeuralNetwork::~RSNeuralNetwork() {
+RSNeuralNetworkOld::~RSNeuralNetworkOld() {
     for(unsigned int i = 0; i < this->layerCount; ++i){
         delete[] this->layerBiases[i];
         for(unsigned int j = 0; j < info.neuronCounts[i + 1]; ++j) {
@@ -81,7 +81,7 @@ RSNeuralNetwork::~RSNeuralNetwork() {
  * Loading of NN from file
  * @param filepath path to file
  */
-void RSNeuralNetwork::loadFromFile(std::string filepath) {
+void RSNeuralNetworkOld::loadFromFile(std::string filepath) {
     std::ifstream file;
     file.open(filepath.c_str(), std::ios::in|std::ios::binary);
     if(file.is_open()){
@@ -192,7 +192,7 @@ void RSNeuralNetwork::loadFromFile(std::string filepath) {
 /**
  * Memory allocation for RenderScript
  */
-void RSNeuralNetwork::prepareAllocations() {
+void RSNeuralNetworkOld::prepareAllocations() {
     sp<Allocation> meansAllocation = Allocation::createSized(this->renderScriptObject,
                                                              Element::F32(this->renderScriptObject),
                                                              info.neuronCounts[0]);
@@ -262,7 +262,7 @@ void dumpArray(std::string path, float* arr, int size){
  * @param data input data
  * @return NN output
  */
-float* RSNeuralNetwork::forward(float* data) {
+float* RSNeuralNetworkOld::forward(float* data) {
     sp<Allocation> dataAllocation = Allocation::createSized(this->renderScriptObject,
                                                             Element::F32(this->renderScriptObject),
                                                             info.neuronCounts[0]);
@@ -331,7 +331,7 @@ float* RSNeuralNetwork::forward(float* data) {
     return result;
 }
 
-FeatureMatrix *RSNeuralNetwork::forwardAll(FeatureMatrix *data) {
+FeatureMatrix *RSNeuralNetworkOld::forwardAll(FeatureMatrix *data) {
     FeatureMatrix* result = new FeatureMatrix();
     result->init(data->getFramesNum(), 30);
 
@@ -350,7 +350,7 @@ FeatureMatrix *RSNeuralNetwork::forwardAll(FeatureMatrix *data) {
  * @param centerFrame
  * @param out
  */
-void RSNeuralNetwork::prepareInput(FeatureMatrix *data, int centerFrame, float* out) {
+void RSNeuralNetworkOld::prepareInput(FeatureMatrix *data, int centerFrame, float* out) {
     const int neig = 7;
     int frameNum = 0;
     for(int i = 0; i < neig * 2 + 1; i++){

@@ -67,7 +67,6 @@ add_library( # Sets the name of the library.
               src/main/cpp/MelFilterBank.cpp
               src/main/cpp/FeatureMatrix.cpp
               src/main/cpp/firfilter/filt.cpp
-              src/main/cpp/NeuralNetwork.cpp
               src/main/cpp/RSMelFilterBank.cpp
               src/main/cpp/RSNeuralNetwork.cpp
               ${RS_OBJ_FILES}
