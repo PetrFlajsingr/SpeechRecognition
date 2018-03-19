@@ -4,6 +4,7 @@
 
 
 #include <fstream>
+#include <android/log.h>
 #include "RSNeuralNetwork.h"
 
 RSNeuralNetwork::RSNeuralNetwork(std::string filepath, const char *cacheDir) {
@@ -30,6 +31,7 @@ void RSNeuralNetwork::loadFromFile(std::string filepath) {
 
         this->layerBiases = new float*[info.layerCount];
         this->layerWeights = new float**[info.layerCount];
+        this->layerFunction = new ACTIVATION_FUNCTIONS[info.layerCount];
 
         info.neuronCounts = new unsigned int[info.layerCount];
 
@@ -39,6 +41,7 @@ void RSNeuralNetwork::loadFromFile(std::string filepath) {
 
         this->layerVars[0] = new float[var_meanLength];
         this->layerMeans[0] = new float[var_meanLength];
+        this->info.inputSize = var_meanLength;
 
         //mean data
         float tempFloat = 0;
@@ -122,8 +125,14 @@ void RSNeuralNetwork::prepareInput(FeatureMatrix *data, int index, float *out) {
 RSNeuralNetwork::~RSNeuralNetwork() {
     for(unsigned int i = 0; i < info.layerCount; ++i){
         delete[] this->layerBiases[i];
-        for(unsigned int j = 0; j < info.neuronCounts[i + 1]; ++j) {
-            delete[] this->layerWeights[i][j];
+        if(i == 0){
+            for(unsigned int j = 0; j < info.inputSize; ++j) {
+                delete[] this->layerWeights[i][j];
+            }
+        } else{
+            for(unsigned int j = 0; j < info.neuronCounts[i]; ++j) {
+                delete[] this->layerWeights[i][j];
+            }
         }
         delete[] this->layerWeights[i];
     }
@@ -134,41 +143,45 @@ RSNeuralNetwork::~RSNeuralNetwork() {
     delete[] this->layerVars;
     delete[] this->layerMeans;
     delete[] this->layerWeights;
+    delete[] this->layerFunction;
+
+
+    delete neuralNetworkRSInstance;
 }
 
 float *RSNeuralNetwork::forward(float *data) {
     sp<Allocation> dataAllocation = Allocation::createSized(this->renderScriptObject,
                                                             Element::F32(this->renderScriptObject),
-                                                            info.neuronCounts[0]);
+                                                            500);
 
     dataAllocation->copy1DFrom(data);
 
     sp<Allocation> iterAlloc;
 
-    int neuronIterator[info.neuronCounts[0]];
-    for(int i = 0; i < info.neuronCounts[0]; i++) {
-        neuronIterator[i] = i;
+    int inputIterator[info.inputSize];
+    for(int i = 0; i < info.inputSize; i++) {
+        inputIterator[i] = i;
     }
+
+    iterAlloc = Allocation::createSized(this->renderScriptObject,
+                                        Element::U32(this->renderScriptObject),
+                                        info.inputSize);
+    iterAlloc->copy1DFrom(inputIterator);
+
+    this->neuralNetworkRSInstance->bind_data(dataAllocation);
+
+    //globals
+    this->neuralNetworkRSInstance->forEach_globalMeansVars(iterAlloc);
+
+    renderScriptObject->finish();
 
 
     uint32_t biasOffset = 0, weightOffset = 0;
     for(uint32_t layerIterator = 0; layerIterator < info.layerCount; layerIterator++){
+        __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "layer: %d", layerIterator+1);
         int neuronIterator[info.neuronCounts[layerIterator]];
         for(int i = 0; i < info.neuronCounts[layerIterator]; i++) {
             neuronIterator[i] = i;
-        }
-
-        if(layerIterator == 0){
-            iterAlloc = Allocation::createSized(this->renderScriptObject,
-                                                Element::U32(this->renderScriptObject), info.neuronCounts[0]);
-            iterAlloc->copy1DFrom(neuronIterator);
-
-            this->neuralNetworkRSInstance->bind_data(dataAllocation);
-
-            //globals
-            this->neuralNetworkRSInstance->forEach_globalMeansVars(iterAlloc);
-
-            renderScriptObject->finish();
         }
 
         this->neuralNetworkRSInstance->set_layerNumber(layerIterator);
@@ -179,14 +192,18 @@ float *RSNeuralNetwork::forward(float *data) {
 
 
         iterAlloc = Allocation::createSized(this->renderScriptObject,
-                                            Element::U32(this->renderScriptObject), info.neuronCounts[layerIterator +  1]);
+                                            Element::U32(this->renderScriptObject), info.neuronCounts[layerIterator]);
+        __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "weights size: %d", info.neuronCounts[layerIterator]);
         iterAlloc->copy1DFrom(neuronIterator);
         this->neuralNetworkRSInstance->forEach_forwardBias(iterAlloc);
         renderScriptObject->finish();
 
         biasOffset += info.neuronCounts[layerIterator];
-        weightOffset += info.neuronCounts[layerIterator] * info.neuronCounts[layerIterator + 1];
-
+        if(layerIterator == 0){
+            weightOffset += info.inputSize * info.neuronCounts[layerIterator];
+        } else{
+            weightOffset += info.neuronCounts[layerIterator - 1] * info.neuronCounts[layerIterator];
+        }
     }
 
     neuralNetworkRSInstance->invoke_calculateSoftmax(info.neuronCounts[info.layerCount - 1]);

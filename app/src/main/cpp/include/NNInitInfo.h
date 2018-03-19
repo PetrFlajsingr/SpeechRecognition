@@ -10,6 +10,7 @@
 struct NNInitInfo{
     unsigned int layerCount;
     unsigned int* neuronCounts;
+    unsigned int inputSize;
 
     virtual ~NNInitInfo() {
         delete[](neuronCounts);

@@ -150,30 +150,60 @@ void threadTest(){
 }
 
 void nntest(){
+    const int FRAME_SIZE = (const int) (8000 * 0.025);
+    const int FRAME_OVERLEAP = (const int) (8000 * 0.010);
+    int recordingSize = 0;
+
+    short* data = readAudioFromFile("/sdcard/AAA_ahojtest.raw", &recordingSize);
+
+    int frameCount = (recordingSize - FRAME_SIZE) / FRAME_OVERLEAP;
+
+    AudioFrame::calcHammingCoef();
+
+    AudioFrame* frames = new AudioFrame[frameCount];
+
+    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "hamming window start");
+    for(unsigned int frame = 0; frame < frameCount; ++frame){
+        frames[frame].applyHammingWindow(data + frame*FRAME_OVERLEAP);
+    }
+    free(data);
+    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "hamming window end");
+
+    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "fft start");
+    kiss_fftr_cfg cfg = kiss_fftr_alloc(FFT_FRAME_LENGTH, 0, NULL, NULL);
+
+    kiss_fft_cpx** fftFrames = new kiss_fft_cpx*[frameCount];
+
+    for(unsigned int i = 0; i < frameCount; ++i){
+        frames[i].applyFFT(&cfg);
+        fftFrames[i] = frames[i].getFftData();
+    }
+    free(cfg);
+
+    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "fft end");
+
+    FeatureMatrix rsMelBankResults;
+    RSMelFilterBank *rsMelBank = new RSMelFilterBank(cacheDir);
+    rsMelBankResults.init(frameCount, MEL_BANK_FRAME_LENGTH);
+    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "RS mel bank start");
+
+    for(int i = 0; i < frameCount; ++i) {
+        rsMelBankResults.getFeaturesMatrix()[i] = rsMelBank->calculateMelBank(fftFrames[i]);
+    }
+    rsMelBank->substractMean(&rsMelBankResults);
+    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "RS mel bank end");
+
     RSNeuralNetwork nn("/sdcard/NNnew.bin", cacheDir);
 
-    float data[360] = {
-            10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-    };
-    float* result = nn.forward(data);
+    //TODO testovat z daty z rsMelBank
+//    for(int i = 0; i < 1000; ++i){
+//        __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "TEST #%d", i+1);
+//
+//
+//        float* result = nn.forward(data);
+//        delete[] result;
+//    }
 
-    for(int i = 0; i < 46; ++i){
-        __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "%d: %g", i, result[i]);
-    }
 
 }
 

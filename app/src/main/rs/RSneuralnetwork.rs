@@ -56,12 +56,14 @@ void forwardWeights(const uint32_t* neuronIterator){
     // weights
     float neuronLayerCount = rsGetElementAt_uint(neuronCounts, layerNumber);
     dataBuffer[*neuronIterator] = 0;
+    //rsDebug("neuronIterator:", *neuronIterator);
     for(int i = 0; i < neuronLayerCount; i++){
         dataBuffer[*neuronIterator] = dataBuffer[*neuronIterator]
                     + data[i]
                     * rsGetElementAt_float(weights,
                         weightOffset + *neuronIterator * neuronLayerCount + i);
     }
+    //rsDebug("neuronIteratorEnd:", *neuronIterator);
 }
 
 void forwardBias(const uint32_t* neuronIterator){
