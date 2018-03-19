@@ -149,7 +149,95 @@ void threadTest(){
     testThread.join();
 }
 
+std::string mapResultToString(float* array){
+    float max = 0;
+    int maxIndex = 0;
+    for(int i = 0; i < 46;i++){
+        if(array[i] > max){
+            max = array[i];
+            maxIndex = i;
+        }
+    }
+    //__android_log_print(ANDROID_LOG_DEBUG, APPNAME, "max: %g", max);
+    switch(maxIndex){
+        case 0: return "AA";
+        case 1: return "AE";
+        case 2: return "AH";
+        case 3: return "AO";
+        case 4: return "AW";
+        case 5: return "AY";
+        case 6: return "B";
+        case 7: return "BRH";
+        case 8: return "CGH";
+        case 9: return "CH";
+        case 10: return "D";
+        case 11: return "DH";
+        case 12: return "EH";
+        case 13: return "ER";
+        case 14: return "EY";
+        case 15: return "F";
+        case 16: return "G";
+        case 17: return "HH";
+        case 18: return "IH";
+        case 19: return "IY";
+        case 20: return "JH";
+        case 21: return "K";
+        case 22: return "L";
+        case 23: return "M";
+        case 24: return "N";
+        case 25: return "NG";
+        case 26: return "NSN";
+        case 27: return "OW";
+        case 28: return "OY";
+        case 29: return "P";
+        case 30: return "R";
+        case 31: return "S";
+        case 32: return "SH";
+        case 33: return "SIL";
+        case 34: return "SMK";
+        case 35: return "T";
+        case 36: return "TH";
+        case 37: return "UH";
+        case 38: return "UHH";
+        case 39: return "UM";
+        case 40: return "UW";
+        case 41: return "V";
+        case 42: return "W";
+        case 43: return "Y";
+        case 44: return "Z";
+        case 45: return "ZH";
+        default: return "ERROR";
+    }
+}
+
 void nntest(){
+//    float testData[360] = {
+//            100, 0, 100, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 100, 0,
+//            100, 0, 100, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 100, 0,
+//            100, 0, 100, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 100, 0,
+//            100, 0, 100, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 100, 0,
+//            100, 0, 100, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 100, 0,
+//            100, 0, 100, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 100, 0,
+//            100, 0, 100, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 100, 0,
+//            100, 0, 100, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 100, 0,
+//            100, 0, 100, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 100, 0,
+//            100, 0, 100, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 100, 0,
+//            100, 0, 100, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 100, 0,
+//            100, 0, 100, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 100, 0,
+//            100, 0, 100, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 100, 0,
+//            100, 0, 100, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 100, 0,
+//            100, 0, 100, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 100, 0
+//    };
+//
+//    RSNeuralNetwork nn2("/sdcard/NNnew.bin", cacheDir);
+//
+//    float* result2 = nn2.forward(testData);
+//
+//    for(int i = 0;i < 46; i++){
+//        __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "result: %g", result2[i]);
+//    }
+//
+//    return;
     const int FRAME_SIZE = (const int) (8000 * 0.025);
     const int FRAME_OVERLEAP = (const int) (8000 * 0.010);
     int recordingSize = 0;
@@ -195,14 +283,11 @@ void nntest(){
 
     RSNeuralNetwork nn("/sdcard/NNnew.bin", cacheDir);
 
-    //TODO testovat z daty z rsMelBank
-//    for(int i = 0; i < 1000; ++i){
-//        __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "TEST #%d", i+1);
-//
-//
-//        float* result = nn.forward(data);
-//        delete[] result;
-//    }
+    FeatureMatrix* result = nn.forwardAll(&rsMelBankResults);
+
+    for(int i = 0;i < frameCount; i++){
+        __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "result: %s", mapResultToString(result->getFeaturesMatrix()[i]).c_str());
+    }
 
 
 }

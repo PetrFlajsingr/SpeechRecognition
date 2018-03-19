@@ -15,9 +15,9 @@
 
 class RSNeuralNetwork {
     enum ACTIVATION_FUNCTIONS{
-        NOTHING,
-        SIGMOID,
-        SOFTMAX
+        NOTHING = 0,
+        SIGMOID = 1,
+        SOFTMAX = 2
     };
 private:
     sp<RS> renderScriptObject;

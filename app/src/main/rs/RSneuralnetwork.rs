@@ -32,7 +32,7 @@ static float softmaxExpSumCalc(int vectorLength){
 void calculateSoftmax(int vectorLength){
     float expSum = softmaxExpSumCalc(vectorLength);
     for(int i = 0; i < vectorLength; ++i){
-        data[i] = exp(dataBuffer[i]) / expSum;
+        data[i] = exp(data[i]) / expSum;
     }
 }
 
@@ -53,17 +53,17 @@ uint32_t biasOffset = 0;
 uint32_t layerNumber; // pro adresovani hodnot v alokacich
 
 void forwardWeights(const uint32_t* neuronIterator){
+//ERROR: používá svoje neuron count na vnitřní pole místo předchozí vrstvy
     // weights
-    float neuronLayerCount = rsGetElementAt_uint(neuronCounts, layerNumber);
+    uint32_t neuronLayerCount = rsGetElementAt_uint(neuronCounts, layerNumber);
     dataBuffer[*neuronIterator] = 0;
-    //rsDebug("neuronIterator:", *neuronIterator);
+
     for(int i = 0; i < neuronLayerCount; i++){
         dataBuffer[*neuronIterator] = dataBuffer[*neuronIterator]
                     + data[i]
                     * rsGetElementAt_float(weights,
                         weightOffset + *neuronIterator * neuronLayerCount + i);
     }
-    //rsDebug("neuronIteratorEnd:", *neuronIterator);
 }
 
 void forwardBias(const uint32_t* neuronIterator){
