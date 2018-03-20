@@ -1,6 +1,7 @@
 #pragma version(1)
 #pragma rs java_package_name(cz.vutbr.fit.xflajs00.voicerecognition)
 
+// Allocations for neural network data
 rs_allocation vars;
 rs_allocation means;
 rs_allocation biases;
@@ -17,9 +18,10 @@ static float sigmoid(float* x){
     return 1.0 / (1 + exp(-(*x)));
 }
 
-float* data;
-static float dataBuffer[500];
+float* data; //< Input data
+static float dataBuffer[500]; //< Data buffer for parallel weights calculation
 
+// Calculation of softmax divider
 static float softmaxExpSumCalc(int vectorLength){
     float softmaxDivider = 0;
     for(int i = 0; i < vectorLength; i++)
@@ -28,7 +30,6 @@ static float softmaxExpSumCalc(int vectorLength){
     return softmaxDivider;
 }
 
-
 void calculateSoftmax(int vectorLength){
     float expSum = softmaxExpSumCalc(vectorLength);
     for(int i = 0; i < vectorLength; ++i){
@@ -36,7 +37,7 @@ void calculateSoftmax(int vectorLength){
     }
 }
 
-
+// Apply global means and variance
 void globalMeansVars(const uint32_t* neuronIterator){
     float dataValue = data[*neuronIterator];
     // means
@@ -47,13 +48,13 @@ void globalMeansVars(const uint32_t* neuronIterator){
     data[*neuronIterator] = dataValue;
 }
 
+// Offsets for weights and biases
 uint32_t weightOffset = 0;
 uint32_t biasOffset = 0;
 
-uint32_t layerNumber; // pro adresovani hodnot v alokacich
+uint32_t layerNumber; //< Number of the layer currently computed
 
 void forwardWeights(const uint32_t* neuronIterator){
-//ERROR: používá svoje neuron count na vnitřní pole místo předchozí vrstvy
     // weights
     uint32_t neuronLayerCount = rsGetElementAt_uint(neuronCounts, layerNumber);
     dataBuffer[*neuronIterator] = 0;
