@@ -36,6 +36,7 @@ static float melInvPoint(float x) {
     return ((exp((float)(x / 1127.0)) - 1.0) * 700.0);
 }
 
+// Value inicialization for mel bank
 void init(){
     initLinSpace(melFBin, 0, TARGET_SAMPLING_RATE / 2, FFT_FRAME_LENGTH / 2 + 1);
 
@@ -63,8 +64,9 @@ void init(){
     }
 }
 
-rs_allocation fftFrame;
+rs_allocation fftFrame; //< data for calculation
 
+// Application of mel bank
 void melBank(const uint32_t* in, float* melBankFrame) {
     *melBankFrame = 0;
     for(int j = 0; j < FFT_FRAME_LENGTH / 2; ++j){
@@ -80,12 +82,13 @@ void melBank(const uint32_t* in, float* melBankFrame) {
     }
 }
 
-static float melBankFramesSum[MEL_BANK_FRAME_LENGTH]; //mean pro odecteni
+static float melBankFramesSum[MEL_BANK_FRAME_LENGTH]; //< Mean for normalisation
 
-uint32_t frameCount; //celkovy pocet ramcu
+uint32_t frameCount; //< Total frame count
 
-rs_allocation melCalculatedFrames;
+rs_allocation melCalculatedFrames; //< Results
 
+// Mean normalization
 void substractMean(const uint32_t* melIndex){
     melBankFramesSum[*melIndex] = 0;
     for(int frameNum = 0; frameNum < frameCount; ++frameNum) {
