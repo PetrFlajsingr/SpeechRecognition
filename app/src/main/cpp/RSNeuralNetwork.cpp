@@ -203,14 +203,8 @@ float *RSNeuralNetwork::forward(float *data) {
 
     renderScriptObject->finish();
 
-    float* DEBUG_INTER_RESULT = new float[500];
-
-    dataAllocation->copy1DRangeTo(0, info.inputSize, DEBUG_INTER_RESULT);
-    logArray("means vars", 0, DEBUG_INTER_RESULT, info.inputSize);
-
     uint32_t biasOffset = 0, weightOffset = 0;
     for(uint32_t layerIterator = 0; layerIterator < info.layerCount; layerIterator++){
-        //__android_log_print(ANDROID_LOG_DEBUG, APPNAME, "layer: %d", layerIterator+1);
         iterAlloc = Allocation::createSized(this->renderScriptObject,
                                             Element::U32(this->renderScriptObject), info.neuronCounts[layerIterator]);
 
@@ -223,17 +217,8 @@ float *RSNeuralNetwork::forward(float *data) {
         this->renderScriptObject->finish();
 
 
-        //neuralNetworkRSInstance->invoke_copyBufferToData(info.neuronCounts[layerIterator]);
-
-        dataAllocation->copy1DRangeTo(0, info.neuronCounts[layerIterator], DEBUG_INTER_RESULT);
-        logArray("weights", layerIterator+1, DEBUG_INTER_RESULT, info.neuronCounts[layerIterator]);
-
-
         this->neuralNetworkRSInstance->forEach_forwardBias(iterAlloc);
         renderScriptObject->finish();
-
-        dataAllocation->copy1DRangeTo(0, info.neuronCounts[layerIterator], DEBUG_INTER_RESULT);
-        logArray("biases", layerIterator+1, DEBUG_INTER_RESULT, info.neuronCounts[layerIterator]);
 
         biasOffset += info.neuronCounts[layerIterator];
         if(layerIterator == 0){
@@ -242,9 +227,6 @@ float *RSNeuralNetwork::forward(float *data) {
             weightOffset += info.neuronCounts[layerIterator - 1] * info.neuronCounts[layerIterator];
         }
     }
-
-    //dataAllocation->copy1DRangeTo(0, info.neuronCounts[info.layerCount - 1], DEBUG_INTER_RESULT);
-    //logArray("before softmax", 5, DEBUG_INTER_RESULT, info.neuronCounts[info.layerCount - 1]);
 
     neuralNetworkRSInstance->invoke_calculateSoftmax(info.neuronCounts[info.layerCount - 1]);
 
