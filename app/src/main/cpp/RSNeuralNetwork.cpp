@@ -182,8 +182,6 @@ float *RSNeuralNetwork::forward(float *data) {
 
     dataAllocation->copy1DFrom(data);
 
-    logArray("input data", 0, data, info.inputSize);
-
     sp<Allocation> iterAlloc;
 
     int neuronIterator[500];
@@ -238,7 +236,7 @@ float *RSNeuralNetwork::forward(float *data) {
 
 FeatureMatrix *RSNeuralNetwork::forwardAll(FeatureMatrix *data) {
     FeatureMatrix* result = new FeatureMatrix();
-    result->init(data->getFramesNum(), info.inputSize);
+    result->init(data->getFramesNum(), 360);
 
     float* inputData = new float[info.inputSize];
     for(int frameNum = 0; frameNum < data->getFramesNum(); frameNum++){
