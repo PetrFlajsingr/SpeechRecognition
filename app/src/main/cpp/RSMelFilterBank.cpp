@@ -1,6 +1,8 @@
-//
-// Created by Petr Flajsingr on 15/12/2017.
-//
+/*
+ * Class providing interface to renderscript implementation of mel bank filters.
+ *
+ * Created by Petr Flajsingr on 15/12/2017.
+ */
 
 #include <constants.h>
 #include "RSMelFilterBank.h"

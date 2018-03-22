@@ -8,8 +8,6 @@
 
 #include "AudioSubsampler.h"
 
-#define APPNAME "cz.vutbr.fit.xflajs00.voicerecognition"
-
 bool RawAudioRecorder::recordingStopBool = false;
 pthread_mutex_t RawAudioRecorder::audioEngineLock = PTHREAD_MUTEX_INITIALIZER;
 SLAndroidSimpleBufferQueueItf RawAudioRecorder::recorderBufferQueue;

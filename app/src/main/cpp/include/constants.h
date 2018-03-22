@@ -7,7 +7,6 @@
 
 
 #define APPNAME "cz.vutbr.fit.xflajs00.voicerecognition"
-#define SHORT_MAX_FLOAT (32768.0f)
 
 const int AUDIO_FRAME_LENGTH = 200;
 const int FFT_FRAME_LENGTH = 256;

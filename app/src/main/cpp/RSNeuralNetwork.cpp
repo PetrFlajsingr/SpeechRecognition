@@ -1,6 +1,9 @@
-//
-// Created by Petr Flajsingr on 17/03/2018.
-//
+/*
+ * Class providing interface to Renderscript implementation of neural network.
+ * Reads neural network from storage and prepares memory for computation.
+ *
+ * Created by Petr Flajsingr on 17/03/2018.
+ */
 
 
 #include <fstream>
