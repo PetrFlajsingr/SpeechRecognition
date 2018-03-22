@@ -4,8 +4,6 @@
 
 
 #include <fstream>
-#include <string>
-#include <sstream>
 #include "RSNeuralNetwork.h"
 
 /**
