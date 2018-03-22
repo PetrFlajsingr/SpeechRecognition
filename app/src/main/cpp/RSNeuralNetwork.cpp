@@ -4,7 +4,6 @@
 
 
 #include <fstream>
-#include <android/log.h>
 #include <string>
 #include <sstream>
 #include "RSNeuralNetwork.h"
