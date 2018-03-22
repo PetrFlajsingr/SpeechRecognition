@@ -196,7 +196,7 @@ void RSNeuralNetwork::prepareAllocations() {
 }
 
 /**
- * Prepares input for NN. TODO put into separate class
+ * Prepares input for NN.
  * @param data input data - mel bank results
  * @param index index of middle frame
  * @param out
