@@ -22,10 +22,9 @@ class RSNeuralNetwork {
 private:
     sp<RS> renderScriptObject;
 
-    ScriptC_RSneuralnetwork* neuralNetworkRSInstance;
+    ScriptC_RSneuralnetwork* neuralNetworkRSInstance; //< Renderscript neural network implementation
 
-    void prepareAllocations();
-
+    // NN data
     NNInitInfo info;
 
     float** layerBiases;
@@ -39,8 +38,9 @@ private:
 
     void loadFromFile(std::string filepath);
 
-    void prepareInput(FeatureMatrix*data, int index, float* out);
+    float* prepareInput(FeatureMatrix*data, int index);
 
+    void prepareAllocations();
 public:
     RSNeuralNetwork(std::string filepath, const char* cacheDir);
 

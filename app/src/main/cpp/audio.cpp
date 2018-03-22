@@ -262,8 +262,6 @@ void nntest(){
         __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "result: %s", mapResultToString(result->getFeaturesMatrix()[i]).c_str());
     }
 
-    result->dumpResultToFile("/sdcard/AAAAAAAAAAtest.txt");
-
 }
 
 void createFrames(){
