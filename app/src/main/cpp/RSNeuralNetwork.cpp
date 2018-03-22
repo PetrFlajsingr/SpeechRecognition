@@ -220,33 +220,11 @@ float* RSNeuralNetwork::prepareInput(FeatureMatrix *data, int index) {
     return result;
 }
 
-RSNeuralNetwork::~RSNeuralNetwork() {
-    for(unsigned int i = 0; i < info.layerCount; ++i){
-        delete[] this->layerBiases[i];
-        if(i == 0){
-            for(unsigned int j = 0; j < info.inputSize; ++j) {
-                delete[] this->layerWeights[i][j];
-            }
-        } else{
-            for(unsigned int j = 0; j < info.neuronCounts[i]; ++j) {
-                delete[] this->layerWeights[i][j];
-            }
-        }
-        delete[] this->layerWeights[i];
-    }
-    delete[] this->layerVars[0];
-    delete[] this->layerMeans[0];
-
-    delete[] this->layerBiases;
-    delete[] this->layerVars;
-    delete[] this->layerMeans;
-    delete[] this->layerWeights;
-    delete[] this->layerFunction;
-
-
-    delete neuralNetworkRSInstance;
-}
-
+/**
+ * Pass data through network.
+ * @param data input data
+ * @return output of neural network
+ */
 float *RSNeuralNetwork::forward(float *data) {
     sp<Allocation> dataAllocation = Allocation::createSized(this->renderScriptObject,
                                                             Element::F32(this->renderScriptObject),
@@ -306,11 +284,16 @@ float *RSNeuralNetwork::forward(float *data) {
     return result;
 }
 
+/**
+ * Forwards entire feature matrix.
+ * @param data output of mel bank filters
+ * @return matrix of neural network outputs
+ */
 FeatureMatrix *RSNeuralNetwork::forwardAll(FeatureMatrix *data) {
     FeatureMatrix* result = new FeatureMatrix();
     result->init(data->getFramesNum(), 360);
 
-    float* inputData = new float[info.inputSize];
+    float* inputData;
     for(int frameNum = 0; frameNum < data->getFramesNum(); frameNum++){
         inputData = prepareInput(data, frameNum);
         result->getFeaturesMatrix()[frameNum] = this->forward(inputData);
@@ -319,7 +302,9 @@ FeatureMatrix *RSNeuralNetwork::forwardAll(FeatureMatrix *data) {
     return result;
 }
 
-
+/**
+ * Total count of neurons in network. For memory allocation and offset calculation.
+ */
 unsigned int RSNeuralNetwork::getTotalNeuronCount() {
     if(totalNeuronCount == 0) {
         for(int i = 0; i < info.layerCount; ++i) {
@@ -329,15 +314,42 @@ unsigned int RSNeuralNetwork::getTotalNeuronCount() {
     return totalNeuronCount;
 }
 
+/**
+ * Total count of weights in network. For memory allocation and offset calculation.
+ */
 unsigned int RSNeuralNetwork::getTotalWeightsCount() {
     unsigned int total = info.inputSize * info.neuronCounts[0];
     for(int i = 0; i < info.layerCount - 1; ++i) {
         total += info.neuronCounts[i] * info.neuronCounts[i + 1];
     }
-//    unsigned int total = info.neuronCounts[0];
-//    for(int i = 0; i < info.layerCount - 1; ++i) {
-//        total += info.neuronCounts[i] * info.neuronCounts[i + 1];
-//    }
     return total;
+}
+
+
+RSNeuralNetwork::~RSNeuralNetwork() {
+    for(unsigned int i = 0; i < info.layerCount; ++i){
+        delete[] this->layerBiases[i];
+        if(i == 0){
+            for(unsigned int j = 0; j < info.inputSize; ++j) {
+                delete[] this->layerWeights[i][j];
+            }
+        } else{
+            for(unsigned int j = 0; j < info.neuronCounts[i]; ++j) {
+                delete[] this->layerWeights[i][j];
+            }
+        }
+        delete[] this->layerWeights[i];
+    }
+    delete[] this->layerVars[0];
+    delete[] this->layerMeans[0];
+
+    delete[] this->layerBiases;
+    delete[] this->layerVars;
+    delete[] this->layerMeans;
+    delete[] this->layerWeights;
+    delete[] this->layerFunction;
+
+
+    delete neuralNetworkRSInstance;
 }
 
