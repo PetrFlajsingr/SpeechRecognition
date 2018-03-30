@@ -21,6 +21,7 @@
 #include <chrono>
 #include <AudioSubsampler.h>
 #include <RSNeuralNetwork.h>
+#include <AcousticModel.h>
 
 #include "RSMelFilterBank.h"
 
@@ -375,6 +376,10 @@ void setCacheDir(const char* cDir){
     cacheDir = cDir;
 }
 
+void AcousticTest(){
+    AcousticModel model("/sdcard/lexicon.txt");
+}
+
 extern "C"{
     JNIEXPORT void JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_MainActivity_setCacheDir(JNIEnv* env, jclass clazz, jstring pathObj){
         setCacheDir(env->GetStringUTFChars(pathObj, NULL));
@@ -406,6 +411,8 @@ JNIEXPORT void JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_MainActivity_
 
     JNIEXPORT void Java_cz_vutbr_fit_xflajs00_voicerecognition_MainActivity_createFrames(JNIEnv* env, jclass clazz){
          //createFrames();
-        nntest();
+        //nntest();
+
+        AcousticTest();
     }
 }

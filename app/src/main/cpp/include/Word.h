@@ -6,8 +6,18 @@
 #define VOICERECOGNITION_WORD_H
 
 
-class Word {
+#include "Phoneme.h"
+#include <vector>
 
+class Word {
+private:
+    static int idCounter;
+public:
+    int id;
+    std::string writtenForm;
+    std::vector<PHONEME_ENUM> phonemes;
+
+    Word(const std::string &writtenForm);
 };
 
 
