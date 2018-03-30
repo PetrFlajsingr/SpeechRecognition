@@ -1,0 +1,14 @@
+//
+// Created by Petr Flajsingr on 30/03/2018.
+//
+
+#ifndef VOICERECOGNITION_LANGUAGEMODEL_H
+#define VOICERECOGNITION_LANGUAGEMODEL_H
+
+
+class LanguageModel {
+
+};
+
+
+#endif //VOICERECOGNITION_LANGUAGEMODEL_H
