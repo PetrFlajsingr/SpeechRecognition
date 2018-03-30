@@ -5,30 +5,10 @@
 #include <ios>
 #include <fstream>
 #include <android/log.h>
+#include "Utils.h"
 #include "AcousticModel.h"
 #include "constants.h"
 
-std::vector<std::string> split(char* str, std::string delimiter, bool removeNewLine){
-    std::vector<std::string> result;
-
-    std::string toSplit(str);
-    size_t pos = 0;
-    std::string token;
-
-    while((pos = toSplit.find(delimiter)) != std::string::npos){
-        token = toSplit.substr(0, pos);
-        result.push_back(token);
-        toSplit.erase(0, pos + delimiter.length());
-    }
-
-    token = toSplit;
-    if(removeNewLine && token.find('\n') != std::string::npos){
-        token.pop_back();
-    }
-    result.push_back(token);
-
-    return result;
-}
 
 AcousticModel::AcousticModel(std::string path) {
     std::ifstream file;
@@ -40,7 +20,7 @@ AcousticModel::AcousticModel(std::string path) {
         while(!file.eof()) {
             file.getline(inputBuffer, 1024);
 
-            splitString = split(inputBuffer, " ", true);
+            splitString = split(inputBuffer, " ");
 
             Word word(splitString.at(0));
             for(int i = 1; i < splitString.size();i++) {
@@ -50,6 +30,4 @@ AcousticModel::AcousticModel(std::string path) {
         }
     }
     file.close();
-
-    print();
 }

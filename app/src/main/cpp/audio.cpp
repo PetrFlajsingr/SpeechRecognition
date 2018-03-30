@@ -22,6 +22,7 @@
 #include <AudioSubsampler.h>
 #include <RSNeuralNetwork.h>
 #include <AcousticModel.h>
+#include <LanguageModel.h>
 
 #include "RSMelFilterBank.h"
 
@@ -378,6 +379,7 @@ void setCacheDir(const char* cDir){
 
 void AcousticTest(){
     AcousticModel model("/sdcard/lexicon.txt");
+    LanguageModel lm("/sdcard/LM.arpa");
 }
 
 extern "C"{

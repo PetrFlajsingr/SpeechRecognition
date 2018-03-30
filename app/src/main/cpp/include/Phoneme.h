@@ -7,6 +7,7 @@
 
 #include <string>
 
+// phonemes coresponding to their output index in neural network
 enum PHONEME_ENUM{
     AA  =   0,
     AE  =   1,

@@ -2,4 +2,73 @@
 // Created by Petr Flajsingr on 30/03/2018.
 //
 
+#include <fstream>
+#include <vector>
+#include <Utils.h>
+#include <stdlib.h>
 #include "LanguageModel.h"
+#include "LMWord.h"
+
+enum FSM_LM{
+    NONE,
+    INFO,
+    DATA
+};
+
+LanguageModel::LanguageModel(std::string path) {
+    std::ifstream file;
+    file.open(path.c_str(), std::ios::in|std::ios::binary);
+    if(file.is_open()){
+        char inputBuffer[1024];
+        FSM_LM state = NONE;
+
+        unsigned int unigramCount = 0;
+        std::vector<std::string> record;
+        while(!file.eof()){
+            file.getline(inputBuffer, 1024);
+            switch(state){
+                case NONE:
+                    if(std::string(inputBuffer).find("data") != std::string::npos){
+                        state = INFO;
+                        continue;
+                    }
+                    if(std::string(inputBuffer).find("grams") != std::string::npos) {
+                        state = DATA;
+                        continue;
+                    }
+                    break;
+                case INFO:
+                    if(std::string(inputBuffer).length() == 0) {
+                        state = NONE;
+                        continue;
+                    }
+                    record = split(inputBuffer, "=");
+                    unigramCount = static_cast<unsigned int>(atoi(record.at(1).c_str()));
+                    break;
+                case DATA:
+                    if(std::string(inputBuffer).length() == 0){
+                        state = NONE;
+                        continue;
+                    }
+
+                    saveWord(inputBuffer);
+                    for(int i = 1; i < unigramCount; i++){
+                        file.getline(inputBuffer, 1024);
+                        saveWord(inputBuffer);
+                    }
+                    break;
+            }
+
+        }
+    }
+    file.close();
+}
+
+void LanguageModel::saveWord(char *input) {
+    std::vector<std::string> record = split(input, "\t");
+
+    LMWord word(record.at(1));
+    word.unigramProbability = static_cast<float>(atof(record.at(0).c_str()));
+
+    words.push_back(word);
+}

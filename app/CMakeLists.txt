@@ -70,9 +70,13 @@ add_library( # Sets the name of the library.
               src/main/cpp/RSMelFilterBank.cpp
               src/main/cpp/RSNeuralNetwork.cpp
 
+              src/main/cpp/Utils.cpp
+
               src/main/cpp/Decoder.cpp
               src/main/cpp/AcousticModel.cpp
+              src/main/cpp/LanguageModel.cpp
               src/main/cpp/Word.cpp
+              src/main/cpp/LMWord.cpp
               src/main/cpp/Phoneme.cpp
               ${RS_OBJ_FILES}
               ${RS_FILES}
