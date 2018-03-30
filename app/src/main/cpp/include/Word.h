@@ -12,6 +12,8 @@
 class Word {
 private:
     static int idCounter;
+
+    static void resetIdCounter();
 public:
     int id;
     std::string writtenForm;

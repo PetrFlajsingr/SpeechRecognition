@@ -11,3 +11,7 @@ Word::Word(const std::string &writtenForm) {
     this->writtenForm = writtenForm;
     this->id = idCounter++;
 }
+
+void Word::resetIdCounter() {
+    idCounter = 0;
+}
