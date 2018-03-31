@@ -7,7 +7,8 @@
 
 
 #include <vector>
-#include <Token.h>
+#include <GraphNodeFWD.h>
+#include <TokenFWD.h>
 #include <Phoneme.h>
 
 class GraphNode {
@@ -23,7 +24,7 @@ public:
 
     PHONEME_ENUM inputVectorIndex;
 
-    GraphNode(const std::vector<float> &pathProbablity,
+    GraphNode(const std::vector<float> &pathProbability,
               int wordID, short xPos, PHONEME_ENUM inputVectorIndex);
 };
 

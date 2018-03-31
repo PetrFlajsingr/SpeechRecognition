@@ -7,6 +7,8 @@
 
 
 #include <vector>
+#include <GraphNodeFwd.h>
+#include <TokenFWD.h>
 #include <LMWord.h>
 
 class Token {
@@ -14,10 +16,10 @@ class Token {
 
     std::vector<LMWord> wordHistory;
 
-   // GraphNode* currentNode;
+    GraphNode* currentNode;
 
 public:
-    Token(/*GraphNode *currentNode*/);
+    Token(GraphNode *currentNode);
 
     void cloneInGraph();
 };

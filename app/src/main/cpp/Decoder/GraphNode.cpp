@@ -7,7 +7,7 @@
 #include <Phoneme.h>
 #include <GraphNode.h>
 
-GraphNode::GraphNode(const std::vector<float> &pathProbablity, int wordID, short xPos,
+GraphNode::GraphNode(const std::vector<float> &pathProbability, int wordID, short xPos,
                      PHONEME_ENUM inputVectorIndex) {
 
 }

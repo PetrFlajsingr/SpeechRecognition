@@ -10,6 +10,7 @@
 #include <Decoder.h>
 #include <vector>
 #include <GraphNode.h>
+#include <Token.h>
 
 Decoder::Decoder(std::string pathToLexicon, std::string pathToNgram) {
     this->acousticModel = new AcousticModel(pathToLexicon);

@@ -8,6 +8,6 @@ void Token::cloneInGraph() {
 
 }
 
-//Token::Token(GraphNode* currentNode) : currentNode(currentNode) {}
+Token::Token(GraphNode* currentNode) : currentNode(currentNode) {}
 
-Token::Token() {}
+//Token::Token() {}

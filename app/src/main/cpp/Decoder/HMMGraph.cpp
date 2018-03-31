@@ -8,6 +8,7 @@
 #include <AcousticModel.h>
 #include <HMMGraph.h>
 #include <GraphNode.h>
+#include <Token.h>
 
 std::vector<float> TEMP_PROB = {0.6, 0.4};
 
@@ -30,7 +31,7 @@ HMMGraph::HMMGraph(AcousticModel* model) {
     this->rootNode = new GraphNode(probs, -1, -1, NONE);
     this->rootNode->successorNodes = nodes;
 
-    this->rootNode->tokens.push_back(new Token());
+    this->rootNode->tokens.push_back(new Token(rootNode));
 
     this->outputNode = new GraphNode(TEMP_PROB, -1, -1, NONE);
 }
