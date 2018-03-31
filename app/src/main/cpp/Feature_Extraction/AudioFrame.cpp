@@ -2,10 +2,9 @@
 // Created by Petr Flajsingr on 11/11/2017.
 //
 
-#include "include/AudioFrame.h"
-#include <math.h>
 
-#include <string.h>
+#include <constants.h>
+#include <AudioFrame.h>
 #include <android/log.h>
 
 float AudioFrame::hammingCoef[AUDIO_FRAME_LENGTH];
@@ -36,13 +35,11 @@ AudioFrame::AudioFrame() {
  * coef(n) = alpha - beta * cos((2*pi*n)/(N - 1))
  */
 void AudioFrame::calcHammingCoef() {
-    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "calcHammingCoef(): calculating hamming coefs");
     const double PI_MUL_2 = M_PI*2;
 
     for(int i = 0; i < AUDIO_FRAME_LENGTH; ++i){
         hammingCoef[i] = (float) ( ALPHA - (BETA * cos(PI_MUL_2 * (double)i / (double)(AUDIO_FRAME_LENGTH - 1))));
     }
-    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "calcHammingCoef(): calculating hamming coefs DONE");
 }
 
 AudioFrame::~AudioFrame() {

@@ -2,11 +2,12 @@
 // Created by Petr Flajsingr on 21/11/2017.
 //
 
-#include <string.h>
-#include <math.h>
-#include <android/log.h>
-#include "include/NeuralNetwork.h"
-#include "constants.h"
+
+#include <string>
+#include <NeuralNetwork.h>
+#include <fstream>
+#include <constants.h>
+#include <cmath>
 
 NeuralNetwork::NeuralNetwork(std::string filepath) {
     NNInitInfo initInfo;

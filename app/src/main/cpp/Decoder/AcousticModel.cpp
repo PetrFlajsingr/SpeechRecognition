@@ -2,12 +2,12 @@
 // Created by Petr Flajsingr on 30/03/2018.
 //
 
-#include <ios>
-#include <fstream>
-#include "../Miscelanous/include/Utils.h"
-#include "include/AcousticModel.h"
-#include "constants.h"
 
+
+#include <string>
+#include <AcousticModel.h>
+#include <fstream>
+#include <Utils.h>
 
 AcousticModel::AcousticModel(std::string path) {
     std::ifstream file;

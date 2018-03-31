@@ -5,13 +5,11 @@
 #ifndef VOICERECOGNITION_RSNEURALNETWORK_H
 #define VOICERECOGNITION_RSNEURALNETWORK_H
 
-#include "ScriptC_RSneuralnetwork.h"
-#include "constants.h"
-#include "NNInitInfo.h"
-#include "../../Miscelanous/include/FeatureMatrix.h"
+
+#include <FeatureMatrix.h>
+#include <NNInitInfo.h>
+#include <ScriptC_RSneuralnetwork.h>
 #include <RenderScript.h>
-#include <vector>
-#include <string>
 
 class RSNeuralNetwork {
     enum ACTIVATION_FUNCTIONS{

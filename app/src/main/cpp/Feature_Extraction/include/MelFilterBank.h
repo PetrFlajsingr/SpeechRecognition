@@ -5,10 +5,9 @@
 #ifndef VOICERECOGNITION_MELFILTERBANK_H
 #define VOICERECOGNITION_MELFILTERBANK_H
 
-#include <string>
-#include "constants.h"
-#include "../../Miscelanous/include/FeatureMatrix.h"
-#include "../../kissfft/kiss_fft.h"
+
+#include <FeatureMatrix.h>
+#include <kiss_fft.h>
 
 class MelFilterBank {
 private:

@@ -5,8 +5,6 @@
 #ifndef VOICERECOGNITION_FEATURESMATRIXFLOAT_H
 #define VOICERECOGNITION_FEATURESMATRIXFLOAT_H
 
-
-#include <cstdio>
 #include <string>
 
 class FeatureMatrix {

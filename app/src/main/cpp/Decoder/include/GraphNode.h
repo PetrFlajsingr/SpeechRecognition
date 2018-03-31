@@ -7,13 +7,24 @@
 
 
 #include <vector>
+#include <Token.h>
+#include <Phoneme.h>
 
 class GraphNode {
 public:
     std::vector<float> pathProbablity;
-    std::vector<GraphNode*> nextNode;
+    std::vector<GraphNode*> successorNodes;
 
-    GraphNode(const std::vector<float> &pathProbablity, const std::vector<GraphNode *> &nextNode);
+    std::vector<Token*> tokens;
+
+    int wordID; //< id of acoustic model ("row")
+
+    short xPos; //< position in sequence ("column")
+
+    PHONEME_ENUM inputVectorIndex;
+
+    GraphNode(const std::vector<float> &pathProbablity,
+              int wordID, short xPos, PHONEME_ENUM inputVectorIndex);
 };
 
 

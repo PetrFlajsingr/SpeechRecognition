@@ -6,11 +6,9 @@
 #define VOICERECOGNITION_AUDIOFRAME_H
 
 
-#include <stddef.h>
-#include <stdio.h>
-#include "../../kissfft/kiss_fft.h"
-#include "../../kissfft/kiss_fftr.h"
-#include "constants.h"
+#include <constants.h>
+#include <kiss_fft.h>
+#include <kiss_fftr.h>
 
 class AudioFrame {
 private:

@@ -6,8 +6,20 @@
 #define VOICERECOGNITION_TOKEN_H
 
 
-class Token {
+#include <vector>
+#include <LMWord.h>
 
+class Token {
+    float likelihood = 0.0f;
+
+    std::vector<LMWord> wordHistory;
+
+   // GraphNode* currentNode;
+
+public:
+    Token(/*GraphNode *currentNode*/);
+
+    void cloneInGraph();
 };
 
 

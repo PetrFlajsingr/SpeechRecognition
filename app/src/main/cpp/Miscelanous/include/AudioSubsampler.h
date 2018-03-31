@@ -5,9 +5,6 @@
 #ifndef NATIVEAUDIO_AUDIOSUBSAMPLER_H
 #define NATIVEAUDIO_AUDIOSUBSAMPLER_H
 
-
-#include <stddef.h>
-
 /**
  * Wrapper for static classes handling subsamoling to 8kHz sample rate for recognition.
  */

@@ -5,7 +5,8 @@
 #ifndef VOICERECOGNITION_LANGUAGEMODEL_H
 #define VOICERECOGNITION_LANGUAGEMODEL_H
 
-#include <string>
+
+#include <vector>
 #include "LMWord.h"
 
 class LanguageModel {

@@ -6,8 +6,10 @@
  */
 
 
-#include "../../../../../../../Library/Android/sdk/ndk-bundle/sources/cxx-stl/gnu-libstdc++/4.9/include/fstream"
-#include "include/RSNeuralNetwork.h"
+#include <string>
+#include <RSNeuralNetwork.h>
+#include <fstream>
+#include <constants.h>
 
 /**
  * Creates objects needed for Renderscript. Loads the neural network from a file given by the first

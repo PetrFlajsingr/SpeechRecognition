@@ -2,29 +2,20 @@
 // Created by Petr Flajsingr on 10/11/2017.
 //
 
-#include <jni.h>
-#include "Miscelanous/include/RawAudioRecorder.h"
-#include "Feature_Extraction/include/AudioFrame.h"
-#include "kissfft/kiss_fftr.h"
-#include "kissfft/kiss_fft.h"
+
+#include <rsCppStructs.h>
+#include <RawAudioRecorder.h>
+#include <AudioFrame.h>
 #include <android/log.h>
-#include <vector>
+#include <FeatureMatrix.h>
+#include <RSMelFilterBank.h>
+#include <RSNeuralNetwork.h>
+#include <LanguageModel.h>
+#include <AcousticModel.h>
 #include <iostream>
 #include <fstream>
-#include <sstream>
-#include "constants.h"
-#include "Feature_Extraction/include/MelFilterBank.h"
-#include <RenderScript.h>
 #include <thread>
-#include <condition_variable>
-
-#include <chrono>
-#include "Miscelanous/include/AudioSubsampler.h"
-#include "Feature_Extraction/include/RSNeuralNetwork.h"
-#include "Decoder/include/AcousticModel.h"
-#include "Decoder/include/LanguageModel.h"
-
-#include "Feature_Extraction/include/RSMelFilterBank.h"
+#include <AudioSubsampler.h>
 
 using namespace android::RSC;
 

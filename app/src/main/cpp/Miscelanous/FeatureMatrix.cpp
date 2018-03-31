@@ -2,12 +2,13 @@
 // Created by Petr Flajsingr on 30/11/2017.
 //
 
+
+#include <FeatureMatrix.h>
+#include <constants.h>
+#include <string>
 #include <fstream>
 #include <sstream>
-#include <cmath>
-#include <android/log.h>
-#include "include/FeatureMatrix.h"
-#include "constants.h"
+#include <string>
 
 float **FeatureMatrix::getFeaturesMatrix() {
     return featuresMatrix;

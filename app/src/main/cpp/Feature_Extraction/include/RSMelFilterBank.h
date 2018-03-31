@@ -6,9 +6,9 @@
 #define VOICERECOGNITION_RSMELFILTERBANK_H
 
 #include <RenderScript.h>
-#include "../../Miscelanous/include/FeatureMatrix.h"
+#include <FeatureMatrix.h>
+#include <kiss_fft.h>
 #include "ScriptC_RSmelfilterbank.h"
-#include "../../kissfft/kiss_fft.h"
 
 using namespace android::RSC;
 

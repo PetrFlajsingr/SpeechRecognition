@@ -5,15 +5,13 @@
 #ifndef VOICERECOGNITION_NNINITINFO_H
 #define VOICERECOGNITION_NNINITINFO_H
 
-#include <string>
-
 struct NNInitInfo{
     unsigned int layerCount;
     unsigned int* neuronCounts;
     unsigned int inputSize;
 
     virtual ~NNInitInfo() {
-        delete[](neuronCounts);
+        delete[] neuronCounts;
     }
 };
 

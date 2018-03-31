@@ -10,12 +10,19 @@
 #include "AcousticModel.h"
 
 class HMMGraph {
+private:
+    void addSuccessors(GraphNode *node, AcousticModel* model, int wordID, int phonemeIndex);
 public:
     GraphNode* rootNode;
+    GraphNode* outputNode;
 
     HMMGraph(AcousticModel* model);
 
     virtual ~HMMGraph();
+
+    void update(AcousticModel* model);
+
+    void destroySuccessors(GraphNode* node);
 };
 
 

@@ -4,8 +4,9 @@
  * Created by Petr Flajsingr on 15/12/2017.
  */
 
+
+#include <RSMelFilterBank.h>
 #include <constants.h>
-#include "include/RSMelFilterBank.h"
 
 /**
  * Requires cache directory of the application for use in RenderScript

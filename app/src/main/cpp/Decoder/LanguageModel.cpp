@@ -2,12 +2,13 @@
 // Created by Petr Flajsingr on 30/03/2018.
 //
 
+
+#include <string>
 #include <fstream>
+#include <LanguageModel.h>
 #include <vector>
-#include "../Miscelanous/include/Utils.h"
+#include <Utils.h>
 #include <stdlib.h>
-#include "include/LanguageModel.h"
-#include "include/LMWord.h"
 
 enum FSM_LM{
     NONE,

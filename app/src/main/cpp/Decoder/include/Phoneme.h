@@ -54,7 +54,8 @@ enum PHONEME_ENUM{
     W   =   42,
     Y   =   43,
     Z   =   44,
-    ZH  =   45
+    ZH  =   45,
+    NONE = -1
 };
 
 class Phoneme {

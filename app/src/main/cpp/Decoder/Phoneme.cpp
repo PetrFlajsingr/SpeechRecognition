@@ -2,7 +2,7 @@
 // Created by Petr Flajsingr on 30/03/2018.
 //
 
-#include "include/Phoneme.h"
+#include <Phoneme.h>
 
 PHONEME_ENUM Phoneme::stringToPhoneme(std::string phoneme) {
     if(phoneme == "AA") return PHONEME_ENUM::AA;
@@ -51,4 +51,6 @@ PHONEME_ENUM Phoneme::stringToPhoneme(std::string phoneme) {
     if(phoneme == "Y") return PHONEME_ENUM::Y;
     if(phoneme == "Z") return PHONEME_ENUM::Z;
     if(phoneme == "ZH") return PHONEME_ENUM::ZH;
+
+    return PHONEME_ENUM::NONE;
 }

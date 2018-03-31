@@ -1,8 +1,11 @@
 //
 // Created by Petr Flajsingr on 30/03/2018.
 //
+
+
 #include <string>
-#include "include/Utils.h"
+#include <vector>
+#include <Utils.h>
 
 std::vector<std::string> split(char* str, std::string delimiter){
     std::vector<std::string> result;

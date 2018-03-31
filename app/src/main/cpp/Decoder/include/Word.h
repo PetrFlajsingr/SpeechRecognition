@@ -6,8 +6,8 @@
 #define VOICERECOGNITION_WORD_H
 
 
-#include "Phoneme.h"
 #include <vector>
+#include "Phoneme.h"
 
 class Word {
 private:

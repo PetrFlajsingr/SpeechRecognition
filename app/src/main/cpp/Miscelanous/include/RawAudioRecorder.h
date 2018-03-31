@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <pthread.h>
 #include <condition_variable>
-#include "constants.h"
+#include <constants.h>
 
 class RawAudioRecorder {
 private:

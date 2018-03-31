@@ -6,7 +6,22 @@
 #define VOICERECOGNITION_DECODER_H
 
 
+#include "AcousticModel.h"
+#include "LanguageModel.h"
+#include "HMMGraph.h"
+
 class Decoder {
+private:
+    AcousticModel* acousticModel;
+    LanguageModel* languageModel;
+
+    HMMGraph* graph;
+public:
+    Decoder(std::string pathToLexicon, std::string pathToNgram);
+
+    virtual ~Decoder();
+
+    void decode(float* input);
 
 };
 

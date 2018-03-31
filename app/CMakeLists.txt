@@ -5,8 +5,8 @@ cmake_minimum_required(VERSION 3.4.1)
 
 # variables for files
 set(DEBUG_MODEL 1)
-set(CPP_SOURCE_FILES "")
-set(CPP_HEADER_FILES "")
+#set(CPP_SOURCE_FILES "")
+#set(CPP_HEADER_FILES "")
 set(RS_FILES "")
 set(RS_OBJ_FILES "")
 set(RENDER_SCRIPT_HEADERS_PATH ${ANDROID_NDK}/toolchains/renderscript/prebuilt/${ANDROID_HOST_TAG}/platform/rs)
@@ -15,15 +15,20 @@ set(RENDER_SCRIPT_HEADERS_PATH ${ANDROID_NDK}/toolchains/renderscript/prebuilt/$
 execute_process(COMMAND mkdir -p "${PROJECT_SOURCE_DIR}/src/main/jniLibs/${ANDROID_ABI}")
 
 include_directories(src/main/cpp/include)
+include_directories(src/main/cpp/Decoder/include)
+include_directories(src/main/cpp/Miscelanous/include)
+include_directories(src/main/cpp/Feature_Extraction/include)
+include_directories(src/main/cpp/kissfft)
+include_directories(src/main/cpp/firfilter)
 include_directories(${RENDER_SCRIPT_HEADERS_PATH}/cpp
                     ${RENDER_SCRIPT_HEADERS_PATH}/scriptc
                     ${RENDER_SCRIPT_HEADERS_PATH})
 link_directories(${ANDROID_NDK}/toolchains/renderscript/prebuilt/${ANDROID_HOST_TAG}/platform/${ANDROID_SYSROOT_ABI})
 
-file(GLOB_RECURSE CPP_SOURCE_FILES src/main/cpp/src/*)
-file(GLOB_RECURSE KISS_FFT_FILES src/main/cpp/src/kissfft/*)
-file(GLOB_RECURSE FIR_FILTER_FILES src/main/cpp/src/firfilter/*)
-file(GLOB_RECURSE CPP_HEADER_FILES src/main/cpp/include/*)
+#file(GLOB_RECURSE CPP_SOURCE_FILES src/main/cpp/src/*)
+#file(GLOB_RECURSE KISS_FFT_FILES src/main/cpp/src/kissfft/*)
+#file(GLOB_RECURSE FIR_FILTER_FILES src/main/cpp/src/firfilter/*)
+#file(GLOB_RECURSE CPP_HEADER_FILES src/main/cpp/include/*)
 file(GLOB_RECURSE RS_FILES src/main/rs/*)
 
 if(DEBUG_MODEL)
@@ -72,6 +77,8 @@ add_library( # Sets the name of the library.
               src/main/cpp/firfilter/filt.cpp
 
               # DECODER
+              src/main/cpp/Decoder/HMMGraph.cpp
+              src/main/cpp/Decoder/GraphNode.cpp
               src/main/cpp/Decoder/Decoder.cpp
               src/main/cpp/Decoder/AcousticModel.cpp
               src/main/cpp/Decoder/LanguageModel.cpp
@@ -79,8 +86,8 @@ add_library( # Sets the name of the library.
               src/main/cpp/Decoder/LMWord.cpp
               src/main/cpp/Decoder/Phoneme.cpp
               src/main/cpp/Decoder/Token.cpp
-              src/main/cpp/Decoder/HMMGraph.cpp
-              src/main/cpp/Decoder/GraphNode.cpp
+
+
 
               ${RS_OBJ_FILES}
               ${RS_FILES}

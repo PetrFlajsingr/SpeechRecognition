@@ -2,12 +2,9 @@
 // Created by Petr Flajsingr on 11/11/2017.
 //
 
-#include <stdio.h>
-#include <cmath>
-#include <android/log.h>
-#include <fstream>
-#include "include/AudioSubsampler.h"
-#include "../firfilter/filt.h"
+
+#include <AudioSubsampler.h>
+#include <filt.h>
 
 #define APPNAME "cz.vutbr.fit.xflajs00.voicerecognition"
 

@@ -2,11 +2,11 @@
 // Created by Petr Flajsingr on 30/11/2017.
 //
 
-#include "include/MelFilterBank.h"
-#include <cmath>
+#include <FeatureMatrix.h>
+#include <MelFilterBank.h>
 #include <fstream>
 #include <sstream>
-#include <android/log.h>
+#include <constants.h>
 
 //STATIC
 float* MelFilterBank::melFBin = NULL;
