@@ -79,7 +79,8 @@ add_library( # Sets the name of the library.
               src/main/cpp/Decoder/LMWord.cpp
               src/main/cpp/Decoder/Phoneme.cpp
               src/main/cpp/Decoder/Token.cpp
-              src/main/cpp/Decoder/Graph.cpp
+              src/main/cpp/Decoder/HMMGraph.cpp
+              src/main/cpp/Decoder/GraphNode.cpp
 
               ${RS_OBJ_FILES}
               ${RS_FILES}

@@ -10,9 +10,8 @@
 #include "Word.h"
 
 class AcousticModel {
-private:
-    std::vector<Word> words;
 public:
+    std::vector<Word> words;
     AcousticModel(std::string path);
 };
 

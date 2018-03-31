@@ -6,8 +6,14 @@
 #define VOICERECOGNITION_GRAPHNODE_H
 
 
-class GraphNode {
+#include <vector>
 
+class GraphNode {
+public:
+    std::vector<float> pathProbablity;
+    std::vector<GraphNode*> nextNode;
+
+    GraphNode(const std::vector<float> &pathProbablity, const std::vector<GraphNode *> &nextNode);
 };
 
 
