@@ -1,12 +1,9 @@
-# For more information about using CMake with Android Studio, read the
-# documentation: https://d.android.com/studio/projects/add-native-code.html
-
 # Sets the minimum version of CMake required to build the native library.
 
 cmake_minimum_required(VERSION 3.4.1)
 
 
-# set some var
+# variables for files
 set(DEBUG_MODEL 1)
 set(CPP_SOURCE_FILES "")
 set(CPP_HEADER_FILES "")
@@ -43,38 +40,38 @@ foreach(rs_file ${RS_FILES})
     configure_file(${PROJECT_SOURCE_DIR}/src/main/obj/local/${ANDROID_ABI}/librs.${name}.so ${PROJECT_SOURCE_DIR}/src/main/jniLibs/${ANDROID_ABI} COPYONLY)
 endforeach()
 
-MESSAGE(STATUS "-------------------------------${RS_FILES}")
-
 # Creates and names a library, sets it as either STATIC
 # or SHARED, and provides the relative paths to its source code.
 # You can define multiple libraries, and CMake builds them for you.
 # Gradle automatically packages shared libraries with your APK.
 
 add_library( # Sets the name of the library.
+# TODO change library name
               raw_audio_recorder
 
               # Sets the library as a shared library.
               SHARED
 
-              # Provides a relative path to your source file(s).
-              #${RS_CPP_FILES}
-
+              # MISCELANOUS
               src/main/cpp/Miscelanous/RawAudioRecorder.cpp
               src/main/cpp/Miscelanous/AudioSubsampler.cpp
               src/main/cpp/Miscelanous/FeatureMatrix.cpp
               src/main/cpp/Miscelanous/Utils.cpp
 
+              # FEATURE EXTRACTION
               src/main/cpp/Feature_Extraction/AudioFrame.cpp
               src/main/cpp/Feature_Extraction/MelFilterBank.cpp
               src/main/cpp/Feature_Extraction/NeuralNetwork.cpp
               src/main/cpp/Feature_Extraction/RSMelFilterBank.cpp
               src/main/cpp/Feature_Extraction/RSNeuralNetwork.cpp
 
+              # THIRD PARTY
               src/main/cpp/kissfft/kiss_fft.c
               src/main/cpp/kissfft/kiss_fftr.c
 
               src/main/cpp/firfilter/filt.cpp
 
+              # DECODER
               src/main/cpp/Decoder/Decoder.cpp
               src/main/cpp/Decoder/AcousticModel.cpp
               src/main/cpp/Decoder/LanguageModel.cpp
@@ -82,6 +79,8 @@ add_library( # Sets the name of the library.
               src/main/cpp/Decoder/LMWord.cpp
               src/main/cpp/Decoder/Phoneme.cpp
               src/main/cpp/Decoder/Token.cpp
+              src/main/cpp/Decoder/Graph.cpp
+
               ${RS_OBJ_FILES}
               ${RS_FILES}
               src/main/cpp/audio.cpp
