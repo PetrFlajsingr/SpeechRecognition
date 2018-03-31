@@ -6,7 +6,7 @@
 #define VOICERECOGNITION_LANGUAGEMODEL_H
 
 #include <string>
-#include "../LMWord.h"
+#include "LMWord.h"
 
 class LanguageModel {
 private:

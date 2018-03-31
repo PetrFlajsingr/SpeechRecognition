@@ -5,7 +5,7 @@
 #include <string.h>
 #include <math.h>
 #include <android/log.h>
-#include "NeuralNetwork.h"
+#include "include/NeuralNetwork.h"
 #include "constants.h"
 
 NeuralNetwork::NeuralNetwork(std::string filepath) {

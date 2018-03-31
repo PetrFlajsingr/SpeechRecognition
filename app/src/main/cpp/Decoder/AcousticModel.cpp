@@ -4,9 +4,8 @@
 
 #include <ios>
 #include <fstream>
-#include <android/log.h>
-#include "Utils.h"
-#include "AcousticModel.h"
+#include "../Miscelanous/include/Utils.h"
+#include "include/AcousticModel.h"
 #include "constants.h"
 
 

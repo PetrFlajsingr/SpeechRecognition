@@ -6,7 +6,7 @@
 #define VOICERECOGNITION_NEURALNETWORK_H
 
 #include <fstream>
-#include "FeatureMatrix.h"
+#include "../../Miscelanous/include/FeatureMatrix.h"
 #include "NNInitInfo.h"
 
 class NeuralNetwork {

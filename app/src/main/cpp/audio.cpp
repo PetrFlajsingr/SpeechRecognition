@@ -3,8 +3,8 @@
 //
 
 #include <jni.h>
-#include "RawAudioRecorder.h"
-#include "AudioFrame.h"
+#include "Miscelanous/include/RawAudioRecorder.h"
+#include "Feature_Extraction/include/AudioFrame.h"
 #include "kissfft/kiss_fftr.h"
 #include "kissfft/kiss_fft.h"
 #include <android/log.h>
@@ -13,18 +13,18 @@
 #include <fstream>
 #include <sstream>
 #include "constants.h"
-#include "MelFilterBank.h"
+#include "Feature_Extraction/include/MelFilterBank.h"
 #include <RenderScript.h>
 #include <thread>
 #include <condition_variable>
 
 #include <chrono>
-#include <AudioSubsampler.h>
-#include <RSNeuralNetwork.h>
-#include <AcousticModel.h>
-#include <LanguageModel.h>
+#include "Miscelanous/include/AudioSubsampler.h"
+#include "Feature_Extraction/include/RSNeuralNetwork.h"
+#include "Decoder/include/AcousticModel.h"
+#include "Decoder/include/LanguageModel.h"
 
-#include "RSMelFilterBank.h"
+#include "Feature_Extraction/include/RSMelFilterBank.h"
 
 using namespace android::RSC;
 

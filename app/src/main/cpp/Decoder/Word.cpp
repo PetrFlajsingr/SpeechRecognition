@@ -3,7 +3,7 @@
 //
 
 #include <string>
-#include "Word.h"
+#include "include/Word.h"
 
 int Word::idCounter = 0;
 

@@ -2,11 +2,11 @@
 // Created by Petr Flajsingr on 10/11/2017.
 //
 
-#include "RawAudioRecorder.h"
+#include "include/RawAudioRecorder.h"
 #include <assert.h>
 #include <android/log.h>
 
-#include "AudioSubsampler.h"
+#include "include/AudioSubsampler.h"
 
 bool RawAudioRecorder::recordingStopBool = false;
 pthread_mutex_t RawAudioRecorder::audioEngineLock = PTHREAD_MUTEX_INITIALIZER;

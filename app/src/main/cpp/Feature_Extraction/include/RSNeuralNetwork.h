@@ -8,7 +8,7 @@
 #include "ScriptC_RSneuralnetwork.h"
 #include "constants.h"
 #include "NNInitInfo.h"
-#include "FeatureMatrix.h"
+#include "../../Miscelanous/include/FeatureMatrix.h"
 #include <RenderScript.h>
 #include <vector>
 #include <string>

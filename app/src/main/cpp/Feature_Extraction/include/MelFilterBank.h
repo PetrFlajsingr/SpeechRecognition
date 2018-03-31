@@ -7,8 +7,8 @@
 
 #include <string>
 #include "constants.h"
-#include "FeatureMatrix.h"
-#include "../kissfft/kiss_fft.h"
+#include "../../Miscelanous/include/FeatureMatrix.h"
+#include "../../kissfft/kiss_fft.h"
 
 class MelFilterBank {
 private:

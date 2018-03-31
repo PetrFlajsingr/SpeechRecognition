@@ -2,7 +2,7 @@
 // Created by Petr Flajsingr on 30/11/2017.
 //
 
-#include "MelFilterBank.h"
+#include "include/MelFilterBank.h"
 #include <cmath>
 #include <fstream>
 #include <sstream>

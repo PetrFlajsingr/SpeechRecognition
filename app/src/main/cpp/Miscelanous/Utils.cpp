@@ -2,7 +2,7 @@
 // Created by Petr Flajsingr on 30/03/2018.
 //
 #include <string>
-#include "Utils.h"
+#include "include/Utils.h"
 
 std::vector<std::string> split(char* str, std::string delimiter){
     std::vector<std::string> result;

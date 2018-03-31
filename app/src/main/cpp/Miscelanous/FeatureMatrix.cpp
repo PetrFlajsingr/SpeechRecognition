@@ -6,7 +6,7 @@
 #include <sstream>
 #include <cmath>
 #include <android/log.h>
-#include "FeatureMatrix.h"
+#include "include/FeatureMatrix.h"
 #include "constants.h"
 
 float **FeatureMatrix::getFeaturesMatrix() {

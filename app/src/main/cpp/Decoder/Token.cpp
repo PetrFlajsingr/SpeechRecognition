@@ -2,4 +2,4 @@
 // Created by Petr Flajsingr on 30/03/2018.
 //
 
-#include "Graph.h"
+#include "include/Token.h"

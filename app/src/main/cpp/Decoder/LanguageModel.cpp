@@ -4,10 +4,10 @@
 
 #include <fstream>
 #include <vector>
-#include <Utils.h>
+#include "../Miscelanous/include/Utils.h"
 #include <stdlib.h>
-#include "LanguageModel.h"
-#include "LMWord.h"
+#include "include/LanguageModel.h"
+#include "include/LMWord.h"
 
 enum FSM_LM{
     NONE,

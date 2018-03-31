@@ -6,8 +6,8 @@
 #include <cmath>
 #include <android/log.h>
 #include <fstream>
-#include "AudioSubsampler.h"
-#include "firfilter/filt.h"
+#include "include/AudioSubsampler.h"
+#include "../firfilter/filt.h"
 
 #define APPNAME "cz.vutbr.fit.xflajs00.voicerecognition"
 

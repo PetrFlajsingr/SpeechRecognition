@@ -5,7 +5,7 @@
  */
 
 #include <constants.h>
-#include "RSMelFilterBank.h"
+#include "include/RSMelFilterBank.h"
 
 /**
  * Requires cache directory of the application for use in RenderScript

@@ -8,8 +8,8 @@
 
 #include <stddef.h>
 #include <stdio.h>
-#include "../kissfft/kiss_fft.h"
-#include "../kissfft/kiss_fftr.h"
+#include "../../kissfft/kiss_fft.h"
+#include "../../kissfft/kiss_fftr.h"
 #include "constants.h"
 
 class AudioFrame {

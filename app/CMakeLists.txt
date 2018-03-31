@@ -59,25 +59,29 @@ add_library( # Sets the name of the library.
               # Provides a relative path to your source file(s).
               #${RS_CPP_FILES}
 
-              src/main/cpp/RawAudioRecorder.cpp
-              src/main/cpp/AudioSubsampler.cpp
-              src/main/cpp/AudioFrame.cpp
+              src/main/cpp/Miscelanous/RawAudioRecorder.cpp
+              src/main/cpp/Miscelanous/AudioSubsampler.cpp
+              src/main/cpp/Miscelanous/FeatureMatrix.cpp
+              src/main/cpp/Miscelanous/Utils.cpp
+
+              src/main/cpp/Feature_Extraction/AudioFrame.cpp
+              src/main/cpp/Feature_Extraction/MelFilterBank.cpp
+              src/main/cpp/Feature_Extraction/NeuralNetwork.cpp
+              src/main/cpp/Feature_Extraction/RSMelFilterBank.cpp
+              src/main/cpp/Feature_Extraction/RSNeuralNetwork.cpp
+
               src/main/cpp/kissfft/kiss_fft.c
               src/main/cpp/kissfft/kiss_fftr.c
-              src/main/cpp/MelFilterBank.cpp
-              src/main/cpp/FeatureMatrix.cpp
+
               src/main/cpp/firfilter/filt.cpp
-              src/main/cpp/RSMelFilterBank.cpp
-              src/main/cpp/RSNeuralNetwork.cpp
 
-              src/main/cpp/Utils.cpp
-
-              src/main/cpp/Decoder.cpp
-              src/main/cpp/AcousticModel.cpp
-              src/main/cpp/LanguageModel.cpp
-              src/main/cpp/Word.cpp
-              src/main/cpp/LMWord.cpp
-              src/main/cpp/Phoneme.cpp
+              src/main/cpp/Decoder/Decoder.cpp
+              src/main/cpp/Decoder/AcousticModel.cpp
+              src/main/cpp/Decoder/LanguageModel.cpp
+              src/main/cpp/Decoder/Word.cpp
+              src/main/cpp/Decoder/LMWord.cpp
+              src/main/cpp/Decoder/Phoneme.cpp
+              src/main/cpp/Decoder/Token.cpp
               ${RS_OBJ_FILES}
               ${RS_FILES}
               src/main/cpp/audio.cpp
