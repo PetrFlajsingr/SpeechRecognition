@@ -5,8 +5,6 @@ cmake_minimum_required(VERSION 3.4.1)
 
 # variables for files
 set(DEBUG_MODEL 1)
-#set(CPP_SOURCE_FILES "")
-#set(CPP_HEADER_FILES "")
 set(RS_FILES "")
 set(RS_OBJ_FILES "")
 set(RENDER_SCRIPT_HEADERS_PATH ${ANDROID_NDK}/toolchains/renderscript/prebuilt/${ANDROID_HOST_TAG}/platform/rs)
@@ -25,10 +23,6 @@ include_directories(${RENDER_SCRIPT_HEADERS_PATH}/cpp
                     ${RENDER_SCRIPT_HEADERS_PATH})
 link_directories(${ANDROID_NDK}/toolchains/renderscript/prebuilt/${ANDROID_HOST_TAG}/platform/${ANDROID_SYSROOT_ABI})
 
-#file(GLOB_RECURSE CPP_SOURCE_FILES src/main/cpp/src/*)
-#file(GLOB_RECURSE KISS_FFT_FILES src/main/cpp/src/kissfft/*)
-#file(GLOB_RECURSE FIR_FILTER_FILES src/main/cpp/src/firfilter/*)
-#file(GLOB_RECURSE CPP_HEADER_FILES src/main/cpp/include/*)
 file(GLOB_RECURSE RS_FILES src/main/rs/*)
 
 if(DEBUG_MODEL)
