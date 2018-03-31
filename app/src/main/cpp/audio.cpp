@@ -16,6 +16,7 @@
 #include <fstream>
 #include <thread>
 #include <AudioSubsampler.h>
+#include <Decoder.h>
 
 using namespace android::RSC;
 
@@ -368,9 +369,62 @@ void setCacheDir(const char* cDir){
     cacheDir = cDir;
 }
 
+FeatureMatrix* fromTestFile(){
+    const int FRAME_SIZE = (const int) (TARGET_SAMPLING_RATE * 0.025);
+    const int FRAME_OVERLEAP = (const int) (TARGET_SAMPLING_RATE * 0.010);
+    int recordingSize = 0;
+
+    short* data = readAudioFromFile("/sdcard/AAA_numbertest.raw", &recordingSize);
+
+    int frameCount = (recordingSize - FRAME_SIZE) / FRAME_OVERLEAP;
+
+    AudioFrame::calcHammingCoef();
+
+    AudioFrame* frames = new AudioFrame[frameCount];
+
+    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "hamming window start");
+    for(unsigned int frame = 0; frame < frameCount; ++frame){
+        frames[frame].applyHammingWindow(data + frame*FRAME_OVERLEAP);
+    }
+    free(data);
+    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "hamming window end");
+
+    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "fft start");
+    kiss_fftr_cfg cfg = kiss_fftr_alloc(FFT_FRAME_LENGTH, 0, NULL, NULL);
+
+    kiss_fft_cpx** fftFrames = new kiss_fft_cpx*[frameCount];
+
+    for(unsigned int i = 0; i < frameCount; ++i){
+        frames[i].applyFFT(&cfg);
+        fftFrames[i] = frames[i].getFftData();
+    }
+    free(cfg);
+
+    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "fft end");
+
+    FeatureMatrix rsMelBankResults;
+    RSMelFilterBank *rsMelBank = new RSMelFilterBank(cacheDir);
+    rsMelBankResults.init(frameCount, MEL_BANK_FRAME_LENGTH);
+    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "RS mel bank start");
+
+    for(int i = 0; i < frameCount; ++i) {
+        rsMelBankResults.getFeaturesMatrix()[i] = rsMelBank->calculateMelBank(fftFrames[i]);
+    }
+    rsMelBank->substractMean(&rsMelBankResults);
+    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "RS mel bank end");
+
+    RSNeuralNetwork nn("/sdcard/NNnew.bin", cacheDir);
+
+    return nn.forwardAll(&rsMelBankResults);
+}
+
 void AcousticTest(){
-    AcousticModel model("/sdcard/lexicon.txt");
-    LanguageModel lm("/sdcard/LM.arpa");
+    FeatureMatrix* nnResult = fromTestFile();
+    Decoder decoder("/sdcard/lexicon.txt", "/sdcard/LM.arpa");
+
+    for(int i = 0; i < nnResult->getFramesNum(); i++) {
+        decoder.decode(nnResult->getFeaturesMatrix()[i]);
+    }
 }
 
 extern "C"{

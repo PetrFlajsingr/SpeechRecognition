@@ -8,9 +8,12 @@
 
 #include "Word.h"
 
+/**
+ * Contains information about acoustic model.
+ */
 class AcousticModel {
 public:
-    std::vector<Word> words;
+    std::vector<Word> words; //< vector of all words in the model
     AcousticModel(std::string path);
 };
 

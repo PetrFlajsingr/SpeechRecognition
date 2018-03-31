@@ -11,21 +11,25 @@
 #include <TokenFWD.h>
 #include <Phoneme.h>
 
+/**
+ * Represents one node in the HMM graph.
+ */
 class GraphNode {
 public:
-    std::vector<float> pathProbablity;
-    std::vector<GraphNode*> successorNodes;
+    // indexes of these vectors correlate
+    std::vector<float> pathProbablity; //< probability of path to the next node
+    std::vector<GraphNode*> successorNodes; //< next nodes
 
-    std::vector<Token*> tokens;
+    std::vector<Token*> tokens; //< tokens currently residing in this node
 
     int wordID; //< id of acoustic model ("row")
 
     short xPos; //< position in sequence ("column")
 
-    PHONEME_ENUM inputVectorIndex;
+    PHONEME_ENUM inputVectorIndex; //< index for NN output
 
-    GraphNode(const std::vector<float> &pathProbability,
-              int wordID, short xPos, PHONEME_ENUM inputVectorIndex);
+    GraphNode(const std::vector<float> &pathProbablity, int wordID, short xPos,
+              PHONEME_ENUM inputVectorIndex);
 };
 
 

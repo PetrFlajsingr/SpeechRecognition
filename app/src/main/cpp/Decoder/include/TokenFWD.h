@@ -4,6 +4,7 @@
 
 #ifndef VOICERECOGNITION_TOKENFWD_H
 #define VOICERECOGNITION_TOKENFWD_H
+// file created to avoid confusing the compiler with cycling dependency
 class Token;
 
 #endif //VOICERECOGNITION_TOKENFWD_H

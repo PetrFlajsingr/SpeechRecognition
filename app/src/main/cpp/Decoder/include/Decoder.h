@@ -6,16 +6,21 @@
 #define VOICERECOGNITION_DECODER_H
 
 
-#include "AcousticModel.h"
-#include "LanguageModel.h"
-#include "HMMGraph.h"
+#include <AcousticModel.h>
+#include <LanguageModel.h>
+#include <HMMGraph.h>
 
+/**
+ * Wrapper for all functions of Viterbi decoding.
+ */
 class Decoder {
 private:
     AcousticModel* acousticModel;
     LanguageModel* languageModel;
 
     HMMGraph* graph;
+
+    void cloneAllTokens();
 public:
     Decoder(std::string pathToLexicon, std::string pathToNgram);
 

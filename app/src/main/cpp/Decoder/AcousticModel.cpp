@@ -2,13 +2,15 @@
 // Created by Petr Flajsingr on 30/03/2018.
 //
 
-
-
 #include <string>
 #include <AcousticModel.h>
 #include <fstream>
 #include <Utils.h>
 
+/**
+ * Reads a lexicon from file.
+ * @param path path to lexicon file
+ */
 AcousticModel::AcousticModel(std::string path) {
     std::ifstream file;
     file.open(path.c_str(), std::ios::in|std::ios::binary);

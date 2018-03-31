@@ -5,12 +5,11 @@
 #ifndef VOICERECOGNITION_LMWORD_H
 #define VOICERECOGNITION_LMWORD_H
 
-
 #include <string>
 
 class LMWord {
 private:
-    static unsigned int idCounter;
+    static unsigned int idCounter; //< static counter
 public:
     std::string writtenForm;
 

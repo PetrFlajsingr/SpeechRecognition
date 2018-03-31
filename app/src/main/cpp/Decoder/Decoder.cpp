@@ -12,12 +12,16 @@
 #include <GraphNode.h>
 #include <Token.h>
 
+/**
+ * Prepares language and acoustic models and lays foundation for a graph.
+ * @param pathToLexicon
+ * @param pathToNgram
+ */
 Decoder::Decoder(std::string pathToLexicon, std::string pathToNgram) {
     this->acousticModel = new AcousticModel(pathToLexicon);
     this->languageModel = new LanguageModel(pathToNgram);
 
     this->graph = new HMMGraph(this->acousticModel);
-    graph->update(acousticModel);
 }
 
 Decoder::~Decoder() {
@@ -26,8 +30,19 @@ Decoder::~Decoder() {
     delete this->graph;
 }
 
+/**
+ * Sends data through the graph.
+ * @param input output of NN
+ */
 void Decoder::decode(float *input) {
-    this->graph->update(acousticModel);
+    graph->update(acousticModel);
 
-    graph->rootNode->tokens.at(0)->cloneInGraph();
+    cloneAllTokens();
+}
+
+/**
+ * Clones all tokens in the graph and calculates new likelihood.
+ */
+void Decoder::cloneAllTokens() {
+
 }

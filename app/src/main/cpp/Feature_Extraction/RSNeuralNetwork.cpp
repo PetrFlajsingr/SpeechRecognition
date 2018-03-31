@@ -293,7 +293,7 @@ float *RSNeuralNetwork::forward(float *data) {
  */
 FeatureMatrix *RSNeuralNetwork::forwardAll(FeatureMatrix *data) {
     FeatureMatrix* result = new FeatureMatrix();
-    result->init(data->getFramesNum(), 360);
+    result->init(data->getFramesNum(), 46);
 
     float* inputData;
     for(int frameNum = 0; frameNum < data->getFramesNum(); frameNum++){

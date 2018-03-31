@@ -2,7 +2,6 @@
 // Created by Petr Flajsingr on 30/03/2018.
 //
 
-
 #include <string>
 #include <fstream>
 #include <LanguageModel.h>
@@ -10,12 +9,19 @@
 #include <Utils.h>
 #include <stdlib.h>
 
+/**
+ * Enum for finite state machine reading from file
+ */
 enum FSM_LM{
-    NONE,
-    INFO,
-    DATA
+    NONE, //< skipping
+    INFO, //< header
+    DATA //< ngrams
 };
 
+/**
+ * Reads language model from an .arpa formatted file
+ * @param path path to .arpa file
+ */
 LanguageModel::LanguageModel(std::string path) {
     std::ifstream file;
     file.open(path.c_str(), std::ios::in|std::ios::binary);
@@ -51,7 +57,6 @@ LanguageModel::LanguageModel(std::string path) {
                         state = NONE;
                         continue;
                     }
-
                     saveWord(inputBuffer);
                     for(int i = 1; i < unigramCount; i++){
                         file.getline(inputBuffer, 1024);
@@ -65,6 +70,10 @@ LanguageModel::LanguageModel(std::string path) {
     file.close();
 }
 
+/**
+ * Saves word into representation using LMWord.
+ * @param input data from file (f.e. "-0.1110232 car")
+ */
 void LanguageModel::saveWord(char *input) {
     std::vector<std::string> record = split(input, "\t");
 

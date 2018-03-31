@@ -7,7 +7,10 @@
 
 #include <string>
 
-// phonemes coresponding to their output index in neural network
+/**
+ * phonemes coresponding to their output index in neural network
+ * TODO change enum name
+ */
 enum PHONEME_ENUM{
     AA  =   0,
     AE  =   1,
@@ -58,10 +61,12 @@ enum PHONEME_ENUM{
     NONE = -1
 };
 
+/**
+ * This class serves mainly for reading data for acoustic model.
+ */
 class Phoneme {
 public:
     static PHONEME_ENUM stringToPhoneme(std::string phoneme);
-
 };
 
 

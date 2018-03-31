@@ -5,9 +5,8 @@
 #ifndef VOICERECOGNITION_GRAPH_H
 #define VOICERECOGNITION_GRAPH_H
 
-
-#include "GraphNode.h"
-#include "AcousticModel.h"
+#include <GraphNode.h>
+#include <AcousticModel.h>
 
 class HMMGraph {
 private:
