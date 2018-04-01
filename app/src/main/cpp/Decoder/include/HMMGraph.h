@@ -11,6 +11,8 @@
 class HMMGraph {
 private:
     void addSuccessors(GraphNode *node, AcousticModel* model, int wordID, int phonemeIndex);
+
+    void destroySuccessors(GraphNode* node);
 public:
     GraphNode* rootNode;
     GraphNode* outputNode;
@@ -21,7 +23,7 @@ public:
 
     void update(AcousticModel* model);
 
-    void destroySuccessors(GraphNode* node);
+    void applyViterbiCriterium(GraphNode* node);
 };
 
 

@@ -18,19 +18,29 @@ class Token {
     static std::vector<Token*> tokenVector; //< vector of all tokens in the graph
         // serves as an access point for faster cloning
 
-    unsigned long index_TokenVector; //< index in tokenVector, for fast deletion from tokenVector
-
-    float likelihood = 0.0f;
+    static std::vector<unsigned int> indexesToDelete;
 
     std::vector<LMWord> wordHistory; //< word history for ngrams
 
     GraphNode* currentNode; //< node in which the token is placed
 
     float calculateLikelihood(float* inputVector, unsigned int pathNumber);
+
+    static void updateIndexes(unsigned int beginIndex, unsigned int endIndex, int toAdd);
 public:
+    float likelihood = 0.0f;
+
+    unsigned long index_TokenVector; //< index in tokenVector, for fast deletion from tokenVector
+
     Token(GraphNode *currentNode);
 
-    void cloneInGraph(float* inputVector);
+    void passInGraph(float *inputVector);
+
+    static void passAllTokens(float* inputVector);
+
+    static void addIndexToDelete(unsigned int index);
+
+    static void deleteInvalidTokens();
 };
 
 

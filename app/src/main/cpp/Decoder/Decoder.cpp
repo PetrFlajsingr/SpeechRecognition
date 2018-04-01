@@ -36,13 +36,7 @@ Decoder::~Decoder() {
  */
 void Decoder::decode(float *input) {
     graph->update(acousticModel);
-
-    cloneAllTokens();
-}
-
-/**
- * Clones all tokens in the graph and calculates new likelihood.
- */
-void Decoder::cloneAllTokens() {
-
+    Token::passAllTokens(input);
+    graph->applyViterbiCriterium(graph->rootNode);
+    Token::deleteInvalidTokens();
 }

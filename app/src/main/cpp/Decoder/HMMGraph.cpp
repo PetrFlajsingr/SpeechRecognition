@@ -94,3 +94,40 @@ void HMMGraph::destroySuccessors(GraphNode *node) {
     }
     node->successorNodes.clear();
 }
+
+/**
+ * Iterates through all tokens in a node, finds the one with highest likelihood.
+ */
+void keepMax(std::vector<Token*>* tokens){
+    float maxLikelihood = 0.0;
+    for(auto iterator = tokens->begin();
+         iterator != tokens->end();
+         iterator++){
+        if((*iterator)->likelihood > maxLikelihood)
+            maxLikelihood = (*iterator)->likelihood;
+    }
+
+    for(auto iterator = tokens->begin();
+        iterator != tokens->end();
+        iterator++){
+        if((*iterator)->likelihood < maxLikelihood){
+            Token::addIndexToDelete((*iterator)->index_TokenVector);
+            tokens->erase(iterator);
+            iterator--;
+        }
+    }
+}
+
+/**
+ * Iterates through all nodes in a graph and find tokens with highest likelihood.
+ */
+void HMMGraph::applyViterbiCriterium(GraphNode* node) {
+    keepMax(&(node->tokens));
+
+    //skips loopback node
+    for(auto nodeIterator = node->successorNodes.begin() + 1;
+            nodeIterator != node->successorNodes.end();
+            nodeIterator++){
+        applyViterbiCriterium(*nodeIterator);
+    }
+}

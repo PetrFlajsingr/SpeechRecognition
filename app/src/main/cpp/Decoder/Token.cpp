@@ -6,6 +6,7 @@
 #include <GraphNode.h>
 
 std::vector<Token*> Token::tokenVector;
+std::vector<unsigned int> Token::indexesToDelete;
 /**
  * Registers token in static vector for all tokens.
  * Saves index in the vector for fast deletion from the vector.
@@ -20,14 +21,15 @@ Token::Token(GraphNode* currentNode) : currentNode(currentNode) {
  * Step in an algorithm. Clones the token into next states and calculates new likelihood.
  * @param inputVector vector of NN outputs
  */
-void Token::cloneInGraph(float* inputVector) {
+void Token::passInGraph(float *inputVector) {
     int i = 0;
-    for(auto iterator = currentNode->successorNodes.begin();
+    this->currentNode = currentNode->successorNodes.at(0);
+    this->likelihood = calculateLikelihood(inputVector, 0);
+    for(auto iterator = currentNode->successorNodes.begin() + 1;
             iterator != currentNode->successorNodes.end();
             iterator++, i++){
         Token* newToken = new Token(*iterator);
         newToken->likelihood = calculateLikelihood(inputVector, i);
-
         (*iterator)->tokens.push_back(newToken);
     }
 }
@@ -39,5 +41,43 @@ void Token::cloneInGraph(float* inputVector) {
  * @return new likelihood
  */
 float Token::calculateLikelihood(float* inputVector, unsigned int pathNumber) {
-    return likelihood + inputVector[currentNode->inputVectorIndex] * currentNode->pathProbablity.at(pathNumber);
+    return likelihood
+           + inputVector[currentNode->successorNodes.at(pathNumber)->inputVectorIndex]
+             * currentNode->pathProbablity.at(pathNumber);
+}
+
+void Token::passAllTokens(float *inputVector) {
+    for(auto iterator = tokenVector.begin();
+            iterator != tokenVector.end();
+            iterator++){
+        (*iterator)->passInGraph(inputVector);
+    }
+}
+
+void Token::addIndexToDelete(unsigned int index) {
+    indexesToDelete.push_back(index);
+}
+
+void Token::updateIndexes(unsigned int beginIndex, unsigned int endIndex, int toAdd){
+    for(auto iterator = tokenVector.begin() + beginIndex;
+            iterator != tokenVector.begin() + endIndex;
+            iterator++){
+        (*iterator)->index_TokenVector += toAdd;
+    }
+}
+
+void Token::deleteInvalidTokens() {
+    unsigned int deletedCounter = 0;
+
+    for(auto indexIterator = indexesToDelete.begin();
+            indexIterator != indexesToDelete.end();
+            indexIterator++){
+        tokenVector.erase(tokenVector.begin() + *indexIterator - deletedCounter);
+        deletedCounter++;
+
+        updateIndexes(*indexIterator,
+                      (indexIterator == indexesToDelete.end() - 1)
+                      ? tokenVector.size() : *(indexIterator + 1),
+                      -(int)deletedCounter);
+    }
 }

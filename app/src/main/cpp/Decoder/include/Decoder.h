@@ -19,8 +19,6 @@ private:
     LanguageModel* languageModel;
 
     HMMGraph* graph;
-
-    void cloneAllTokens();
 public:
     Decoder(std::string pathToLexicon, std::string pathToNgram);
 
