@@ -33,11 +33,11 @@ class Token {
 public:
     float likelihood = 0.0f;
 
-    Word* word;
+    int word;
 
     unsigned long index_TokenVector; //< index in tokenVector, for fast deletion from tokenVector
 
-    Token(GraphNode *currentNode, Word* word);
+    Token(GraphNode *currentNode, int word);
 
     void passInGraph(float *inputVector);
 
@@ -46,6 +46,10 @@ public:
     static void addIndexToDelete(unsigned int index);
 
     static void deleteInvalidTokens();
+
+    virtual ~Token();
+
+    static void deleteStatic();
 };
 
 

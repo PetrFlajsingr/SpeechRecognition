@@ -28,6 +28,8 @@ Decoder::~Decoder() {
     delete this->acousticModel;
     delete this->languageModel;
     delete this->graph;
+
+    Token::deleteStatic();
 }
 
 /**
@@ -35,8 +37,16 @@ Decoder::~Decoder() {
  * @param input output of NN
  */
 void Decoder::decode(float *input) {
+    graph->rootNode->tokens.push_back(new Token(graph->rootNode, -1));
     graph->update(acousticModel);
     Token::passAllTokens(input);
     graph->applyViterbiCriterium(graph->rootNode);
     Token::deleteInvalidTokens();
+
+    output += graph->output(acousticModel);
+    Token::deleteInvalidTokens();
+}
+
+std::string Decoder::getOutput() {
+    return this->output;
 }

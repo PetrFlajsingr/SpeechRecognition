@@ -7,9 +7,12 @@
 #include <HMMGraph.h>
 #include <GraphNode.h>
 #include <Token.h>
+#include <sstream>
 
 //TODO temp variable, remove
 std::vector<float> TEMP_PROB = {0.6, 0.4};
+
+//TODO memory leak - uvolneni pameti
 
 /**
  * Prepares root node of a graph and creates first token;
@@ -27,16 +30,17 @@ HMMGraph::HMMGraph(AcousticModel* model) {
                                         model->words.at(i).phonemes.at(0));
         nodes.push_back(node);
     }
-    this->rootNode = new GraphNode(probs, -1, -1, NONE);
+    this->rootNode = new GraphNode(probs, -2, -1, NONE);
     this->rootNode->successorNodes = nodes;
 
-    this->rootNode->tokens.push_back(new Token(rootNode, nullptr));
+    //this->rootNode->tokens.push_back(new Token(rootNode, -1));
 
     this->outputNode = new GraphNode(TEMP_PROB, -1, -1, NONE);
 }
 
 HMMGraph::~HMMGraph() {
-    delete this->rootNode;
+    destroyGraph(rootNode);
+    delete outputNode;
 }
 
 /**
@@ -122,14 +126,61 @@ void keepMax(std::vector<Token*>* tokens){
  * Iterates through all nodes in a graph and find tokens with highest likelihood.
  */
 void HMMGraph::applyViterbiCriterium(GraphNode* node) {
+    if(node == outputNode)
+        return;
     keepMax(&(node->tokens));
 
     if(node->successorNodes.size() <= 1)
         return;
+    int offset = 0;
+    if(node != rootNode)
+        offset = 1;
     //skips loopback node
-    for(auto nodeIterator = node->successorNodes.begin() + 1;
+    for(auto nodeIterator = node->successorNodes.begin() + offset;
             nodeIterator != node->successorNodes.end();
             nodeIterator++){
         applyViterbiCriterium(*nodeIterator);
     }
+}
+
+std::string toString(float& value){
+    std::ostringstream ss;
+    ss << value;
+    return ss.str();
+}
+
+std::string toString(int& value){
+    std::ostringstream ss;
+    ss << value;
+    return ss.str();
+}
+
+std::string HMMGraph::output(AcousticModel* model) {
+    std::string result = "";
+    for(int i = 0; i < outputNode->tokens.size(); i++){
+        result += "Word:\t" + model->words.at(outputNode->tokens.at(i)->word).writtenForm
+                  + "\tLikelihood:\t" + toString(outputNode->tokens.at(i)->likelihood)
+                  + "\n";
+    }
+
+
+    for(auto iterator = outputNode->tokens.begin();
+        iterator != outputNode->tokens.end();
+        iterator++){
+            Token::addIndexToDelete((*iterator)->index_TokenVector);
+            outputNode->tokens.erase(iterator);
+            iterator--;
+    }
+    return result;
+}
+
+void HMMGraph::destroyGraph(GraphNode* node) {
+    if(node == outputNode)
+        return;
+    for(auto iterator = node->successorNodes.begin() + 1;
+            iterator != node->successorNodes.end();
+            iterator++){
+        destroyGraph(*iterator);
+    }
+    delete node;
 }

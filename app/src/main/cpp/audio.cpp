@@ -423,8 +423,17 @@ void AcousticTest(){
     Decoder decoder("/sdcard/lexicon.txt", "/sdcard/LM.arpa");
 
     for(int i = 0; i < nnResult->getFramesNum(); i++) {
+        __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "Decode %d", i);
         decoder.decode(nnResult->getFeaturesMatrix()[i]);
     }
+
+    std::string hahahaahahahaha = decoder.getOutput();
+
+    std::ofstream out;
+    out.open("/sdcard/AAA_decoder_result.txt");
+
+    out.write(hahahaahahahaha.c_str(), hahahaahahahaha.length());
+    out.close();
 }
 
 extern "C"{

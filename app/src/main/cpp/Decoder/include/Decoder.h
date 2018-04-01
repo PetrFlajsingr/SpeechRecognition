@@ -19,6 +19,8 @@ private:
     LanguageModel* languageModel;
 
     HMMGraph* graph;
+
+    std::string output = "";
 public:
     Decoder(std::string pathToLexicon, std::string pathToNgram);
 
@@ -26,6 +28,7 @@ public:
 
     void decode(float* input);
 
+    std::string getOutput();
 };
 
 

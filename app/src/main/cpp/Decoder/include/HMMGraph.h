@@ -13,6 +13,8 @@ private:
     void addSuccessors(GraphNode *node, AcousticModel* model, int wordID, int phonemeIndex);
 
     void destroySuccessors(GraphNode* node);
+
+    void destroyGraph(GraphNode* node);
 public:
     GraphNode* rootNode;
     GraphNode* outputNode;
@@ -24,6 +26,8 @@ public:
     void update(AcousticModel* model);
 
     void applyViterbiCriterium(GraphNode* node);
+
+    std::string output(AcousticModel* model);
 };
 
 

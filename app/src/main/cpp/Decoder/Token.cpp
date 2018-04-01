@@ -5,6 +5,8 @@
 #include <algorithm>
 #include <Token.h>
 #include <GraphNode.h>
+#include <constants.h>
+#include <android/log.h>
 
 std::vector<Token*> Token::tokenVector;
 std::vector<unsigned int> Token::indexesToDelete;
@@ -14,12 +16,13 @@ unsigned int Token::tokenCounter;
  * Saves index in the vector for fast deletion from the vector.
  * @param currentNode node of graph
  */
-Token::Token(GraphNode* currentNode, Word* word) : currentNode(currentNode) {
+Token::Token(GraphNode* currentNode, int word) : currentNode(currentNode) {
     index_TokenVector = tokenVector.size();
     tokenVector.push_back(this);
     tokenCounter++;
 
-    this->word = word;
+    if(word >= 0)
+        this->word = word;
 }
 
 /**
@@ -27,16 +30,20 @@ Token::Token(GraphNode* currentNode, Word* word) : currentNode(currentNode) {
  * @param inputVector vector of NN outputs
  */
 void Token::passInGraph(float *inputVector) {
+    if(currentNode->wordID == -1)
+        return;
     int i = 0;
     for(auto iterator = currentNode->successorNodes.begin() + 1;
             iterator != currentNode->successorNodes.end();
             iterator++, i++){
-        Token* newToken = new Token(*iterator, this->word);
+        int wordID = ((*iterator)->wordID >= 0) ? (*iterator)->wordID : currentNode->wordID;
+        Token* newToken = new Token(*iterator, wordID);
         newToken->likelihood = calculateLikelihood(inputVector, i);
         (*iterator)->tokens.push_back(newToken);
     }
     this->currentNode = currentNode->successorNodes.at(0);
     this->likelihood = calculateLikelihood(inputVector, 0);
+    this->word = this->currentNode->wordID;
 }
 
 /**
@@ -60,6 +67,7 @@ void Token::passAllTokens(float *inputVector) {
     for(unsigned int i = 0; i < oldTokenCount; i++){
         tokenVector.at(i)->passInGraph(inputVector);
     }
+    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "Token count %d", Token::tokenCounter);
 }
 
 /**
@@ -104,4 +112,21 @@ void Token::deleteInvalidTokens() {
                       endIndex,
                       -(int)deletedCounter);
     }
+    indexesToDelete.clear();
+}
+
+Token::~Token() {
+    tokenCounter--;
+}
+
+void Token::deleteStatic() {
+    for(auto iterator = tokenVector.begin();
+            iterator != tokenVector.end();){
+        delete *iterator;
+        tokenVector.erase(iterator);
+    }
+    tokenVector.clear();
+    indexesToDelete.clear();
+
+    tokenCounter = 0;
 }
