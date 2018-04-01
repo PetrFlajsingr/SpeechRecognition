@@ -10,11 +10,14 @@
 #include <GraphNodeFwd.h>
 #include <TokenFWD.h>
 #include <LMWord.h>
+#include "Word.h"
 
 /**
  * Represents a token in a HMM graph.
  */
 class Token {
+    static unsigned int tokenCounter;
+
     static std::vector<Token*> tokenVector; //< vector of all tokens in the graph
         // serves as an access point for faster cloning
 
@@ -30,9 +33,11 @@ class Token {
 public:
     float likelihood = 0.0f;
 
+    Word* word;
+
     unsigned long index_TokenVector; //< index in tokenVector, for fast deletion from tokenVector
 
-    Token(GraphNode *currentNode);
+    Token(GraphNode *currentNode, Word* word);
 
     void passInGraph(float *inputVector);
 

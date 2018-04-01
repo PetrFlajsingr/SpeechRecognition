@@ -30,9 +30,7 @@ HMMGraph::HMMGraph(AcousticModel* model) {
     this->rootNode = new GraphNode(probs, -1, -1, NONE);
     this->rootNode->successorNodes = nodes;
 
-    this->rootNode->tokens.push_back(new Token(rootNode));
-
-    GraphNode test = *(rootNode->successorNodes.at(5));
+    this->rootNode->tokens.push_back(new Token(rootNode, nullptr));
 
     this->outputNode = new GraphNode(TEMP_PROB, -1, -1, NONE);
 }
@@ -99,6 +97,8 @@ void HMMGraph::destroySuccessors(GraphNode *node) {
  * Iterates through all tokens in a node, finds the one with highest likelihood.
  */
 void keepMax(std::vector<Token*>* tokens){
+    if(tokens->size() <= 1)
+        return;
     float maxLikelihood = 0.0;
     for(auto iterator = tokens->begin();
          iterator != tokens->end();
@@ -124,6 +124,8 @@ void keepMax(std::vector<Token*>* tokens){
 void HMMGraph::applyViterbiCriterium(GraphNode* node) {
     keepMax(&(node->tokens));
 
+    if(node->successorNodes.size() <= 1)
+        return;
     //skips loopback node
     for(auto nodeIterator = node->successorNodes.begin() + 1;
             nodeIterator != node->successorNodes.end();
