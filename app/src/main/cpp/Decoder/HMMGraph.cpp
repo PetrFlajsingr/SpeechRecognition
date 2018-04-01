@@ -12,8 +12,6 @@
 //TODO temp variable, remove
 std::vector<float> TEMP_PROB = {0.6, 0.4};
 
-//TODO memory leak - uvolneni pameti
-
 /**
  * Prepares root node of a graph and creates first token;
  * @param model Acoustic model
