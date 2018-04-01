@@ -72,6 +72,7 @@ void Token::deleteInvalidTokens() {
     for(auto indexIterator = indexesToDelete.begin();
             indexIterator != indexesToDelete.end();
             indexIterator++){
+        delete tokenVector.at(*indexIterator - deletedCounter);
         tokenVector.erase(tokenVector.begin() + *indexIterator - deletedCounter);
         deletedCounter++;
 
