@@ -46,6 +46,10 @@ float Token::calculateLikelihood(float* inputVector, unsigned int pathNumber) {
              * currentNode->pathProbablity.at(pathNumber);
 }
 
+/**
+ * Passes all tokens through the graph (one step)
+ * @param inputVector
+ */
 void Token::passAllTokens(float *inputVector) {
     for(auto iterator = tokenVector.begin();
             iterator != tokenVector.end();
@@ -54,10 +58,17 @@ void Token::passAllTokens(float *inputVector) {
     }
 }
 
+/**
+ * Registers token for deletion
+ * @param index
+ */
 void Token::addIndexToDelete(unsigned int index) {
     indexesToDelete.push_back(index);
 }
 
+/**
+ * Updates indexes for deletion in given range
+ */
 void Token::updateIndexes(unsigned int beginIndex, unsigned int endIndex, int toAdd){
     for(auto iterator = tokenVector.begin() + beginIndex;
             iterator != tokenVector.begin() + endIndex;
@@ -66,6 +77,10 @@ void Token::updateIndexes(unsigned int beginIndex, unsigned int endIndex, int to
     }
 }
 
+/**
+ * Deletes all tokens marked for deletion in "indexesToDelete".
+ * Updates "index_TokenVector" for all remaining.
+ */
 void Token::deleteInvalidTokens() {
     unsigned int deletedCounter = 0;
 
