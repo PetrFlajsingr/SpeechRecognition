@@ -26,10 +26,8 @@ HMMGraph::HMMGraph(AcousticModel* model) {
     std::vector<float> probs;
     std::vector<GraphNode*> nodes;
 
-
-    float logProb = log(1.0f / model->words.size());
     for(int i = 0; i < model->words.size(); i++){
-        probs.push_back(logProb);
+        probs.push_back(0);
         GraphNode* node = new GraphNode(TEMP_PROB, i, 0,
                                         model->words.at(i).phonemes.at(0));
         nodes.push_back(node);
