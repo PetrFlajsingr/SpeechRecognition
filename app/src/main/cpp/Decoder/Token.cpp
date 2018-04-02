@@ -41,7 +41,12 @@ void Token::passInGraph(float *inputVector) {
         newToken->likelihood = calculateLikelihood(inputVector, i);
         (*iterator)->tokens.push_back(newToken);
     }
+    //removing old record of token
+    this->currentNode->tokens.erase(std::find(currentNode->tokens.begin(), currentNode->tokens.end(), this));
+    //moving to new node
     this->currentNode = currentNode->successorNodes.at(0);
+    //adding record of token in node
+    this->currentNode->tokens.push_back(this);
     this->likelihood = calculateLikelihood(inputVector, 0);
     this->word = this->currentNode->wordID;
 }
@@ -55,7 +60,7 @@ void Token::passInGraph(float *inputVector) {
 float Token::calculateLikelihood(float* inputVector, unsigned int pathNumber) {
     return likelihood
            + inputVector[currentNode->successorNodes.at(pathNumber)->inputVectorIndex]
-             * currentNode->pathProbablity.at(pathNumber);
+             + currentNode->pathProbablity.at(pathNumber);
 }
 
 /**
@@ -63,11 +68,12 @@ float Token::calculateLikelihood(float* inputVector, unsigned int pathNumber) {
  * @param inputVector
  */
 void Token::passAllTokens(float *inputVector) {
+    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "Token count on start %d", Token::tokenCounter);
     unsigned int oldTokenCount = tokenVector.size();
     for(unsigned int i = 0; i < oldTokenCount; i++){
         tokenVector.at(i)->passInGraph(inputVector);
     }
-    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "Token count %d", Token::tokenCounter);
+    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "Token count before deletion %d", Token::tokenCounter);
 }
 
 /**
@@ -113,6 +119,8 @@ void Token::deleteInvalidTokens() {
                       -(int)deletedCounter);
     }
     indexesToDelete.clear();
+
+    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "Token count after deletion %d", Token::tokenCounter);
 }
 
 Token::~Token() {

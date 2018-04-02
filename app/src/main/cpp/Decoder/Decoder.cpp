@@ -11,7 +11,9 @@
 #include <vector>
 #include <GraphNode.h>
 #include <Token.h>
+#include <Utils.h>
 
+int emitCount = 0;
 /**
  * Prepares language and acoustic models and lays foundation for a graph.
  * @param pathToLexicon
@@ -43,6 +45,8 @@ void Decoder::decode(float *input) {
     graph->applyViterbiCriterium(graph->rootNode);
     Token::deleteInvalidTokens();
 
+    output += "EMIT: " + toString(emitCount) + "\n";
+    emitCount++;
     output += graph->output(acousticModel);
     Token::deleteInvalidTokens();
 }

@@ -33,7 +33,7 @@ static float softmaxExpSumCalc(int vectorLength){
 void calculateSoftmax(int vectorLength){
     float expSum = softmaxExpSumCalc(vectorLength);
     for(int i = 0; i < vectorLength; ++i){
-        data[i] = exp(data[i]) / expSum;
+        data[i] = log(exp(data[i]) / expSum);
     }
 }
 

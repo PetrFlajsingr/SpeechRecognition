@@ -6,6 +6,19 @@
 #include <string>
 #include <vector>
 #include <Utils.h>
+#include <sstream>
+
+std::string toString(float& value){
+    std::ostringstream ss;
+    ss << value;
+    return ss.str();
+}
+
+std::string toString(int& value){
+    std::ostringstream ss;
+    ss << value;
+    return ss.str();
+}
 
 std::vector<std::string> split(char* str, std::string delimiter){
     std::vector<std::string> result;

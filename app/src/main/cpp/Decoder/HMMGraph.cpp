@@ -8,9 +8,15 @@
 #include <GraphNode.h>
 #include <Token.h>
 #include <sstream>
+#include <cmath>
+#include <Utils.h>
+#include <limits>
 
 //TODO temp variable, remove
-std::vector<float> TEMP_PROB = {0.6, 0.4};
+std::vector<float> TEMP_PROB = {
+        static_cast<float>(log(0.6)),
+        static_cast<float>(log(0.4))
+};
 
 /**
  * Prepares root node of a graph and creates first token;
@@ -21,9 +27,9 @@ HMMGraph::HMMGraph(AcousticModel* model) {
     std::vector<GraphNode*> nodes;
 
 
-    float prob = 1.0f / model->words.size();
+    float logProb = log(1.0f / model->words.size());
     for(int i = 0; i < model->words.size(); i++){
-        probs.push_back(prob);
+        probs.push_back(logProb);
         GraphNode* node = new GraphNode(TEMP_PROB, i, 0,
                                         model->words.at(i).phonemes.at(0));
         nodes.push_back(node);
@@ -98,23 +104,23 @@ void HMMGraph::destroySuccessors(GraphNode *node) {
 /**
  * Iterates through all tokens in a node, finds the one with highest likelihood.
  */
-void keepMax(std::vector<Token*>* tokens){
-    if(tokens->size() <= 1)
+void keepMax(std::vector<Token*>& tokens){
+    if(tokens.size() <= 1)
         return;
-    float maxLikelihood = 0.0;
-    for(auto iterator = tokens->begin();
-         iterator != tokens->end();
+    float maxLikelihood = -std::numeric_limits<float>::max();
+    for(auto iterator = tokens.begin();
+         iterator != tokens.end();
          iterator++){
         if((*iterator)->likelihood > maxLikelihood)
             maxLikelihood = (*iterator)->likelihood;
     }
 
-    for(auto iterator = tokens->begin();
-        iterator != tokens->end();
+    for(auto iterator = tokens.begin();
+        iterator != tokens.end();
         iterator++){
         if((*iterator)->likelihood < maxLikelihood){
             Token::addIndexToDelete((*iterator)->index_TokenVector);
-            tokens->erase(iterator);
+            tokens.erase(iterator);
             iterator--;
         }
     }
@@ -126,7 +132,7 @@ void keepMax(std::vector<Token*>* tokens){
 void HMMGraph::applyViterbiCriterium(GraphNode* node) {
     if(node == outputNode)
         return;
-    keepMax(&(node->tokens));
+    keepMax(node->tokens);
 
     if(node->successorNodes.size() <= 1)
         return;
@@ -141,26 +147,34 @@ void HMMGraph::applyViterbiCriterium(GraphNode* node) {
     }
 }
 
-std::string toString(float& value){
-    std::ostringstream ss;
-    ss << value;
-    return ss.str();
-}
+std::string getMostLikely(std::vector<Token*>& vector, AcousticModel* model){
+    int index = -1;
+    float maxSoFar = -std::numeric_limits<float>::max();
+    int i = 0;
+    for(auto iterator = vector.begin();
+            iterator != vector.end();
+            iterator++, i++){
+        if((*iterator)->likelihood > maxSoFar){
+            maxSoFar = (*iterator)->likelihood;
+            index = i;
+        }
+    }
 
-std::string toString(int& value){
-    std::ostringstream ss;
-    ss << value;
-    return ss.str();
+    return model->words.at(vector.at(index)->word).writtenForm;
 }
 
 std::string HMMGraph::output(AcousticModel* model) {
     std::string result = "";
     for(int i = 0; i < outputNode->tokens.size(); i++){
+        std::string tabs = "\t";
+        if(model->words.at(outputNode->tokens.at(i)->word).writtenForm.length() < 4)
+            tabs += "\t";
         result += "Word:\t" + model->words.at(outputNode->tokens.at(i)->word).writtenForm
-                  + "\tLikelihood:\t" + toString(outputNode->tokens.at(i)->likelihood)
+                  + tabs + "Likelihood:\t" + toString(outputNode->tokens.at(i)->likelihood)
                   + "\n";
     }
-
+    if(outputNode->tokens.size() > 0)
+        result += "Most likely: " + getMostLikely(outputNode->tokens, model) + "\n";
 
     for(auto iterator = outputNode->tokens.begin();
         iterator != outputNode->tokens.end();
