@@ -5,9 +5,33 @@
 #ifndef VOICERECOGNITION_VOICEACTIVITYDETECTOR_H
 #define VOICERECOGNITION_VOICEACTIVITYDETECTOR_H
 
+#include <constants.h>
 
 class VoiceActivityDetector {
+private:
+    const unsigned int FRAMES_FOR_TRANSITION_INACTIVE = 25;
+    const unsigned int FRAMES_FOR_TRANSITION_ACTIVE = 4;
 
+    enum STATE {
+        ACTIVE = 0,
+        INACTIVE = 1
+    };
+
+    STATE currentState = INACTIVE;
+
+    unsigned int counterForTransition[2] = {0, 0};
+
+    float meanForNormalisation[MEL_BANK_FRAME_LENGTH] = {0};
+
+    unsigned int elementCount = 0;
+public:
+    VoiceActivityDetector();
+
+    virtual ~VoiceActivityDetector();
+
+    void checkData(float* data);
+
+    bool isActive();
 };
 
 

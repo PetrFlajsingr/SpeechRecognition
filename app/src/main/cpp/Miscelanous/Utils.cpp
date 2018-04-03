@@ -7,6 +7,7 @@
 #include <vector>
 #include <Utils.h>
 #include <sstream>
+#include <fstream>
 
 std::string toString(float& value){
     std::ostringstream ss;
@@ -40,4 +41,30 @@ std::vector<std::string> split(char* str, std::string delimiter){
     result.push_back(token);
 
     return result;
+}
+
+void dumpToFile(std::string path, bool* array, unsigned int length) {
+    std::ofstream out;
+    out.open(path.c_str());
+
+    for(int i = 0; i < length; ++i){
+        if(array[i])
+            out.write("true", 4);
+        else
+            out.write("false", 5);
+        out.write("\n", 1);
+    }
+    out.close();
+}
+void dumpToFile(std::string path, float* array, unsigned int length) {
+    std::ofstream out;
+    out.open(path.c_str());
+
+    for(int i = 0; i < length; ++i){
+        std::stringstream ss;
+        ss << array[i];
+        out.write(ss.str().c_str(), ss.str().size());
+        out.write("\n", 1);
+    }
+    out.close();
 }

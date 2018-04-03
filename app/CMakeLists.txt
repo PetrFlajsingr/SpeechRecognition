@@ -16,6 +16,7 @@ include_directories(src/main/cpp/include)
 include_directories(src/main/cpp/Decoder/include)
 include_directories(src/main/cpp/Miscelanous/include)
 include_directories(src/main/cpp/Feature_Extraction/include)
+include_directories(src/main/cpp/Voice_Activity_Detection/include)
 include_directories(src/main/cpp/kissfft)
 include_directories(src/main/cpp/firfilter)
 include_directories(${RENDER_SCRIPT_HEADERS_PATH}/cpp
@@ -81,7 +82,8 @@ add_library( # Sets the name of the library.
               src/main/cpp/Decoder/Phoneme.cpp
               src/main/cpp/Decoder/Token.cpp
 
-
+              # VOICE ACTIVITY DETECTION
+              src/main/cpp/Voice_Activity_Detection/VoiceActivityDetector.cpp
 
               ${RS_OBJ_FILES}
               ${RS_FILES}

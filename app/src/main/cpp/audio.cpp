@@ -17,6 +17,8 @@
 #include <thread>
 #include <AudioSubsampler.h>
 #include <Decoder.h>
+#include <Utils.h>
+#include "Voice_Activity_Detection/VoiceActivityDetector.h"
 
 using namespace android::RSC;
 
@@ -369,7 +371,7 @@ void setCacheDir(const char* cDir){
     cacheDir = cDir;
 }
 
-FeatureMatrix* fromTestFile(){
+FeatureMatrix* nnFromTestFile(){
     const int FRAME_SIZE = (const int) (TARGET_SAMPLING_RATE * 0.025);
     const int FRAME_OVERLEAP = (const int) (TARGET_SAMPLING_RATE * 0.010);
     int recordingSize = 0;
@@ -418,8 +420,76 @@ FeatureMatrix* fromTestFile(){
     return nn.forwardAll(&rsMelBankResults);
 }
 
+FeatureMatrix* melFromTestFile(){
+    const int FRAME_SIZE = (const int) (TARGET_SAMPLING_RATE * 0.025);
+    const int FRAME_OVERLEAP = (const int) (TARGET_SAMPLING_RATE * 0.010);
+    int recordingSize = 0;
+
+    short* data = readAudioFromFile("/sdcard/AAA_numbertest.raw", &recordingSize);
+
+    int frameCount = (recordingSize - FRAME_SIZE) / FRAME_OVERLEAP;
+
+    AudioFrame::calcHammingCoef();
+
+    AudioFrame* frames = new AudioFrame[frameCount];
+
+    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "hamming window start");
+    for(unsigned int frame = 0; frame < frameCount; ++frame){
+        frames[frame].applyHammingWindow(data + frame*FRAME_OVERLEAP);
+    }
+    free(data);
+    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "hamming window end");
+
+    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "fft start");
+    kiss_fftr_cfg cfg = kiss_fftr_alloc(FFT_FRAME_LENGTH, 0, NULL, NULL);
+
+    kiss_fft_cpx** fftFrames = new kiss_fft_cpx*[frameCount];
+
+    for(unsigned int i = 0; i < frameCount; ++i){
+        frames[i].applyFFT(&cfg);
+        fftFrames[i] = frames[i].getFftData();
+    }
+    free(cfg);
+
+    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "fft end");
+
+    FeatureMatrix* rsMelBankResults = new FeatureMatrix();
+    RSMelFilterBank *rsMelBank = new RSMelFilterBank(cacheDir);
+    rsMelBankResults->init(frameCount, MEL_BANK_FRAME_LENGTH);
+    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "RS mel bank start");
+
+    for(int i = 0; i < frameCount; ++i) {
+        rsMelBankResults->getFeaturesMatrix()[i] = rsMelBank->calculateMelBank(fftFrames[i]);
+    }
+    rsMelBank->substractMean(rsMelBankResults);
+    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "RS mel bank end");
+
+   return rsMelBankResults;
+}
+
+void VADtest(){
+    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "VADtest() started");
+    FeatureMatrix* melResult = melFromTestFile();
+
+    VoiceActivityDetector detector;
+
+    std::vector<bool> answers;
+    for(int i = 0; i < melResult->getFramesNum(); i++){
+        detector.checkData(melResult->getFeaturesMatrix()[i]);
+        answers.push_back(detector.isActive());
+    }
+
+    bool* array = new bool[answers.size()];
+    std::copy(std::begin(answers), std::end(answers), array);
+    dumpToFile("/sdcard/AAA_decision_VAD.txt", array, answers.size());
+
+    delete melResult;
+
+    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "VADtest() ended");
+}
+
 void AcousticTest(){
-    FeatureMatrix* nnResult = fromTestFile();
+    FeatureMatrix* nnResult = nnFromTestFile();
     Decoder decoder("/sdcard/lexicon.txt", "/sdcard/LM.arpa");
 
     for(int i = 0; i < nnResult->getFramesNum(); i++) {
@@ -434,6 +504,8 @@ void AcousticTest(){
 
     out.write(hahahaahahahaha.c_str(), hahahaahahahaha.length());
     out.close();
+
+    delete nnResult;
 }
 
 extern "C"{
@@ -469,6 +541,8 @@ JNIEXPORT void JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_MainActivity_
          //createFrames();
         //nntest();
 
-        AcousticTest();
+        //AcousticTest();
+
+        VADtest();
     }
 }
