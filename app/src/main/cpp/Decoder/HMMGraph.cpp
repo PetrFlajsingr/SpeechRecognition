@@ -35,8 +35,6 @@ HMMGraph::HMMGraph(AcousticModel* model) {
     this->rootNode = new GraphNode(probs, -2, -1, NONE);
     this->rootNode->successorNodes = nodes;
 
-    //this->rootNode->tokens.push_back(new Token(rootNode, -1));
-
     this->outputNode = new GraphNode(TEMP_PROB, -1, -1, NONE);
 }
 

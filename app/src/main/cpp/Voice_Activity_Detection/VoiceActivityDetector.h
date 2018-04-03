@@ -1,0 +1,14 @@
+//
+// Created by Petr Flajsingr on 03/04/2018.
+//
+
+#ifndef VOICERECOGNITION_VOICEACTIVITYDETECTOR_H
+#define VOICERECOGNITION_VOICEACTIVITYDETECTOR_H
+
+
+class VoiceActivityDetector {
+
+};
+
+
+#endif //VOICERECOGNITION_VOICEACTIVITYDETECTOR_H
