@@ -28,6 +28,8 @@ public:
     void applyViterbiCriterium(GraphNode* node);
 
     std::string output(AcousticModel* model);
+
+    void eraseTokenRecords(GraphNode* node);
 };
 
 

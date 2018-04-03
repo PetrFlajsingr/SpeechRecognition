@@ -192,3 +192,17 @@ void HMMGraph::destroyGraph(GraphNode* node) {
     }
     delete node;
 }
+
+void HMMGraph::eraseTokenRecords(GraphNode* node) {
+    node->tokens.clear();
+    if(node == outputNode)
+        return;
+    int offset = 1;
+    if(node == rootNode)
+        offset = 0;
+    for(auto iterator = node->successorNodes.begin() + offset;
+            iterator != node->successorNodes.end();
+            iterator++){
+        eraseTokenRecords(*iterator);
+    }
+}

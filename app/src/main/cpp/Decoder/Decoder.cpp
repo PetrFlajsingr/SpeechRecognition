@@ -66,6 +66,7 @@ void Decoder::reset() {
 
     Token::deleteInvalidTokens();
     Token::deleteStatic();
+    graph->eraseTokenRecords(graph->rootNode);
     graph->rootNode->tokens.push_back(new Token(graph->rootNode, -1));
 }
 
