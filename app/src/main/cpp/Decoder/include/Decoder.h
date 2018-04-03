@@ -26,9 +26,13 @@ public:
 
     virtual ~Decoder();
 
-    void decode(float* input);
+    void decode(float* input, bool endOfSpeech);
 
     std::string getOutput();
+
+    std::string getWinner();
+
+    void reset();
 };
 
 

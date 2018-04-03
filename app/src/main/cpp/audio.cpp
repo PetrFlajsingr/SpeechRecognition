@@ -468,20 +468,48 @@ FeatureMatrix* melFromTestFile(){
 }
 
 void VADtest(){
-    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "VADtest() started");
     FeatureMatrix* melResult = melFromTestFile();
 
     VoiceActivityDetector detector;
 
-    std::vector<bool> answers;
+    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "VAD start");
+    std::vector<bool> VADResult;
     for(int i = 0; i < melResult->getFramesNum(); i++){
         detector.checkData(melResult->getFeaturesMatrix()[i]);
-        answers.push_back(detector.isActive());
+        VADResult.push_back(detector.isActive());
     }
+    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "VAD end");
 
-    bool* array = new bool[answers.size()];
-    std::copy(std::begin(answers), std::end(answers), array);
-    dumpToFile("/sdcard/AAA_decision_VAD.txt", array, answers.size());
+    /*bool* array = new bool[VADResult.size()];
+    std::copy(std::begin(VADResult), std::end(VADResult), array);
+    dumpToFile("/sdcard/AAA_decision_VAD.txt", array, VADResult.size());*/
+
+    RSNeuralNetwork nn("/sdcard/NNnew.bin", cacheDir);
+
+    FeatureMatrix* nnResult = nn.forwardAll(melResult);
+
+    Decoder decoder("/sdcard/lexicon.txt", "/sdcard/LM.arpa");
+
+    bool active = false;
+
+    for(int i = 0; i < nnResult->getFramesNum(); i++){
+        if(VADResult[i])
+            int a = 10;
+        else
+            int a = 11;
+        if(!active && VADResult[i] == true){
+            active = true;
+        } else if(active && VADResult[i] == false){
+            decoder.decode(nnResult->getFeaturesMatrix()[i], true);
+            __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "RESULT: %s", decoder.getWinner().c_str());
+            active = false;
+            decoder.reset();
+        }
+
+        if(active){
+            decoder.decode(nnResult->getFeaturesMatrix()[i], false);
+        }
+    }
 
     delete melResult;
 
@@ -494,7 +522,7 @@ void AcousticTest(){
 
     for(int i = 0; i < nnResult->getFramesNum(); i++) {
         __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "Decode %d", i);
-        decoder.decode(nnResult->getFeaturesMatrix()[i]);
+        decoder.decode(nnResult->getFeaturesMatrix()[i], false);
     }
 
     std::string hahahaahahahaha = decoder.getOutput();

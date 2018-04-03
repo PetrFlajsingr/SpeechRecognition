@@ -68,12 +68,12 @@ float Token::calculateLikelihood(float* inputVector, unsigned int pathNumber) {
  * @param inputVector
  */
 void Token::passAllTokens(float *inputVector) {
-    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "Token count on start %d", Token::tokenCounter);
+    //__android_log_print(ANDROID_LOG_DEBUG, APPNAME, "Token count on start %d", Token::tokenCounter);
     unsigned int oldTokenCount = tokenVector.size();
     for(unsigned int i = 0; i < oldTokenCount; i++){
         tokenVector.at(i)->passInGraph(inputVector);
     }
-    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "Token count before deletion %d", Token::tokenCounter);
+    //__android_log_print(ANDROID_LOG_DEBUG, APPNAME, "Token count before deletion %d", Token::tokenCounter);
 }
 
 /**
@@ -120,7 +120,7 @@ void Token::deleteInvalidTokens() {
     }
     indexesToDelete.clear();
 
-    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "Token count after deletion %d", Token::tokenCounter);
+    //__android_log_print(ANDROID_LOG_DEBUG, APPNAME, "Token count after deletion %d", Token::tokenCounter);
 }
 
 Token::~Token() {
