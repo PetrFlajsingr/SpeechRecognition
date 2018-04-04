@@ -42,7 +42,7 @@ Decoder::~Decoder() {
 void Decoder::decode(float *input, bool endOfSpeech) {
     graph->update(acousticModel);
     Token::passAllTokens(input);
-    graph->applyViterbiCriterium(graph->rootNode);
+    graph->applyViterbiCriterium();
     Token::deleteInvalidTokens();
 
 
@@ -72,7 +72,7 @@ void Decoder::reset() {
 
     Token::deleteInvalidTokens();
     Token::deleteStatic();
-    graph->eraseTokenRecords(graph->rootNode);
+    graph->eraseTokenRecords();
     graph->rootNode->tokens.push_back(new Token(graph->rootNode, -1));
 }
 

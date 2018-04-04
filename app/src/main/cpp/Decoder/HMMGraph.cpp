@@ -123,11 +123,13 @@ void keepMax(std::vector<Token*>& tokens){
 }
 
 /**
- * Iterates through all nodes in a graph and find tokens with highest likelihood.
+ * Recursively iterates through all nodes in a graph and find tokens with highest likelihood.
  */
 void HMMGraph::applyViterbiCriterium(GraphNode* node) {
+    // exit condition
     if(node == outputNode)
         return;
+
     keepMax(node->tokens);
 
     if(node->successorNodes.size() <= 1)
@@ -196,6 +198,7 @@ std::string HMMGraph::output(AcousticModel* model) {
  * Recursive deletion of GraphNodes
  */
 void HMMGraph::destroyGraph(GraphNode* node) {
+    // exit condition
     if(node == outputNode)
         return;
     for(auto iterator = node->successorNodes.begin() + 1;
@@ -212,6 +215,7 @@ void HMMGraph::destroyGraph(GraphNode* node) {
  */
 void HMMGraph::eraseTokenRecords(GraphNode* node) {
     node->tokens.clear();
+    // exit condition
     if(node == outputNode)
         return;
     int offset = 1;
@@ -222,4 +226,16 @@ void HMMGraph::eraseTokenRecords(GraphNode* node) {
             iterator++){
         eraseTokenRecords(*iterator);
     }
+}
+
+void HMMGraph::applyPruning() {
+
+}
+
+void HMMGraph::applyViterbiCriterium() {
+    applyViterbiCriterium(rootNode);
+}
+
+void HMMGraph::eraseTokenRecords() {
+    eraseTokenRecords(rootNode);
 }

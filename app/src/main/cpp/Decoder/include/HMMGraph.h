@@ -10,11 +10,17 @@
 
 class HMMGraph {
 private:
+    const unsigned int MAX_TOKEN_COUNT = 10; //< max count per "step" (1 level of graph)
+
     void addSuccessors(GraphNode *node, AcousticModel* model, int wordID, int phonemeIndex);
 
     void destroySuccessors(GraphNode* node);
 
     void destroyGraph(GraphNode* node);
+
+    void applyViterbiCriterium(GraphNode* node);
+
+    void eraseTokenRecords(GraphNode* node);
 public:
     GraphNode* rootNode;
     GraphNode* outputNode;
@@ -25,11 +31,13 @@ public:
 
     void update(AcousticModel* model);
 
-    void applyViterbiCriterium(GraphNode* node);
+    void applyViterbiCriterium();
+
+    void applyPruning();
 
     std::string output(AcousticModel* model);
 
-    void eraseTokenRecords(GraphNode* node);
+    void eraseTokenRecords();
 };
 
 
