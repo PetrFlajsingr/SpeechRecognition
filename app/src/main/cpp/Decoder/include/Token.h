@@ -50,6 +50,12 @@ public:
     virtual ~Token();
 
     static void deleteStatic();
+
+    struct sortByLikelihood {
+        bool operator()(Token const &a, Token const &b) const {
+            return a.likelihood > b.likelihood;
+        }
+    };
 };
 
 
