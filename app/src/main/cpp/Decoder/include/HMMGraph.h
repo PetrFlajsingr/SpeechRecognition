@@ -23,6 +23,8 @@ private:
     void eraseTokenRecords(GraphNode* node);
 
     void deleteLowLikelihood(std::vector<Token*>& tokens);
+
+    void searchTokens(std::vector<std::vector<Token*>>& allTokens, GraphNode* node, unsigned int level);
 public:
     GraphNode* rootNode;
     GraphNode* outputNode;

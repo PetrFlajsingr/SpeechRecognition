@@ -229,22 +229,43 @@ void HMMGraph::eraseTokenRecords(GraphNode* node) {
     }
 }
 
-void searchTokens(std::vector<std::vector<Token*>>& allTokens){
-
-}
-
 void HMMGraph::deleteLowLikelihood(std::vector<Token*>& tokens){
     for(auto iterator = tokens.begin() + MAX_TOKEN_COUNT;
             iterator != tokens.end();
             iterator++){
         Token::addIndexToDelete((*iterator)->index_TokenVector);
-
         (*iterator)->currentNode->tokens.erase(iterator);
     }
 
     tokens.clear();
 }
 
+void HMMGraph::searchTokens(std::vector<std::vector<Token *>> &allTokens, GraphNode* node, unsigned int level) {
+    if(node == outputNode)
+        return;
+
+    if(allTokens.size() < level + 1){
+        allTokens.push_back();
+    }
+    // root node doesn't matter - it starts of the recursion
+    if(node == rootNode) {
+        for(auto iterator = node->successorNodes.begin();
+                iterator != node->successorNodes.end();
+                iterator++){
+            searchTokens(allTokens, *iterator, level);
+        }
+        return;
+    }else if(!node->tokens.empty()) {
+        allTokens.at(level).push_back(node->tokens.at(0));
+    }
+
+    searchTokens(allTokens, node->successorNodes.at(1), level + 1);
+}
+
+/**
+ * Marks tokens with low likelihood for deletion.
+ * Viterbi criterium has to be applied before using this function (only one token per node).
+ */
 void HMMGraph::applyPruning() {
     /*
      * TODO get vector of all tokens in a "level"
@@ -259,7 +280,7 @@ void HMMGraph::applyPruning() {
     std::vector<std::vector<Token*>> allTokens;
 
     // for filling the vectors
-    searchTokens(allTokens);
+    searchTokens(allTokens, rootNode, 0);
 
     // sorting by likelihood - descending
     for(auto iterator = allTokens.begin();
