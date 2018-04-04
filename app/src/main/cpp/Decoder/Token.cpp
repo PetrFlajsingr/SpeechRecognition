@@ -5,8 +5,6 @@
 #include <algorithm>
 #include <Token.h>
 #include <GraphNode.h>
-#include <constants.h>
-#include <android/log.h>
 
 std::vector<Token*> Token::tokenVector;
 std::vector<unsigned int> Token::indexesToDelete;

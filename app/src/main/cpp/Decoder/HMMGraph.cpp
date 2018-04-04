@@ -11,6 +11,7 @@
 #include <cmath>
 #include <Utils.h>
 #include <limits>
+#include <algorithm>
 
 //TODO temp variable, remove
 std::vector<float> TEMP_PROB = {
@@ -228,14 +229,48 @@ void HMMGraph::eraseTokenRecords(GraphNode* node) {
     }
 }
 
+void searchTokens(std::vector<std::vector<Token*>>& allTokens){
+
+}
+
+void HMMGraph::deleteLowLikelihood(std::vector<Token*>& tokens){
+    for(auto iterator = tokens.begin() + MAX_TOKEN_COUNT;
+            iterator != tokens.end();
+            iterator++){
+        Token::addIndexToDelete((*iterator)->index_TokenVector);
+
+        (*iterator)->currentNode->tokens.erase(iterator);
+    }
+
+    tokens.clear();
+}
+
 void HMMGraph::applyPruning() {
     /*
      * TODO get vector of all tokens in a "level"
      * sort using Token::sortByLikelihood
      * keep MAX_TOKEN_COUNT of best tokens
      * register the rest for deletion using Token::addIndexToDelete
+     * remove record from node.tokens
      * destroy the vector
      */
+
+    // each inner vector represents tokens in one level
+    std::vector<std::vector<Token*>> allTokens;
+
+    // for filling the vectors
+    searchTokens(allTokens);
+
+    // sorting by likelihood - descending
+    for(auto iterator = allTokens.begin();
+            iterator != allTokens.end();
+            iterator++){
+        std::sort((*iterator).begin(), (*iterator).end(), Token::sortByLikelihood());
+
+        deleteLowLikelihood(*iterator);
+    }
+
+    allTokens.clear();
 }
 
 void HMMGraph::applyViterbiCriterium() {

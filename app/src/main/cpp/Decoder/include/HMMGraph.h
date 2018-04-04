@@ -21,6 +21,8 @@ private:
     void applyViterbiCriterium(GraphNode* node);
 
     void eraseTokenRecords(GraphNode* node);
+
+    void deleteLowLikelihood(std::vector<Token*>& tokens);
 public:
     GraphNode* rootNode;
     GraphNode* outputNode;

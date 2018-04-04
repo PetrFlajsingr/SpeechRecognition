@@ -10,7 +10,7 @@
 #include <GraphNodeFwd.h>
 #include <TokenFWD.h>
 #include <LMWord.h>
-#include "Word.h"
+#include <Word.h>
 
 /**
  * Represents a token in a HMM graph.
@@ -25,7 +25,7 @@ class Token {
 
     std::vector<LMWord> wordHistory; //< word history for ngrams
 
-    GraphNode* currentNode; //< node in which the token is placed
+
 
     float calculateLikelihood(float* inputVector, unsigned int pathNumber);
 
@@ -39,6 +39,8 @@ public:
 
     Token(GraphNode *currentNode, int word);
 
+    virtual ~Token();
+
     void passInGraph(float *inputVector);
 
     static void passAllTokens(float* inputVector);
@@ -47,8 +49,6 @@ public:
 
     static void deleteInvalidTokens();
 
-    virtual ~Token();
-
     static void deleteStatic();
 
     struct sortByLikelihood {
@@ -56,6 +56,9 @@ public:
             return a.likelihood > b.likelihood;
         }
     };
+
+    // TODO function for deletion
+    GraphNode* currentNode; //< node in which the token is placed
 };
 
 
