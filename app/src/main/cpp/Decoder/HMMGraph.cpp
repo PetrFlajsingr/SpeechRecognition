@@ -143,6 +143,11 @@ void HMMGraph::applyViterbiCriterium(GraphNode* node) {
     }
 }
 
+/**
+ * Returns most likely word.
+ * @param vector Vector of tokens to check
+ * @param model Acoustic model
+ */
 std::string getMostLikely(std::vector<Token*>& vector, AcousticModel* model){
     int index = -1;
     float maxSoFar = -std::numeric_limits<float>::max();
@@ -159,6 +164,11 @@ std::string getMostLikely(std::vector<Token*>& vector, AcousticModel* model){
     return model->words.at(vector.at(index)->word).writtenForm;
 }
 
+/**
+ * Debug output
+ * @param model
+ * @return
+ */
 std::string HMMGraph::output(AcousticModel* model) {
     std::string result = "";
     for(int i = 0; i < outputNode->tokens.size(); i++){
@@ -182,6 +192,9 @@ std::string HMMGraph::output(AcousticModel* model) {
     return result;
 }
 
+/**
+ * Recursive deletion of GraphNodes
+ */
 void HMMGraph::destroyGraph(GraphNode* node) {
     if(node == outputNode)
         return;
@@ -193,6 +206,10 @@ void HMMGraph::destroyGraph(GraphNode* node) {
     delete node;
 }
 
+/**
+ * Recursive deletion of Token records inside nodes.
+ * @param node
+ */
 void HMMGraph::eraseTokenRecords(GraphNode* node) {
     node->tokens.clear();
     if(node == outputNode)
