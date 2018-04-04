@@ -127,6 +127,9 @@ Token::~Token() {
     tokenCounter--;
 }
 
+/**
+ * Deletes all tokens recorded in tokenVector.
+ */
 void Token::deleteStatic() {
     for(auto iterator = tokenVector.begin();
             iterator != tokenVector.end();){
