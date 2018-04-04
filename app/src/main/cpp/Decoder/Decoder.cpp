@@ -52,10 +52,16 @@ void Decoder::decode(float *input, bool endOfSpeech) {
     }
 }
 
+/**
+ * Debug output
+ */
 std::string Decoder::getOutput() {
     return this->output;
 }
 
+/**
+ * Resets the decoder. Removes all tokens.
+ */
 void Decoder::reset() {
     output = "";
     for(auto iterator = graph->outputNode->tokens.begin();
@@ -70,6 +76,9 @@ void Decoder::reset() {
     graph->rootNode->tokens.push_back(new Token(graph->rootNode, -1));
 }
 
+/**
+ * Returns the word with the highest likelihood from the output node.
+ */
 std::string Decoder::getWinner() {
     auto vector = this->graph->outputNode->tokens;
 
