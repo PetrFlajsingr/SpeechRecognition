@@ -45,6 +45,9 @@ void Decoder::decode(float *input, bool endOfSpeech) {
     graph->applyViterbiCriterium();
     Token::deleteInvalidTokens();
 
+    graph->applyPruning();
+    Token::deleteInvalidTokens();
+
 
     if(!endOfSpeech) {
         output += graph->output(acousticModel);

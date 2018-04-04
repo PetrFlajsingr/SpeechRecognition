@@ -230,11 +230,13 @@ void HMMGraph::eraseTokenRecords(GraphNode* node) {
 }
 
 void HMMGraph::deleteLowLikelihood(std::vector<Token*>& tokens){
+    if(tokens.size() <= MAX_TOKEN_COUNT)
+        return;
     for(auto iterator = tokens.begin() + MAX_TOKEN_COUNT;
             iterator != tokens.end();
             iterator++){
         Token::addIndexToDelete((*iterator)->index_TokenVector);
-        (*iterator)->currentNode->tokens.erase(iterator);
+        (*iterator)->currentNode->tokens.clear();
     }
 
     tokens.clear();
@@ -245,7 +247,8 @@ void HMMGraph::searchTokens(std::vector<std::vector<Token *>> &allTokens, GraphN
         return;
 
     if(allTokens.size() < level + 1){
-        allTokens.push_back();
+        std::vector<Token*> vector;
+        allTokens.push_back(vector);
     }
     // root node doesn't matter - it starts of the recursion
     if(node == rootNode) {
@@ -286,7 +289,10 @@ void HMMGraph::applyPruning() {
     for(auto iterator = allTokens.begin();
             iterator != allTokens.end();
             iterator++){
-        std::sort((*iterator).begin(), (*iterator).end(), Token::sortByLikelihood());
+        std::sort((*iterator).begin(), (*iterator).end(),
+                  [](const Token* ls, const Token* rs){
+                      return ls->likelihood > rs->likelihood;
+                  });
 
         deleteLowLikelihood(*iterator);
     }

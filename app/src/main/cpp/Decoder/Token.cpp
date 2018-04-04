@@ -139,3 +139,4 @@ void Token::deleteStatic() {
 
     tokenCounter = 0;
 }
+

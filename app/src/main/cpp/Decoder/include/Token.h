@@ -25,8 +25,6 @@ class Token {
 
     std::vector<LMWord> wordHistory; //< word history for ngrams
 
-
-
     float calculateLikelihood(float* inputVector, unsigned int pathNumber);
 
     static void updateIndexes(unsigned int beginIndex, unsigned int endIndex, int toAdd);
@@ -50,12 +48,6 @@ public:
     static void deleteInvalidTokens();
 
     static void deleteStatic();
-
-    struct sortByLikelihood {
-        bool operator()(Token const &a, Token const &b) const {
-            return a.likelihood > b.likelihood;
-        }
-    };
 
     // TODO function for deletion
     GraphNode* currentNode; //< node in which the token is placed

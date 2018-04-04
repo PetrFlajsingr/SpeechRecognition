@@ -10,7 +10,7 @@
 
 class HMMGraph {
 private:
-    const unsigned int MAX_TOKEN_COUNT = 10; //< max count per "step" (1 level of graph)
+    const unsigned int MAX_TOKEN_COUNT = 15; //< max count per "step" (1 level of graph)
 
     void addSuccessors(GraphNode *node, AcousticModel* model, int wordID, int phonemeIndex);
 
