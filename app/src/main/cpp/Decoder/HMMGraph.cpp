@@ -229,7 +229,13 @@ void HMMGraph::eraseTokenRecords(GraphNode* node) {
 }
 
 void HMMGraph::applyPruning() {
-
+    /*
+     * TODO get vector of all tokens in a "level"
+     * sort using Token::sortByLikelihood
+     * keep MAX_TOKEN_COUNT of best tokens
+     * register the rest for deletion using Token::addIndexToDelete
+     * destroy the vector
+     */
 }
 
 void HMMGraph::applyViterbiCriterium() {
