@@ -2,9 +2,11 @@ package cz.vutbr.fit.xflajs00.voicerecognition;
 
 import android.Manifest;
 import android.os.Handler;
+import android.support.annotation.Keep;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
@@ -29,8 +31,30 @@ public class MainActivity extends AppCompatActivity {
 
         setCacheDir(this.getCacheDir().toString());
         createEngine();
-
     }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+        getJniString();
+    }
+
+    // please, let me live even though I used this dark programming technique
+    public void messageMe(String text) {
+        final String text2 = text;
+        runOnUiThread(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        TextView view = (TextView)findViewById(R.id.textViewRecognitionResult);
+                        view.setText(text2);
+                    }
+                }
+        );
+    }
+
+
+
 
     /** Called when the activity is about to be destroyed. */
     @Override
@@ -39,7 +63,6 @@ public class MainActivity extends AppCompatActivity {
         shutdown();
         super.onDestroy();
     }
-
     private Thread threadAudioRecorder;
 
     /** Native methods, implemented in jni folder */
@@ -51,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
     public static native void shutdown();
     public static native void createFrames();
     public static native void threadTest();
+    public native String getJniString();
 
     static{
         System.loadLibrary("raw_audio_recorder");

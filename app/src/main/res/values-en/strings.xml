@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Voice recognition</string>
+    <string name="app_name">Speech recognition</string>
     <string name="recognizedTextInit">Field for recognition results</string>
     <string name="startRecording">Start recording</string>
     <string name="stopRecording">Stop recording</string>
+    <string name="active">Active</string>
+    <string name="inactive">Inactive</string>
 </resources>

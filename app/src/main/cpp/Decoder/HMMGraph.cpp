@@ -24,16 +24,16 @@ std::vector<float> TEMP_PROB = {
  * @param model Acoustic model
  */
 HMMGraph::HMMGraph(AcousticModel* model) {
-    std::vector<float> probs;
+    std::vector<float> probabilities;
     std::vector<GraphNode*> nodes;
 
     for(int i = 0; i < model->words.size(); i++){
-        probs.push_back(0);
+        probabilities.push_back(0);
         GraphNode* node = new GraphNode(TEMP_PROB, i, 0,
                                         model->words.at(i).phonemes.at(0));
         nodes.push_back(node);
     }
-    this->rootNode = new GraphNode(probs, -2, -1, NONE);
+    this->rootNode = new GraphNode(probabilities, -2, -1, NONE);
     this->rootNode->successorNodes = nodes;
 
     this->outputNode = new GraphNode(TEMP_PROB, -1, -1, NONE);

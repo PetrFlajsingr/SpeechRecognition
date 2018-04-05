@@ -19,6 +19,18 @@
 #include <Decoder.h>
 #include <Utils.h>
 #include "Voice_Activity_Detection/VoiceActivityDetector.h"
+#include <unistd.h>
+
+#define LOGI(...) \
+  ((void)__android_log_print(ANDROID_LOG_INFO, APPNAME, __VA_ARGS__))
+#define LOGW(...) \
+  ((void)__android_log_print(ANDROID_LOG_WARN, APPNAME, __VA_ARGS__))
+#define LOGD(...) \
+  ((void)__android_log_print(ANDOIRD_LOG_DEBUG, APPNAME, __VA_ARGS__))
+#define LOGE(...) \
+  ((void)__android_log_print(ANDROID_LOG_ERROR, APPNAME, __VA_ARGS__))
+
+
 
 using namespace android::RSC;
 
@@ -480,9 +492,6 @@ void VADtest(){
     }
     __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "VAD end");
 
-    /*bool* array = new bool[VADResult.size()];
-    std::copy(std::begin(VADResult), std::end(VADResult), array);
-    dumpToFile("/sdcard/AAA_decision_VAD.txt", array, VADResult.size());*/
 
     RSNeuralNetwork nn("/sdcard/NNnew.bin", cacheDir);
 
@@ -493,10 +502,6 @@ void VADtest(){
     bool active = false;
 
     for(int i = 0; i < nnResult->getFramesNum(); i++){
-        if(VADResult[i])
-            int a = 10;
-        else
-            int a = 11;
         if(!active && VADResult[i] == true){
             active = true;
         } else if(active && VADResult[i] == false){
@@ -537,12 +542,29 @@ void AcousticTest(){
 }
 
 extern "C"{
+
+JNIEXPORT jstring Java_cz_vutbr_fit_xflajs00_voicerecognition_MainActivity_getJniString( JNIEnv* env, jobject obj){
+
+    jstring jstr = env->NewStringUTF("This comes from jni.");
+    jclass clazz = env->FindClass("cz/vutbr/fit/xflajs00/voicerecognition/MainActivity");
+    jmethodID messageMe = env->GetMethodID(clazz, "messageMe", "(Ljava/lang/String;)V");
+    env->CallVoidMethod(obj, messageMe, jstr);
+
+    return env->NewStringUTF("kokot");
+}
+
     JNIEXPORT void JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_MainActivity_setCacheDir(JNIEnv* env, jclass clazz, jstring pathObj){
         setCacheDir(env->GetStringUTFChars(pathObj, NULL));
     }
 
 JNIEXPORT void JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_MainActivity_threadTest(JNIEnv* env, jclass clazz){
     threadTest();
+}
+
+
+JNIEXPORT jboolean JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_MainActivity_register
+        (JNIEnv * env, jobject obj, jlong hwnd) {
+
 }
 
     JNIEXPORT void JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_MainActivity_createEngine(JNIEnv* env, jclass clazz){
@@ -571,6 +593,7 @@ JNIEXPORT void JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_MainActivity_
 
         //AcousticTest();
 
-        VADtest();
+        //VADtest();
+
     }
 }

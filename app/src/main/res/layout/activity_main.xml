@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="cz.vutbr.fit.xflajs00.voicerecognition.MainActivity">
@@ -11,8 +11,14 @@
         android:id="@+id/button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="8dp"
         android:onClick="createFrames"
-        android:text="Button"/>
+        android:text="Test button"
+        app:layout_constraintBottom_toTopOf="@+id/buttonRecognitionControl"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/scrollView2"/>
 
     <ToggleButton
         android:id="@+id/buttonRecognitionControl"
@@ -36,8 +42,8 @@
     <ScrollView
         android:id="@+id/scrollView2"
         android:layout_width="0dp"
-        android:layout_height="400dp"
-        app:layout_constraintHorizontal_bias="0.0"
+        android:layout_height="387dp"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         tools:layout_editor_absoluteY="0dp">
@@ -66,5 +72,18 @@
                 tools:layout_constraintTop_creator="1"/>
         </LinearLayout>
     </ScrollView>
+
+    <TextView
+        android:id="@+id/VADTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/inactive"
+        android:textColor="@android:color/holo_red_dark"
+        app:layout_constraintBottom_toTopOf="@+id/buttonRecognitionControl"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/scrollView2"/>
 
 </android.support.constraint.ConstraintLayout>

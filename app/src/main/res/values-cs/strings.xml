@@ -4,4 +4,6 @@
     <string name="startRecording">Začít nahrávat</string>
     <string name="recognizedTextInit">Zde se zobrazí výsledek rozpoznávání</string>
     <string name="stopRecording">Ukončit nahrávání</string>
+    <string name="active">Aktivní</string>
+    <string name="inactive">Neaktivní</string>
 </resources>
