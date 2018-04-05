@@ -12,7 +12,9 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-public class MainActivity extends AppCompatActivity {
+import org.w3c.dom.Text;
+
+public class MainActivity extends AppCompatActivity implements SpeechRecognitionAPI.ISpeechRecognitionAPICallback{
     private boolean recording = false;
     private boolean created = false;
 
@@ -112,6 +114,28 @@ public class MainActivity extends AppCompatActivity {
             }
         };
         thread.start();
+
+    }
+
+    @Override
+    public void onVADChanged() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                TextView view = (TextView) findViewById(R.id.VADTextView);
+
+
+            }
+        });
+    }
+
+    @Override
+    public void onSequenceRecognized() {
+
+    }
+
+    @Override
+    public void onRecognitionDone() {
 
     }
 }
