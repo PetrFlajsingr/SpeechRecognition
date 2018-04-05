@@ -4,17 +4,35 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SpeechRecognitionAPI {
+    // NATIVE METHODS
+    public native void setCacheDir(String cacheDir);
+    public native void createEngine();
+    public native boolean createAudioRecorder();
+    public native void startRecording();
+    public native void stopRecording();
+    public native void shutdown();
+
+    static{
+        System.loadLibrary("raw_audio_recorder");
+    }
+    //\ NATIVE METHODS
+
+
+
+    // LISTENERS
     private List<ISpeechRecognitionAPICallback> listeners = new ArrayList<>();
+
+    private VAD_Activity activity = VAD_Activity.INACTIVE;
 
     private void notifyVADChanged(){
         for(ISpeechRecognitionAPICallback listener : listeners) {
-            listener.onVADChanged();
+            listener.onVADChanged(activity);
         }
     }
 
-    private void notifyOnSequenceRecognized(){
+    private void notifyOnSequenceRecognized(String sequence){
         for(ISpeechRecognitionAPICallback listener : listeners) {
-            listener.onSequenceRecognized();
+            listener.onSequenceRecognized(sequence);
         }
     }
 
@@ -24,15 +42,21 @@ public class SpeechRecognitionAPI {
         }
     }
 
-    public void registerCallbacks(ISpeechRecognitionAPICallback listener){
+    public void addListener(ISpeechRecognitionAPICallback listener){
         listeners.add(listener);
     }
 
-    public interface ISpeechRecognitionAPICallback {
-        void onVADChanged();
+    public enum VAD_Activity{
+        ACTIVE,
+        INACTIVE
+    }
 
-        void onSequenceRecognized();
+    public interface ISpeechRecognitionAPICallback {
+        void onVADChanged(VAD_Activity activity);
+
+        void onSequenceRecognized(String sequence);
 
         void onRecognitionDone();
     }
+    //\ LISTENERS
 }

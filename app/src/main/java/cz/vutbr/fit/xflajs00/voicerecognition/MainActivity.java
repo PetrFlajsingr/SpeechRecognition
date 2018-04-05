@@ -1,6 +1,7 @@
 package cz.vutbr.fit.xflajs00.voicerecognition;
 
 import android.Manifest;
+import android.graphics.Color;
 import android.os.Handler;
 import android.support.annotation.Keep;
 import android.support.v4.app.ActivityCompat;
@@ -31,14 +32,14 @@ public class MainActivity extends AppCompatActivity implements SpeechRecognition
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.MODIFY_AUDIO_SETTINGS}, 1);
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
 
-        setCacheDir(this.getCacheDir().toString());
-        createEngine();
+        //setCacheDir(this.getCacheDir().toString());
+        //createEngine();
     }
 
     @Override
     protected void onResume(){
         super.onResume();
-        getJniString();
+        //getJniString();
     }
 
     // please, let me live even though I used this dark programming technique
@@ -62,12 +63,12 @@ public class MainActivity extends AppCompatActivity implements SpeechRecognition
     @Override
     protected void onDestroy()
     {
-        shutdown();
+        //shutdown();
         super.onDestroy();
     }
     private Thread threadAudioRecorder;
 
-    /** Native methods, implemented in jni folder */
+    /*
     public static native void setCacheDir(String cacheDir);
     public static native void createEngine();
     public static native boolean createAudioRecorder();
@@ -80,12 +81,12 @@ public class MainActivity extends AppCompatActivity implements SpeechRecognition
 
     static{
         System.loadLibrary("raw_audio_recorder");
-    }
+    }*/
 
 
     // UI control with a button
     public void recordingControl(View view){
-        recording = !recording;
+        /*recording = !recording;
         if(recording){
             if (!created) {
                 created = createAudioRecorder();
@@ -102,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements SpeechRecognition
                 recording = false;
         }else{
             stopRecording();
-        }
+        }*/
     }
 
 
@@ -110,7 +111,7 @@ public class MainActivity extends AppCompatActivity implements SpeechRecognition
         Thread thread = new Thread() {
             @Override
             public void run() {
-                createFrames();
+                //createFrames();
             }
         };
         thread.start();
@@ -118,20 +119,37 @@ public class MainActivity extends AppCompatActivity implements SpeechRecognition
     }
 
     @Override
-    public void onVADChanged() {
+    public void onVADChanged(SpeechRecognitionAPI.VAD_Activity activity) {
+        final String text;
+        final int textColor;
+
+        if(activity == SpeechRecognitionAPI.VAD_Activity.ACTIVE){
+            text = getString(R.string.active);
+            textColor = Color.GREEN;
+        } else {
+            text = getString(R.string.inactive);
+            textColor = Color.RED;
+        }
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 TextView view = (TextView) findViewById(R.id.VADTextView);
-
-
+                view.setText(text);
+                view.setTextColor(textColor);
             }
         });
     }
 
     @Override
-    public void onSequenceRecognized() {
-
+    public void onSequenceRecognized(String sequence) {
+        final String finalSequence = sequence;
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                TextView view = (TextView) findViewById(R.id.textViewRecognitionResult);
+                view.setText(String.format("%s%s", view.getText(), finalSequence));
+            }
+        });
     }
 
     @Override

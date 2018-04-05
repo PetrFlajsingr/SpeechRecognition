@@ -543,29 +543,65 @@ void AcousticTest(){
 
 extern "C"{
 
-JNIEXPORT jstring Java_cz_vutbr_fit_xflajs00_voicerecognition_MainActivity_getJniString( JNIEnv* env, jobject obj){
+    JNIEXPORT jstring Java_cz_vutbr_fit_xflajs00_voicerecognition_MainActivity_getJniString( JNIEnv* env, jobject obj){
 
-    jstring jstr = env->NewStringUTF("This comes from jni.");
-    jclass clazz = env->FindClass("cz/vutbr/fit/xflajs00/voicerecognition/MainActivity");
-    jmethodID messageMe = env->GetMethodID(clazz, "messageMe", "(Ljava/lang/String;)V");
-    env->CallVoidMethod(obj, messageMe, jstr);
+        jstring jstr = env->NewStringUTF("This comes from jni.");
+        jclass clazz = env->FindClass("cz/vutbr/fit/xflajs00/voicerecognition/MainActivity");
+        jmethodID messageMe = env->GetMethodID(clazz, "messageMe", "(Ljava/lang/String;)V");
+        env->CallVoidMethod(obj, messageMe, jstr);
 
-    return env->NewStringUTF("kokot");
-}
+        return env->NewStringUTF("kokot");
+    }
 
+    //setCacheDir
+    JNIEXPORT void Java_cz_vutbr_fit_xflajs00_voicerecognition_SpeechRecognitionAPI_setCacheDir
+            (JNIEnv* env, jobject obj, jstring pathObj){
+        setCacheDir(env->GetStringUTFChars(pathObj, NULL));
+    }
+
+    //createEngine
+    JNIEXPORT void JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_SpeechRecognitionAPI_createEngine
+            (JNIEnv* env, jobject obj){
+        createEngine();
+    }
+
+    //createAudioRecorder
+    JNIEXPORT jboolean JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_SpeechRecognitionAPI_createAudioRecorder
+            (JNIEnv* env, jobject obj){
+        return createAudioRecorder();
+    }
+
+    //startRecording
+    JNIEXPORT void JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_SpeechRecognitionAPI_startRecording
+            (JNIEnv* env, jobject obj){
+        startRecording();
+    }
+
+    //stopRecording
+    JNIEXPORT void JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_SpeechRecognitionAPI_stopRecording
+            (JNIEnv* env, jobject obj){
+        stopRecording();
+    }
+
+    //shutdown
+    JNIEXPORT void Java_cz_vutbr_fit_xflajs00_voicerecognition_SpeechRecognitionAPI_shutdown
+            (JNIEnv* env, jobject obj){
+        shutdown();
+    }
+
+    //test
+    JNIEXPORT void Java_cz_vutbr_fit_xflajs00_voicerecognition_SpeechRecognitionAPI_test
+            (JNIEnv* env, jobject obj){
+        VADtest();
+    }
+/*
     JNIEXPORT void JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_MainActivity_setCacheDir(JNIEnv* env, jclass clazz, jstring pathObj){
         setCacheDir(env->GetStringUTFChars(pathObj, NULL));
     }
 
-JNIEXPORT void JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_MainActivity_threadTest(JNIEnv* env, jclass clazz){
-    threadTest();
-}
-
-
-JNIEXPORT jboolean JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_MainActivity_register
-        (JNIEnv * env, jobject obj, jlong hwnd) {
-
-}
+    JNIEXPORT void JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_MainActivity_threadTest(JNIEnv* env, jclass clazz){
+        threadTest();
+    }
 
     JNIEXPORT void JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_MainActivity_createEngine(JNIEnv* env, jclass clazz){
         createEngine();
@@ -596,4 +632,6 @@ JNIEXPORT jboolean JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_MainActiv
         //VADtest();
 
     }
+
+    */
 }
