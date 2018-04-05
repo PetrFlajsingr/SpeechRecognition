@@ -13,7 +13,7 @@ public class SpeechRecognitionAPI {
     public native void shutdown();
 
     static{
-        System.loadLibrary("raw_audio_recorder");
+        System.loadLibrary("speech_recognition");
     }
     //\ NATIVE METHODS
 

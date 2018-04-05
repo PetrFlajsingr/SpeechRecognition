@@ -47,7 +47,7 @@ endforeach()
 
 add_library( # Sets the name of the library.
 # TODO change library name
-              raw_audio_recorder
+              speech_recognition
 
               # Sets the library as a shared library.
               SHARED
