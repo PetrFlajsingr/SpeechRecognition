@@ -1,0 +1,14 @@
+//
+// Created by Petr Flajsingr on 05/04/2018.
+//
+
+#ifndef VOICERECOGNITION_SPEECHRECOGNITIONAPI_H
+#define VOICERECOGNITION_SPEECHRECOGNITIONAPI_H
+
+
+class SpeechRecognitionAPI {
+
+};
+
+
+#endif //VOICERECOGNITION_SPEECHRECOGNITIONAPI_H
