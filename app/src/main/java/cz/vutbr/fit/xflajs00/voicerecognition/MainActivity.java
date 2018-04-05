@@ -2,22 +2,17 @@ package cz.vutbr.fit.xflajs00.voicerecognition;
 
 import android.Manifest;
 import android.graphics.Color;
-import android.os.Handler;
-import android.support.annotation.Keep;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-import android.widget.ProgressBar;
 import android.widget.TextView;
-
-import org.w3c.dom.Text;
 
 public class MainActivity extends AppCompatActivity implements SpeechRecognitionAPI.ISpeechRecognitionAPICallback{
     private boolean recording = false;
     private boolean created = false;
+
+    private SpeechRecognitionAPI speechAPI;
 
     /**
      * Requests permissions on start.
@@ -32,6 +27,8 @@ public class MainActivity extends AppCompatActivity implements SpeechRecognition
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.MODIFY_AUDIO_SETTINGS}, 1);
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
 
+        speechAPI = new SpeechRecognitionAPI(this.getCacheDir().toString());
+        speechAPI.addListener(this);
         //setCacheDir(this.getCacheDir().toString());
         //createEngine();
     }
@@ -64,6 +61,7 @@ public class MainActivity extends AppCompatActivity implements SpeechRecognition
     protected void onDestroy()
     {
         //shutdown();
+        speechAPI.shutdown();
         super.onDestroy();
     }
     private Thread threadAudioRecorder;
@@ -86,6 +84,13 @@ public class MainActivity extends AppCompatActivity implements SpeechRecognition
 
     // UI control with a button
     public void recordingControl(View view){
+        recording = !recording;
+        if(recording){
+            speechAPI.startRecording();
+        }else{
+            speechAPI.stopRecording();
+        }
+
         /*recording = !recording;
         if(recording){
             if (!created) {
@@ -111,7 +116,7 @@ public class MainActivity extends AppCompatActivity implements SpeechRecognition
         Thread thread = new Thread() {
             @Override
             public void run() {
-                //createFrames();
+                speechAPI.test();
             }
         };
         thread.start();
@@ -119,11 +124,11 @@ public class MainActivity extends AppCompatActivity implements SpeechRecognition
     }
 
     @Override
-    public void onVADChanged(SpeechRecognitionAPI.VAD_Activity activity) {
+    public void onVADChanged(SpeechRecognitionAPI.VAD_ACTIVITY activity) {
         final String text;
         final int textColor;
 
-        if(activity == SpeechRecognitionAPI.VAD_Activity.ACTIVE){
+        if(activity == SpeechRecognitionAPI.VAD_ACTIVITY.ACTIVE){
             text = getString(R.string.active);
             textColor = Color.GREEN;
         } else {

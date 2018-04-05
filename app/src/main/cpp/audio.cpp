@@ -543,7 +543,7 @@ void AcousticTest(){
 
 extern "C"{
 
-    JNIEXPORT jstring Java_cz_vutbr_fit_xflajs00_voicerecognition_MainActivity_getJniString( JNIEnv* env, jobject obj){
+    JNIEXPORT jstring JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_MainActivity_getJniString( JNIEnv* env, jobject obj){
 
         jstring jstr = env->NewStringUTF("This comes from jni.");
         jclass clazz = env->FindClass("cz/vutbr/fit/xflajs00/voicerecognition/MainActivity");
@@ -554,43 +554,43 @@ extern "C"{
     }
 
     //setCacheDir
-    JNIEXPORT void Java_cz_vutbr_fit_xflajs00_voicerecognition_SpeechRecognitionAPI_setCacheDir
+    JNIEXPORT void JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_SpeechRecognitionAPI_setCacheDirNative
             (JNIEnv* env, jobject obj, jstring pathObj){
         setCacheDir(env->GetStringUTFChars(pathObj, NULL));
     }
 
     //createEngine
-    JNIEXPORT void JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_SpeechRecognitionAPI_createEngine
+    JNIEXPORT void JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_SpeechRecognitionAPI_createEngineNative
             (JNIEnv* env, jobject obj){
         createEngine();
     }
 
     //createAudioRecorder
-    JNIEXPORT jboolean JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_SpeechRecognitionAPI_createAudioRecorder
+    JNIEXPORT jboolean JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_SpeechRecognitionAPI_createAudioRecorderNative
             (JNIEnv* env, jobject obj){
         return createAudioRecorder();
     }
 
     //startRecording
-    JNIEXPORT void JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_SpeechRecognitionAPI_startRecording
+    JNIEXPORT void JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_SpeechRecognitionAPI_startRecordingNative
             (JNIEnv* env, jobject obj){
         startRecording();
     }
 
     //stopRecording
-    JNIEXPORT void JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_SpeechRecognitionAPI_stopRecording
+    JNIEXPORT void JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_SpeechRecognitionAPI_stopRecordingNative
             (JNIEnv* env, jobject obj){
         stopRecording();
     }
 
     //shutdown
-    JNIEXPORT void Java_cz_vutbr_fit_xflajs00_voicerecognition_SpeechRecognitionAPI_shutdown
+    JNIEXPORT void JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_SpeechRecognitionAPI_shutdownNative
             (JNIEnv* env, jobject obj){
         shutdown();
     }
 
     //test
-    JNIEXPORT void Java_cz_vutbr_fit_xflajs00_voicerecognition_SpeechRecognitionAPI_test
+    JNIEXPORT void JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_SpeechRecognitionAPI_testNative
             (JNIEnv* env, jobject obj){
         VADtest();
     }

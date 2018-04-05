@@ -15,8 +15,8 @@
 
 //TODO temp variable, remove
 std::vector<float> TEMP_PROB = {
-        static_cast<float>(log(0.6)),
-        static_cast<float>(log(0.4))
+        static_cast<float>(log(0.8)),
+        static_cast<float>(log(0.2))
 };
 
 /**
