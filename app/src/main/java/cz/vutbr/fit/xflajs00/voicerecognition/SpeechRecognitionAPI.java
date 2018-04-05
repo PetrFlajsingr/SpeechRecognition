@@ -3,15 +3,26 @@ package cz.vutbr.fit.xflajs00.voicerecognition;
 import java.util.ArrayList;
 import java.util.List;
 
+
+/**
+ * Usage:
+ * SpeechRecognitionAPI speechRecognitionAPI = SpeechRecognitionAPI(<activity>.getCacheDir.toString());
+ * speechRecognitionAPI.addListener(<class implementing SpeechRecognitionAPI.ISpeechRecognitionAPICallback interface>);
+ * --- IN ANOTHER THREAD: ---
+ * speechRecognitionAPI.startRecording();
+ * --------------------------
+ * speechRecognitionAPI.stopRecording();
+ *
+ * --- When no longer needed: ---
+ * speechRecognitionAPI.shutdown();
+ */
 public class SpeechRecognitionAPI {
     // TEST
-
     private native void testNative();
 
     public void test(){
         testNative();
     }
-
     //\ TEST
     // NATIVE METHODS
     private native void setCacheDirNative(String cacheDir);
@@ -38,9 +49,11 @@ public class SpeechRecognitionAPI {
         createEngineNative();
     }
 
-    public void startRecording(){
+    public void startRecording() throws Exception {
         if(!recorderCreated){
-            createAudioRecorderNative();
+            if(!createAudioRecorderNative()){
+                throw new Exception("Failed to create audio recorder");
+            }
             recorderCreated = true;
         }
 
@@ -58,7 +71,21 @@ public class SpeechRecognitionAPI {
     }
 
     // CALLBACKS FROM NDK
+    private void VADChanged(boolean activity){
+        if(activity){
+            notifyVADChanged(VAD_ACTIVITY.ACTIVE);
+        } else {
+            notifyVADChanged(VAD_ACTIVITY.INACTIVE);
+        }
+    }
 
+    private void sequenceRecognized(String sequence){
+        notifySequenceRecognized(sequence);
+    }
+
+    private void recognitionDone(){
+        notifyRecognitionDone();
+    }
 
     //\ CALLBACKS FROM NDK
 
@@ -66,21 +93,19 @@ public class SpeechRecognitionAPI {
     // LISTENERS
     private List<ISpeechRecognitionAPICallback> listeners = new ArrayList<>();
 
-    private VAD_ACTIVITY activity = VAD_ACTIVITY.INACTIVE;
-
-    private void notifyVADChanged(){
+    private void notifyVADChanged(VAD_ACTIVITY activity){
         for(ISpeechRecognitionAPICallback listener : listeners) {
             listener.onVADChanged(activity);
         }
     }
 
-    private void notifyOnSequenceRecognized(String sequence){
+    private void notifySequenceRecognized(String sequence){
         for(ISpeechRecognitionAPICallback listener : listeners) {
             listener.onSequenceRecognized(sequence);
         }
     }
 
-    private void notifyOnRecognitionDone(){
+    private void notifyRecognitionDone(){
         for(ISpeechRecognitionAPICallback listener : listeners) {
             listener.onRecognitionDone();
         }
