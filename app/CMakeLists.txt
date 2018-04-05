@@ -112,7 +112,7 @@ find_library( # Sets the name of the path variable.
 # build script, prebuilt third-party libraries, or system libraries.
 
 target_link_libraries( # Specifies the target library.
-                       raw_audio_recorder
+                       speech_recognition
                        OpenSLES
                        RScpp_static
 
