@@ -30,6 +30,13 @@
 #define LOGE(...) \
   ((void)__android_log_print(ANDROID_LOG_ERROR, APPNAME, __VA_ARGS__))
 
+typedef struct registeredObject{
+    jclass clazz;
+    jobject obj;
+    JNIEnv* env;
+}T_registeredObject;
+
+std::vector<T_registeredObject> callbackObjects;
 
 
 using namespace android::RSC;
@@ -521,6 +528,34 @@ void VADtest(){
     __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "VADtest() ended");
 }
 
+void notifyVADChanged(bool activity){
+    for(auto iterator = callbackObjects.begin();
+            iterator != callbackObjects.end();
+            iterator++){
+        jmethodID messageMe = iterator->env->GetMethodID(iterator->clazz, "VADChanged", "(B)V");
+        iterator->env->CallVoidMethod(iterator->obj, messageMe, activity);
+    }
+}
+
+void notifySequenceRecognized(std::string sequence){
+    for(auto iterator = callbackObjects.begin();
+        iterator != callbackObjects.end();
+        iterator++){
+        jstring argumentString = iterator->env->NewStringUTF(sequence.c_str());
+        jmethodID messageMe = iterator->env->GetMethodID(iterator->clazz, "sequenceRecognized", "(B)V");
+        iterator->env->CallVoidMethod(iterator->obj, messageMe, argumentString);
+    }
+}
+
+void notifyRecognitionDone(){
+    for(auto iterator = callbackObjects.begin();
+        iterator != callbackObjects.end();
+        iterator++){
+        jmethodID messageMe = iterator->env->GetMethodID(iterator->clazz, "recognitionDone", "()V");
+        iterator->env->CallVoidMethod(iterator->obj, messageMe);
+    }
+}
+
 void AcousticTest(){
     FeatureMatrix* nnResult = nnFromTestFile();
     Decoder decoder("/sdcard/lexicon.txt", "/sdcard/LM.arpa");
@@ -543,16 +578,29 @@ void AcousticTest(){
 
 extern "C"{
 
-    JNIEXPORT jstring JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_MainActivity_getJniString( JNIEnv* env, jobject obj){
+    JNIEXPORT jstring JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_MainActivity_getJniString
+            (JNIEnv* env, jobject obj){
 
         jstring jstr = env->NewStringUTF("This comes from jni.");
         jclass clazz = env->FindClass("cz/vutbr/fit/xflajs00/voicerecognition/MainActivity");
         jmethodID messageMe = env->GetMethodID(clazz, "messageMe", "(Ljava/lang/String;)V");
         env->CallVoidMethod(obj, messageMe, jstr);
 
-        return env->NewStringUTF("kokot");
+        return env->NewStringUTF("test");
     }
 
+
+    // CALLBACKS
+    JNIEXPORT void JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_SpeechRecognitionAPI_registerCallbacksNative
+            ( JNIEnv* env, jobject obj){
+        T_registeredObject object;
+        object.clazz = env->FindClass("cz/vutbr/fit/xflajs00/voicerecognition/SpeechRecognitionAPI");
+        object.env = env;
+        object.obj = obj;
+        callbackObjects.push_back(object);
+    }
+
+    // CONTROL FUCTIONS
     //setCacheDir
     JNIEXPORT void JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_SpeechRecognitionAPI_setCacheDirNative
             (JNIEnv* env, jobject obj, jstring pathObj){

@@ -32,6 +32,8 @@ public class SpeechRecognitionAPI {
     private native void stopRecordingNative();
     private native void shutdownNative();
 
+    private native void registerCallbacksNative();
+
     static{
         System.loadLibrary("speech_recognition");
     }
@@ -47,6 +49,8 @@ public class SpeechRecognitionAPI {
     public SpeechRecognitionAPI(String cacheDir) {
         setCacheDirNative(cacheDir);
         createEngineNative();
+
+        registerCallbacksNative();
     }
 
     public void startRecording() throws Exception {
