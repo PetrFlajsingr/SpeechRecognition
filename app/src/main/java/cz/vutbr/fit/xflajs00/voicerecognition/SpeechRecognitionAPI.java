@@ -106,6 +106,9 @@ public class SpeechRecognitionAPI {
     }
 
     // CALLBACKS FROM NDK
+    /**
+     * These functions are called from NDK via JNI.
+     */
     private void VADChanged(boolean activity){
         if(activity){
             notifyVADChanged(VAD_ACTIVITY.ACTIVE);

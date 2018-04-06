@@ -14,6 +14,10 @@ public class MainActivity extends AppCompatActivity implements SpeechRecognition
 
     private SpeechRecognitionAPI speechAPI;
 
+    private TextView resultTextView;
+
+    private TextView VADTextView;
+
     /**
      * Requests permissions on start.
      * @param savedInstanceState
@@ -29,32 +33,15 @@ public class MainActivity extends AppCompatActivity implements SpeechRecognition
 
         speechAPI = new SpeechRecognitionAPI(this.getCacheDir().toString());
         speechAPI.addListener(this);
-        //setCacheDir(this.getCacheDir().toString());
-        //createEngine();
+
+        resultTextView = (TextView) findViewById(R.id.textViewRecognitionResult);
+        VADTextView = (TextView) findViewById(R.id.VADTextView);
     }
 
     @Override
     protected void onResume(){
         super.onResume();
-        //getJniString();
     }
-
-    // please, let me live even though I used this dark programming technique
-    public void messageMe(String text) {
-        final String text2 = text;
-        runOnUiThread(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        TextView view = (TextView)findViewById(R.id.textViewRecognitionResult);
-                        view.setText(text2);
-                    }
-                }
-        );
-    }
-
-
-
 
     /** Called when the activity is about to be destroyed. */
     @Override
@@ -64,24 +51,6 @@ public class MainActivity extends AppCompatActivity implements SpeechRecognition
         speechAPI.shutdown();
         super.onDestroy();
     }
-    private Thread threadAudioRecorder;
-
-    /*
-    public static native void setCacheDir(String cacheDir);
-    public static native void createEngine();
-    public static native boolean createAudioRecorder();
-    public static native void startRecording();
-    public static native void stopRecording();
-    public static native void shutdown();
-    public static native void createFrames();
-    public static native void threadTest();
-    public native String getJniString();
-
-    static{
-        System.loadLibrary("raw_audio_recorder");
-    }*/
-
-
     // UI control with a button
     public void recordingControl(View view){
         recording = !recording;
@@ -95,25 +64,6 @@ public class MainActivity extends AppCompatActivity implements SpeechRecognition
         }else{
             speechAPI.stopRecording();
         }
-
-        /*recording = !recording;
-        if(recording){
-            if (!created) {
-                created = createAudioRecorder();
-            }
-            if(created){
-                Thread thread = new Thread() {
-                    @Override
-                    public void run() {
-                        threadTest();
-                    }
-                };
-                thread.start();
-            }else
-                recording = false;
-        }else{
-            stopRecording();
-        }*/
     }
 
 
@@ -143,9 +93,8 @@ public class MainActivity extends AppCompatActivity implements SpeechRecognition
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                TextView view = (TextView) findViewById(R.id.VADTextView);
-                view.setText(text);
-                view.setTextColor(textColor);
+                VADTextView.setText(text);
+                VADTextView.setTextColor(textColor);
             }
         });
     }
@@ -156,14 +105,13 @@ public class MainActivity extends AppCompatActivity implements SpeechRecognition
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                TextView view = (TextView) findViewById(R.id.textViewRecognitionResult);
-                view.setText(String.format("%s%s", view.getText(), finalSequence));
+                resultTextView.setText(String.format("%s\n%s", resultTextView.getText(), finalSequence));
             }
         });
     }
 
     @Override
     public void onRecognitionDone() {
-
+        // not implemented
     }
 }

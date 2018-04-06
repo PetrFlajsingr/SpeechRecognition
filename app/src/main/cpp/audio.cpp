@@ -26,17 +26,21 @@
 #define LOGW(...) \
   ((void)__android_log_print(ANDROID_LOG_WARN, APPNAME, __VA_ARGS__))
 #define LOGD(...) \
-  ((void)__android_log_print(ANDOIRD_LOG_DEBUG, APPNAME, __VA_ARGS__))
+  ((void)__android_log_print(ANDROID_LOG_DEBUG, APPNAME, __VA_ARGS__))
 #define LOGE(...) \
   ((void)__android_log_print(ANDROID_LOG_ERROR, APPNAME, __VA_ARGS__))
 
 typedef struct registeredObject{
-    jclass clazz;
     jobject obj;
-    JNIEnv* env;
 }T_registeredObject;
 
 std::vector<T_registeredObject> callbackObjects;
+
+void notifyVADChanged(bool activity);
+
+void notifySequenceRecognized(std::string sequence);
+
+void notifyRecognitionDone();
 
 
 using namespace android::RSC;
@@ -164,120 +168,7 @@ void threadTest(){
     testThread.join();
 }
 
-std::string mapResultToString(float* array){
-    float max = 0;
-    int maxIndex = 0;
-    for(int i = 0; i < 46;i++){
-        if(array[i] > max){
-            max = array[i];
-            maxIndex = i;
-        }
-    }
-    //__android_log_print(ANDROID_LOG_DEBUG, APPNAME, "max: %g", max);
-    switch(maxIndex){
-        case 0: return "AA";
-        case 1: return "AE";
-        case 2: return "AH";
-        case 3: return "AO";
-        case 4: return "AW";
-        case 5: return "AY";
-        case 6: return "B";
-        case 7: return "BRH";
-        case 8: return "CGH";
-        case 9: return "CH";
-        case 10: return "D";
-        case 11: return "DH";
-        case 12: return "EH";
-        case 13: return "ER";
-        case 14: return "EY";
-        case 15: return "F";
-        case 16: return "G";
-        case 17: return "HH";
-        case 18: return "IH";
-        case 19: return "IY";
-        case 20: return "JH";
-        case 21: return "K";
-        case 22: return "L";
-        case 23: return "M";
-        case 24: return "N";
-        case 25: return "NG";
-        case 26: return "NSN";
-        case 27: return "OW";
-        case 28: return "OY";
-        case 29: return "P";
-        case 30: return "R";
-        case 31: return "S";
-        case 32: return "SH";
-        case 33: return "SIL";
-        case 34: return "SMK";
-        case 35: return "T";
-        case 36: return "TH";
-        case 37: return "UH";
-        case 38: return "UHH";
-        case 39: return "UM";
-        case 40: return "UW";
-        case 41: return "V";
-        case 42: return "W";
-        case 43: return "Y";
-        case 44: return "Z";
-        case 45: return "ZH";
-        default: return "ERROR";
-    }
-}
-
-void nntest(){
-    const int FRAME_SIZE = (const int) (TARGET_SAMPLING_RATE * 0.025);
-    const int FRAME_OVERLEAP = (const int) (TARGET_SAMPLING_RATE * 0.010);
-    int recordingSize = 0;
-
-    short* data = readAudioFromFile("/sdcard/AAA_ahojtest.raw", &recordingSize);
-
-    int frameCount = (recordingSize - FRAME_SIZE) / FRAME_OVERLEAP;
-
-    AudioFrame::calcHammingCoef();
-
-    AudioFrame* frames = new AudioFrame[frameCount];
-
-    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "hamming window start");
-    for(unsigned int frame = 0; frame < frameCount; ++frame){
-        frames[frame].applyHammingWindow(data + frame*FRAME_OVERLEAP);
-    }
-    free(data);
-    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "hamming window end");
-
-    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "fft start");
-    kiss_fftr_cfg cfg = kiss_fftr_alloc(FFT_FRAME_LENGTH, 0, NULL, NULL);
-
-    kiss_fft_cpx** fftFrames = new kiss_fft_cpx*[frameCount];
-
-    for(unsigned int i = 0; i < frameCount; ++i){
-        frames[i].applyFFT(&cfg);
-        fftFrames[i] = frames[i].getFftData();
-    }
-    free(cfg);
-
-    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "fft end");
-
-    FeatureMatrix rsMelBankResults;
-    RSMelFilterBank *rsMelBank = new RSMelFilterBank(cacheDir);
-    rsMelBankResults.init(frameCount, MEL_BANK_FRAME_LENGTH);
-    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "RS mel bank start");
-
-    for(int i = 0; i < frameCount; ++i) {
-        rsMelBankResults.getFeaturesMatrix()[i] = rsMelBank->calculateMelBank(fftFrames[i]);
-    }
-    rsMelBank->substractMean(&rsMelBankResults);
-    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "RS mel bank end");
-
-    RSNeuralNetwork nn("/sdcard/NNnew.bin", cacheDir);
-
-    FeatureMatrix* result = nn.forwardAll(&rsMelBankResults);
-
-    for(int i = 0;i < frameCount; i++){
-        __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "result: %s", mapResultToString(result->getFeaturesMatrix()[i]).c_str());
-    }
-
-}
+//\ threads
 
 void createFrames(){
    // int a;
@@ -511,10 +402,14 @@ void VADtest(){
     for(int i = 0; i < nnResult->getFramesNum(); i++){
         if(!active && VADResult[i] == true){
             active = true;
+            notifyVADChanged(active);
         } else if(active && VADResult[i] == false){
             decoder.decode(nnResult->getFeaturesMatrix()[i], true);
-            __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "RESULT: %s", decoder.getWinner().c_str());
+            std::string winnerWord = decoder.getWinner();
+            __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "RESULT: %s", winnerWord.c_str());
+            notifySequenceRecognized(winnerWord);
             active = false;
+            notifyVADChanged(active);
             decoder.reset();
         }
 
@@ -525,80 +420,83 @@ void VADtest(){
 
     delete melResult;
 
+    notifyRecognitionDone();
+
     __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "VADtest() ended");
 }
 
+static JavaVM *g_VM;
+
+JNIEnv* AttachJava(bool* attached) {
+    JavaVMAttachArgs args = {JNI_VERSION_1_2, 0, 0};
+    JNIEnv* java;
+    if(g_VM->AttachCurrentThread(&java, &args) == JNI_FALSE)
+        *attached = false;
+    else
+        *attached = true;
+    return java;
+}
+
+void DetachJava(){
+    g_VM->DetachCurrentThread();
+}
+
 void notifyVADChanged(bool activity){
+    bool attached;
+    JNIEnv* env = AttachJava(&attached);
+    jclass tmpClazz = env->FindClass("cz/vutbr/fit/xflajs00/voicerecognition/SpeechRecognitionAPI");
+    tmpClazz = (jclass)env->NewGlobalRef(tmpClazz);
     for(auto iterator = callbackObjects.begin();
             iterator != callbackObjects.end();
             iterator++){
-        jmethodID messageMe = iterator->env->GetMethodID(iterator->clazz, "VADChanged", "(B)V");
-        iterator->env->CallVoidMethod(iterator->obj, messageMe, activity);
+        jmethodID methodID = env->GetMethodID(tmpClazz, "VADChanged", "(Z)V");
+        iterator->obj = env->NewGlobalRef(iterator->obj);
+        env->CallVoidMethod(iterator->obj, methodID, activity ? JNI_TRUE : JNI_FALSE);
     }
+    if(attached)
+        DetachJava();
 }
 
 void notifySequenceRecognized(std::string sequence){
+    bool attached;
+    JNIEnv* env = AttachJava(&attached);
+    jclass tmpClazz = env->FindClass("cz/vutbr/fit/xflajs00/voicerecognition/SpeechRecognitionAPI");
+    tmpClazz = (jclass)env->NewGlobalRef(tmpClazz);
     for(auto iterator = callbackObjects.begin();
         iterator != callbackObjects.end();
         iterator++){
-        jstring argumentString = iterator->env->NewStringUTF(sequence.c_str());
-        jmethodID messageMe = iterator->env->GetMethodID(iterator->clazz, "sequenceRecognized", "(B)V");
-        iterator->env->CallVoidMethod(iterator->obj, messageMe, argumentString);
+        jmethodID methodID = env->GetMethodID(tmpClazz, "sequenceRecognized", "(Ljava/lang/String;)V");
+        env->CallVoidMethod(iterator->obj, methodID, env->NewStringUTF(sequence.c_str()));
     }
+    if(attached)
+        DetachJava();
 }
 
 void notifyRecognitionDone(){
+    bool attached;
+    JNIEnv* env = AttachJava(&attached);
+    jclass tmpClazz = env->FindClass("cz/vutbr/fit/xflajs00/voicerecognition/SpeechRecognitionAPI");
+    tmpClazz = (jclass)env->NewGlobalRef(tmpClazz);
     for(auto iterator = callbackObjects.begin();
         iterator != callbackObjects.end();
         iterator++){
-        jmethodID messageMe = iterator->env->GetMethodID(iterator->clazz, "recognitionDone", "()V");
-        iterator->env->CallVoidMethod(iterator->obj, messageMe);
+        jmethodID methodID = env->GetMethodID(tmpClazz, "recognitionDone", "()V");
+        env->CallVoidMethod(iterator->obj, methodID);
     }
-}
-
-void AcousticTest(){
-    FeatureMatrix* nnResult = nnFromTestFile();
-    Decoder decoder("/sdcard/lexicon.txt", "/sdcard/LM.arpa");
-
-    for(int i = 0; i < nnResult->getFramesNum(); i++) {
-        __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "Decode %d", i);
-        decoder.decode(nnResult->getFeaturesMatrix()[i], false);
-    }
-
-    std::string hahahaahahahaha = decoder.getOutput();
-
-    std::ofstream out;
-    out.open("/sdcard/AAA_decoder_result.txt");
-
-    out.write(hahahaahahahaha.c_str(), hahahaahahahaha.length());
-    out.close();
-
-    delete nnResult;
+    if(attached)
+        DetachJava();
 }
 
 extern "C"{
-
-    JNIEXPORT jstring JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_MainActivity_getJniString
-            (JNIEnv* env, jobject obj){
-
-        jstring jstr = env->NewStringUTF("This comes from jni.");
-        jclass clazz = env->FindClass("cz/vutbr/fit/xflajs00/voicerecognition/MainActivity");
-        jmethodID messageMe = env->GetMethodID(clazz, "messageMe", "(Ljava/lang/String;)V");
-        env->CallVoidMethod(obj, messageMe, jstr);
-
-        return env->NewStringUTF("test");
-    }
-
-
     // CALLBACKS
     JNIEXPORT void JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_SpeechRecognitionAPI_registerCallbacksNative
             ( JNIEnv* env, jobject obj){
         T_registeredObject object;
-        object.clazz = env->FindClass("cz/vutbr/fit/xflajs00/voicerecognition/SpeechRecognitionAPI");
-        object.env = env;
-        object.obj = obj;
+        object.obj = env->NewGlobalRef(obj);
+        env->GetJavaVM(&g_VM);
         callbackObjects.push_back(object);
     }
+    //\ CALLBACKS
 
     // CONTROL FUCTIONS
     //setCacheDir
@@ -642,44 +540,4 @@ extern "C"{
             (JNIEnv* env, jobject obj){
         VADtest();
     }
-/*
-    JNIEXPORT void JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_MainActivity_setCacheDir(JNIEnv* env, jclass clazz, jstring pathObj){
-        setCacheDir(env->GetStringUTFChars(pathObj, NULL));
-    }
-
-    JNIEXPORT void JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_MainActivity_threadTest(JNIEnv* env, jclass clazz){
-        threadTest();
-    }
-
-    JNIEXPORT void JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_MainActivity_createEngine(JNIEnv* env, jclass clazz){
-        createEngine();
-    }
-
-    JNIEXPORT jboolean JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_MainActivity_createAudioRecorder(JNIEnv* env, jclass clazz){
-        return createAudioRecorder();
-    }
-
-    JNIEXPORT void JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_MainActivity_stopRecording(JNIEnv* env, jclass clazz){
-        stopRecording();
-    }
-
-    JNIEXPORT void JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_MainActivity_startRecording(JNIEnv* env, jclass clazz){
-        startRecording();
-    }
-
-    JNIEXPORT void Java_cz_vutbr_fit_xflajs00_voicerecognition_MainActivity_shutdown(JNIEnv* env, jclass clazz){
-        shutdown();
-    }
-
-    JNIEXPORT void Java_cz_vutbr_fit_xflajs00_voicerecognition_MainActivity_createFrames(JNIEnv* env, jclass clazz){
-         //createFrames();
-        //nntest();
-
-        //AcousticTest();
-
-        //VADtest();
-
-    }
-
-    */
 }
