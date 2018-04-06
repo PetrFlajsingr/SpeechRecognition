@@ -1,13 +1,17 @@
 package cz.vutbr.fit.xflajs00.voicerecognition;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
+ * Class providing an interface to use a native library for speech recognition.
+ * Uses observer pattern to notify listeners about certain events.
  * Usage:
  * SpeechRecognitionAPI speechRecognitionAPI = SpeechRecognitionAPI(<activity>.getCacheDir.toString());
  * speechRecognitionAPI.addListener(<class implementing SpeechRecognitionAPI.ISpeechRecognitionAPICallback interface>);
+ *
+ * For recognition from microphone:
  * --- IN ANOTHER THREAD: ---
  * speechRecognitionAPI.startRecording();
  * --------------------------
@@ -15,6 +19,10 @@ import java.util.List;
  *
  * --- When no longer needed: ---
  * speechRecognitionAPI.shutdown();
+ *
+ * For recognition of an audio file
+ * speechRecognitionAPI.recognizeWAV(<path to WAV file>);
+ *
  */
 public class SpeechRecognitionAPI {
     // TEST
@@ -46,6 +54,10 @@ public class SpeechRecognitionAPI {
         return recording;
     }
 
+    /**
+     * Requires cache dir path for RenderScript
+     * @param cacheDir cache dir path
+     */
     public SpeechRecognitionAPI(String cacheDir) {
         setCacheDirNative(cacheDir);
         createEngineNative();
@@ -53,6 +65,10 @@ public class SpeechRecognitionAPI {
         registerCallbacksNative();
     }
 
+    /**
+     * Starts recording in native code and starts the recognition at the same time.
+     * @throws Exception Thrown when audio recorder can not be created
+     */
     public void startRecording() throws Exception {
         if(!recorderCreated){
             if(!createAudioRecorderNative()){
@@ -65,13 +81,28 @@ public class SpeechRecognitionAPI {
         recording = true;
     }
 
+    /**
+     * Stops microphone recording
+     */
     public void stopRecording(){
         stopRecordingNative();
         recording = false;
     }
 
+    /**
+     * Destroys allocated memory for audio recording
+     */
     public void shutdown(){
         shutdownNative();
+    }
+
+    /**
+     * Recognizes speech from a given audio file.
+     * @param file WAV audio file
+     */
+    public void recognizeWAV(File file){
+        // TODO implement
+        throw new UnsupportedOperationException("The method has not been implemented");
     }
 
     // CALLBACKS FROM NDK
@@ -124,6 +155,9 @@ public class SpeechRecognitionAPI {
         INACTIVE
     }
 
+    /**
+     * Interface for implementation of listener functions.
+     */
     public interface ISpeechRecognitionAPICallback {
         void onVADChanged(VAD_ACTIVITY activity);
 
