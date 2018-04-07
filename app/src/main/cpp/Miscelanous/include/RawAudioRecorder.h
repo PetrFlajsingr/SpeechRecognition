@@ -13,34 +13,14 @@
 #include <pthread.h>
 #include <condition_variable>
 #include <constants.h>
+#include <QueueData.h>
+#include <SafeQueue.h>
 
 class RawAudioRecorder {
 private:
-    static const int SMALL_RECORDER_FRAMES = SAMPLING_RATE * 0.010; // min length of recorded frame - 100ms
-
     static short *recorderBuffer; //< buffer for recorded data
 
-    static short *sharedAudioData;
-
-    static unsigned int dataCounter;
-public:
-    static unsigned int getDataCounter();
-
-private:
-
-    static std::condition_variable* cv;
-
     static bool recording;
-public:
-    static bool isRecording();
-
-public:
-    static void setCv(std::condition_variable *cv);
-
-public:
-    static void setSharedAudioData(short *sharedAudioData);
-
-private:
 
     // engine interfaces
     SLObjectItf engineObject = NULL;
@@ -70,6 +50,10 @@ public:
     void startRecording();
 
     void stopRecording();
+
+    static bool isRecording();
+
+    static SafeQueue<Q_AudioData*>* melQueue;
 };
 
 

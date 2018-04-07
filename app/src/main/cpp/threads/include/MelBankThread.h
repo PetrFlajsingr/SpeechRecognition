@@ -25,7 +25,7 @@ private:
 
     void threadMelBank();
 
-    kiss_fftr_cfg cfg;
+    void prepareAudioData(short* data, short* newData);
 public:
     MelBankThread(const char* cacheDir);
 

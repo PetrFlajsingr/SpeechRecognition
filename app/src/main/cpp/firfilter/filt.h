@@ -81,7 +81,7 @@
  *     init(): The filter can be re-initialized with a call to this function
  *     get_taps(double *taps): returns the filter taps in the array "taps"
  *     write_taps_to_file(char *filename): writes the filter taps to a file
- *     write_freqres_to_file(char *filename): output frequency response to a file
+ *     write_freqres_to_file(char *filename): clearOutputNode frequency response to a file
  * 
  * Finally, a get_error_flag() function is provided.  Recommended usage
  * is to check the get_error_flag() return value for a non-zero

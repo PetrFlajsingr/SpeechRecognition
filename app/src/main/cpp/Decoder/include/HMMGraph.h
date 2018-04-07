@@ -39,7 +39,7 @@ public:
 
     void applyPruning();
 
-    std::string output(AcousticModel* model);
+    void clearOutputNode();
 
     void eraseTokenRecords();
 };

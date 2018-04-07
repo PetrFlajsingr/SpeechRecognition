@@ -15,8 +15,8 @@
 
 //TODO temp variable, remove
 std::vector<float> TEMP_PROB = {
-        static_cast<float>(log(0.8)),
-        static_cast<float>(log(0.2))
+        static_cast<float>(log(0.6)),
+        static_cast<float>(log(0.4))
 };
 
 /**
@@ -168,23 +168,11 @@ std::string getMostLikely(std::vector<Token*>& vector, AcousticModel* model){
 }
 
 /**
- * Debug output
+ * Debug clearOutputNode
  * @param model
  * @return
  */
-std::string HMMGraph::output(AcousticModel* model) {
-    std::string result = "";
-    for(int i = 0; i < outputNode->tokens.size(); i++){
-        std::string tabs = "\t";
-        if(model->words.at(outputNode->tokens.at(i)->word).writtenForm.length() < 4)
-            tabs += "\t";
-        result += "Word:\t" + model->words.at(outputNode->tokens.at(i)->word).writtenForm
-                  + tabs + "Likelihood:\t" + toString(outputNode->tokens.at(i)->likelihood)
-                  + "\n";
-    }
-    if(outputNode->tokens.size() > 0)
-        result += "Most likely: " + getMostLikely(outputNode->tokens, model) + "\n";
-
+void HMMGraph::clearOutputNode() {
     for(auto iterator = outputNode->tokens.begin();
         iterator != outputNode->tokens.end();
         iterator++){
@@ -192,7 +180,6 @@ std::string HMMGraph::output(AcousticModel* model) {
             outputNode->tokens.erase(iterator);
             iterator--;
     }
-    return result;
 }
 
 /**

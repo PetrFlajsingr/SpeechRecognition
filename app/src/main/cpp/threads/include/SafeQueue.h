@@ -18,15 +18,41 @@ private:
     std::queue<T> queue;
     std::atomic<bool> keep_running;
 public:
-    SafeQueue();
+    SafeQueue():keep_running(true){};
 
-    void enqueue(T item);
+    void enqueue(T item){
+        std::unique_lock<std::mutex> lock(queueMutex);
+        bool wasEmpty = queue.empty();
 
-    bool dequeue(T& item);
+        queue.push(item);
+        lock.unlock();
 
-    bool isEmpty();
+        if(wasEmpty)
+            conditionVariable.notify_one();
+    }
 
-    void shutdown();
+    bool dequeue(T& item){
+        std::unique_lock<std::mutex> lock(queueMutex);
+        while(keep_running && queue.empty()){
+            conditionVariable.wait(lock);
+        }
+
+        if(keep_running && !queue.empty()){
+            item = std::move(queue.front());
+            queue.pop();
+        }
+
+        return keep_running;
+    }
+
+    bool isEmpty(){
+        return queue.empty();
+    }
+
+    void shutdown(){
+        keep_running = false;
+        conditionVariable.notify_all();
+    }
 };
 
 

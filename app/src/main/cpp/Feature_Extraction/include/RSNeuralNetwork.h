@@ -30,6 +30,12 @@ private:
     float** layerMeans;
     float*** layerWeights;
 
+    sp<Allocation> dataAllocation;
+
+    sp<Allocation> iterAlloc;
+
+    int neuronIterator[500];
+
     unsigned int totalNeuronCount = 0;
 
     ACTIVATION_FUNCTIONS* layerFunction;

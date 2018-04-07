@@ -192,7 +192,7 @@ void NeuralNetwork::forward() {
             addVectors(this->layerData[layerIterator - 1], this->layerBiases[layerIterator], this->dataVectorLength);
         }
 
-        //output layer
+        //clearOutputNode layer
         sigmoid(this->layerData[layerIterator - 1], this->dataVectorLength);
         vectorMulMatrix(this->layerData[layerIterator - 1], this->dataVectorLength,
                         this->layerWeights[layerIterator], this->weightCounts[layerIterator],
@@ -282,7 +282,7 @@ void NeuralNetwork::allocateMemory(NNInitInfo initInfo) {
                 this->layerWeights[i][j] = new float[initInfo.neuronCounts[i + 1]];
             }
         }else{
-            // 1 for output neurons
+            // 1 for clearOutputNode neurons
             this->weightCounts[i] = 30;
             for(unsigned int j = 0; j < initInfo.neuronCounts[i]; ++j) {
                 this->layerWeights[i][j] = new float[30];

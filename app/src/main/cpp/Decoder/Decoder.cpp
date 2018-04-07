@@ -37,36 +37,25 @@ Decoder::~Decoder() {
 
 /**
  * Sends data through the graph.
- * @param input output of NN
+ * @param input clearOutputNode of NN
  */
-void Decoder::decode(float *input, bool endOfSpeech) {
+void Decoder::decode(float *input) {
     graph->update(acousticModel);
+    graph->clearOutputNode();
+    Token::deleteInvalidTokens();
+
     Token::passAllTokens(input);
     graph->applyViterbiCriterium();
     Token::deleteInvalidTokens();
 
     graph->applyPruning();
     Token::deleteInvalidTokens();
-
-
-    if(!endOfSpeech) {
-        output += graph->output(acousticModel);
-        Token::deleteInvalidTokens();
-    }
-}
-
-/**
- * Debug output
- */
-std::string Decoder::getOutput() {
-    return this->output;
 }
 
 /**
  * Resets the decoder. Removes all tokens.
  */
 void Decoder::reset() {
-    output = "";
     for(auto iterator = graph->outputNode->tokens.begin();
             iterator != graph->outputNode->tokens.end();){
         Token::addIndexToDelete((*iterator)->index_TokenVector);
@@ -80,7 +69,7 @@ void Decoder::reset() {
 }
 
 /**
- * Returns the word with the highest likelihood from the output node.
+ * Returns the word with the highest likelihood from the clearOutputNode node.
  */
 std::string Decoder::getWinner() {
     auto vector = this->graph->outputNode->tokens;

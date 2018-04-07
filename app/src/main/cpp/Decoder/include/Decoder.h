@@ -19,16 +19,12 @@ private:
     LanguageModel* languageModel;
 
     HMMGraph* graph;
-
-    std::string output = "";
 public:
     Decoder(std::string pathToLexicon, std::string pathToNgram);
 
     virtual ~Decoder();
 
-    void decode(float* input, bool endOfSpeech);
-
-    std::string getOutput();
+    void decode(float* input);
 
     std::string getWinner();
 

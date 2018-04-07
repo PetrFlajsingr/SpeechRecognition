@@ -22,6 +22,7 @@
 #include <unistd.h>
 #include <MelBankThread.h>
 #include <NNThread.h>
+#include <DecoderThread.h>
 
 #define LOGI(...) \
   ((void)__android_log_print(ANDROID_LOG_INFO, APPNAME, __VA_ARGS__))
@@ -53,11 +54,7 @@ short* readAudioFromFile(std::string filepath, int* recordingSize);
 
 const char* cacheDir;
 
-std::condition_variable cv;
-
-short* audioData;
-
-// create the engine and output mix objects
+// create the engine and clearOutputNode mix objects
 void createEngine()
 {
     recorder = new RawAudioRecorder();
@@ -77,102 +74,17 @@ void stopRecording(){
 // set the recording state for the audio recorder
 void startRecording()
 {
-    audioData = new short[MAX_AUDIO_LENGTH];
-    recorder->setSharedAudioData(audioData);
-    recorder->setCv(&cv);
-    recorder->startRecording();
-}
-
-/**
- * Function called from a thread to calculate mel banks on data provided by recorder thread.
- * It is being controlled by a condition_variable unlocking the thread from recorder thread.
- */
-void calculateMelbanksThread(){
-    const int ORIG_FRAME_OVERLAP = SAMPLING_RATE * 0.010;
-    std::mutex mtx;
-    std::unique_lock<std::mutex> lock(mtx);
-
-    AudioFrame::calcHammingCoef();
-
-    kiss_fftr_cfg cfg = kiss_fftr_alloc(FFT_FRAME_LENGTH, 0, NULL, NULL); //< configuration for kissfft
-
-
-    FeatureMatrix melBankResults;
-    melBankResults.init(MAX_FRAME_COUNT, MEL_BANK_FRAME_LENGTH);
-
-    RSMelFilterBank *rsMelBank = new RSMelFilterBank(cacheDir);
-
-    int dataStart = 0; //< offset for data provided by recorder thread
-
-    int frameCounter = 0;
-
-    // thread continues to calculate mel banks as long as the recording is active or there are
-    // data to work through
-    while(recorder->isRecording() || recorder->getDataCounter() - ORIG_FRAME_OVERLAP > dataStart){
-
-        if(recorder->isRecording() && recorder->getDataCounter() < dataStart + ORIG_FRAME_LENGTH){
-            cv.wait(lock);
-            continue;
-        }
-        short *subsampledData = AudioSubsampler::subsample48kHzto8kHz(audioData + dataStart,
-                                                                      ORIG_FRAME_LENGTH);
-
-        if(frameCounter == 0){
-            std::ofstream out;
-            out.open("/sdcard/AAA_AUDIOTEST1.raw", std::ios::out | std::ios::binary);
-
-            out.write((char*)subsampledData, 400);
-            out.close();
-        }
-
-        AudioFrame frame;
-        frame.applyHammingWindow(subsampledData);
-
-        // deletion of not needed memory
-        delete[] subsampledData;
-
-        frame.applyFFT(&cfg);
-
-        kiss_fft_cpx *fftFrame = frame.getFftData();
-
-        // saving the data into matrix
-        melBankResults.getFeaturesMatrix()[frameCounter] = rsMelBank->calculateMelBank(fftFrame);
-
-        //increasing offset
-        dataStart += ORIG_FRAME_OVERLAP;
-
-        frameCounter++;
-    }
-
-    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "test: %d", (recorder->getDataCounter() - ORIG_FRAME_LENGTH) / ORIG_FRAME_OVERLAP);
-
-    melBankResults.setFramesNum(frameCounter);
-
-    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "recording done, total: %d, mine: %d, frames: %d", recorder->getDataCounter(), dataStart, frameCounter);
-
-    rsMelBank->substractMean(&melBankResults);
-
-    std::ofstream out;
-    out.open("/sdcard/AAA_AUDIOTEST.raw", std::ios::out | std::ios::binary);
-
-    out.write((char*)AudioSubsampler::subsample48kHzto8kHz(audioData, recorder->getDataCounter()), recorder->getDataCounter()/6*2);
-    out.close();
-
-    melBankResults.dumpResultToFile("/sdcard/AAA_MELBANKRESULT.TXT");
-
-
-    free(cfg);
-}
-
-void threadTest(){
     MelBankThread melBankThread(cacheDir);
-
     NNThread nnThread(cacheDir);
+    DecoderThread decoderThread;
 
-    return;
-    startRecording();
-    std::thread testThread(calculateMelbanksThread);
-    testThread.join();
+    recorder->melQueue = &melBankThread.inputQueue;
+    melBankThread.nnQueue = &nnThread.inputQueue;
+    nnThread.decoderQueue = &decoderThread.inputQueue;
+
+    recorder->startRecording();
+
+    decoderThread.thread.join();
 }
 
 //\ threads
@@ -288,61 +200,13 @@ void setCacheDir(const char* cDir){
     cacheDir = cDir;
 }
 
-FeatureMatrix* nnFromTestFile(){
-    const int FRAME_SIZE = (const int) (TARGET_SAMPLING_RATE * 0.025);
-    const int FRAME_OVERLEAP = (const int) (TARGET_SAMPLING_RATE * 0.010);
-    int recordingSize = 0;
-
-    short* data = readAudioFromFile("/sdcard/AAA_numbertest.raw", &recordingSize);
-
-    int frameCount = (recordingSize - FRAME_SIZE) / FRAME_OVERLEAP;
-
-    AudioFrame::calcHammingCoef();
-
-    AudioFrame* frames = new AudioFrame[frameCount];
-
-    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "hamming window start");
-    for(unsigned int frame = 0; frame < frameCount; ++frame){
-        frames[frame].applyHammingWindow(data + frame*FRAME_OVERLEAP);
-    }
-    free(data);
-    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "hamming window end");
-
-    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "fft start");
-    kiss_fftr_cfg cfg = kiss_fftr_alloc(FFT_FRAME_LENGTH, 0, NULL, NULL);
-
-    kiss_fft_cpx** fftFrames = new kiss_fft_cpx*[frameCount];
-
-    for(unsigned int i = 0; i < frameCount; ++i){
-        frames[i].applyFFT(&cfg);
-        fftFrames[i] = frames[i].getFftData();
-    }
-    free(cfg);
-
-    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "fft end");
-
-    FeatureMatrix rsMelBankResults;
-    RSMelFilterBank *rsMelBank = new RSMelFilterBank(cacheDir);
-    rsMelBankResults.init(frameCount, MEL_BANK_FRAME_LENGTH);
-    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "RS mel bank start");
-
-    for(int i = 0; i < frameCount; ++i) {
-        rsMelBankResults.getFeaturesMatrix()[i] = rsMelBank->calculateMelBank(fftFrames[i]);
-    }
-    rsMelBank->substractMean(&rsMelBankResults);
-    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "RS mel bank end");
-
-    RSNeuralNetwork nn("/sdcard/NNnew.bin", cacheDir);
-
-    return nn.forwardAll(&rsMelBankResults);
-}
 
 FeatureMatrix* melFromTestFile(){
     const int FRAME_SIZE = (const int) (TARGET_SAMPLING_RATE * 0.025);
     const int FRAME_OVERLEAP = (const int) (TARGET_SAMPLING_RATE * 0.010);
     int recordingSize = 0;
 
-    short* data = readAudioFromFile("/sdcard/AAA_numbertest.raw", &recordingSize);
+    short* data = readAudioFromFile("/sdcard/AA_test.raw.filepart", &recordingSize);
 
     int frameCount = (recordingSize - FRAME_SIZE) / FRAME_OVERLEAP;
 
@@ -411,7 +275,7 @@ void VADtest(){
             active = true;
             notifyVADChanged(active);
         } else if(active && VADResult[i] == false){
-            decoder.decode(nnResult->getFeaturesMatrix()[i], true);
+            decoder.decode(nnResult->getFeaturesMatrix()[i]);
             std::string winnerWord = decoder.getWinner();
             __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "RESULT: %s", winnerWord.c_str());
             notifySequenceRecognized(winnerWord);
@@ -421,7 +285,7 @@ void VADtest(){
         }
 
         if(active){
-            decoder.decode(nnResult->getFeaturesMatrix()[i], false);
+            decoder.decode(nnResult->getFeaturesMatrix()[i]);
         }
     }
 

@@ -8,8 +8,9 @@
 
 #include <thread>
 #include <RSNeuralNetwork.h>
-#include "SafeQueue.h"
-#include "QueueData.h"
+#include <SafeQueue.h>
+#include <QueueData.h>
+
 
 class NNThread{
 private:
@@ -19,8 +20,6 @@ private:
     bool run = true;
 
     void threadNN();
-
-    const char* cacheDir;
 public:
     NNThread(const char* cacheDir);
 

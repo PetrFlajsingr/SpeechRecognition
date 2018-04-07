@@ -14,12 +14,13 @@
 class DecoderThread {
 private:
     Decoder* decoder;
-    std::thread thread;
+
 
     bool run = true;
 
     void threadDecoder();
 public:
+    std::thread thread;
     DecoderThread();
 
     virtual ~DecoderThread();

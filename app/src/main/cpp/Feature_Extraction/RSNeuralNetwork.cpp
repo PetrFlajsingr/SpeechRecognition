@@ -195,6 +195,14 @@ void RSNeuralNetwork::prepareAllocations() {
 
     layerFunctionAllocation->copy1DRangeFrom(0, info.layerCount, layerFunction);
     neuralNetworkRSInstance->set_functions(layerFunctionAllocation);
+
+    dataAllocation = Allocation::createSized(this->renderScriptObject,
+                                                            Element::F32(this->renderScriptObject),
+                                                            500);
+
+    for(int i = 0; i < 500; i++) {
+        neuronIterator[i] = i;
+    }
 }
 
 /**
@@ -225,21 +233,10 @@ float* RSNeuralNetwork::prepareInput(FeatureMatrix *data, int index) {
 /**
  * Pass data through network.
  * @param data input data
- * @return output of neural network
+ * @return clearOutputNode of neural network
  */
 float *RSNeuralNetwork::forward(float *data) {
-    sp<Allocation> dataAllocation = Allocation::createSized(this->renderScriptObject,
-                                                            Element::F32(this->renderScriptObject),
-                                                            500);
-
     dataAllocation->copy1DFrom(data);
-
-    sp<Allocation> iterAlloc;
-
-    int neuronIterator[500];
-    for(int i = 0; i < 500; i++) {
-        neuronIterator[i] = i;
-    }
 
     iterAlloc = Allocation::createSized(this->renderScriptObject,
                                         Element::U32(this->renderScriptObject),
@@ -288,7 +285,7 @@ float *RSNeuralNetwork::forward(float *data) {
 
 /**
  * Forwards entire feature matrix.
- * @param data output of mel bank filters
+ * @param data clearOutputNode of mel bank filters
  * @return matrix of neural network outputs
  */
 FeatureMatrix *RSNeuralNetwork::forwardAll(FeatureMatrix *data) {

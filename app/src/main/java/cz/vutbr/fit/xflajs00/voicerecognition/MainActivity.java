@@ -55,12 +55,17 @@ public class MainActivity extends AppCompatActivity implements SpeechRecognition
     public void recordingControl(View view){
         recording = !recording;
         if(recording){
-            try {
-                speechAPI.startRecording();
-            } catch (Exception e) {
-                e.printStackTrace();
-                recording = false;
-            }
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        speechAPI.startRecording();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        recording = false;
+                    }
+                }
+            }).run();
         }else{
             speechAPI.stopRecording();
         }

@@ -4,6 +4,7 @@
 
 #include <assert.h>
 #include <RawAudioRecorder.h>
+#include <algorithm>
 
 bool RawAudioRecorder::recordingStopBool = false;
 pthread_mutex_t RawAudioRecorder::audioEngineLock = PTHREAD_MUTEX_INITIALIZER;
@@ -11,9 +12,7 @@ SLAndroidSimpleBufferQueueItf RawAudioRecorder::recorderBufferQueue;
 short* RawAudioRecorder::recorderBuffer;
 SLRecordItf RawAudioRecorder::recorderRecord;
 bool RawAudioRecorder::recording = false;
-unsigned int RawAudioRecorder::dataCounter = 0;
-short* RawAudioRecorder::sharedAudioData;
-std::condition_variable* RawAudioRecorder::cv;
+SafeQueue<Q_AudioData*>* RawAudioRecorder::melQueue;
 
 /**
  * Prepares the engine for recording audio.
@@ -61,12 +60,12 @@ void RawAudioRecorder::bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void
         result = (*recorderBufferQueue)->Enqueue(recorderBufferQueue, recorderBuffer,
                                                      SMALL_RECORDER_FRAMES * sizeof(short));
     }
-    for(int i = 0; i < SMALL_RECORDER_FRAMES; ++i){
-       sharedAudioData[dataCounter + i] = recorderBuffer[i];
-    }
 
-    dataCounter += SMALL_RECORDER_FRAMES;
-    cv->notify_all();
+    short* data = new short[SMALL_RECORDER_FRAMES];
+    std::copy(recorderBuffer, recorderBuffer + SMALL_RECORDER_FRAMES,
+                data);
+    melQueue->enqueue(new Q_AudioData{data});
+
     pthread_mutex_unlock(&audioEngineLock);
 }
 
@@ -142,7 +141,7 @@ void RawAudioRecorder::startRecording() {
         delete[] recorderBuffer;
     }
 
-    recorderBuffer = new short[(int)(SAMPLING_RATE * 0.010)];
+    recorderBuffer = new short[SMALL_RECORDER_FRAMES];
     SLresult result;
 
     if (pthread_mutex_trylock(&audioEngineLock)) {
@@ -171,7 +170,6 @@ void RawAudioRecorder::startRecording() {
     (void)result;
 
     recording = true;
-    dataCounter = 0;
 }
 
 /**
@@ -199,18 +197,6 @@ RawAudioRecorder::~RawAudioRecorder() {
     pthread_mutex_destroy(&audioEngineLock);
 }
 
-void RawAudioRecorder::setSharedAudioData(short *sharedAudioData) {
-    RawAudioRecorder::sharedAudioData = sharedAudioData;
-}
-
-void RawAudioRecorder::setCv(std::condition_variable *cv) {
-    RawAudioRecorder::cv = cv;
-}
-
 bool RawAudioRecorder::isRecording() {
     return recording;
-}
-
-unsigned int RawAudioRecorder::getDataCounter() {
-    return dataCounter;
 }

@@ -26,7 +26,7 @@ public:
 
     short xPos; //< position in sequence ("column")
 
-    PHONEME_ENUM inputVectorIndex; //< index for NN output
+    PHONEME_ENUM inputVectorIndex; //< index for NN clearOutputNode
 
     GraphNode(const std::vector<float> &pathProbablity, int wordID, short xPos,
               PHONEME_ENUM inputVectorIndex);

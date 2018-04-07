@@ -8,7 +8,7 @@
 #include <string>
 
 /**
- * phonemes coresponding to their output index in neural network
+ * phonemes coresponding to their clearOutputNode index in neural network
  * TODO change enum name
  */
 enum PHONEME_ENUM{
