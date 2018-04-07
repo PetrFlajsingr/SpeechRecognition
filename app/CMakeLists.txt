@@ -9,14 +9,15 @@ set(RS_FILES "")
 set(RS_OBJ_FILES "")
 set(RENDER_SCRIPT_HEADERS_PATH ${ANDROID_NDK}/toolchains/renderscript/prebuilt/${ANDROID_HOST_TAG}/platform/rs)
 
-# create the jniLibs
-execute_process(COMMAND mkdir -p "${PROJECT_SOURCE_DIR}/src/main/jniLibs/${ANDROID_ABI}")
+# create the rs_libs
+execute_process(COMMAND mkdir -p "${PROJECT_SOURCE_DIR}/src/main/rs_libs/${ANDROID_ABI}")
 
 include_directories(src/main/cpp/include)
 include_directories(src/main/cpp/Decoder/include)
 include_directories(src/main/cpp/Miscelanous/include)
 include_directories(src/main/cpp/Feature_Extraction/include)
 include_directories(src/main/cpp/Voice_Activity_Detection/include)
+include_directories(src/main/cpp/threads/include)
 include_directories(src/main/cpp/kissfft)
 include_directories(src/main/cpp/firfilter)
 include_directories(${RENDER_SCRIPT_HEADERS_PATH}/cpp
@@ -37,7 +38,7 @@ endif()
 foreach(rs_file ${RS_FILES})
     get_filename_component(name ${rs_file} NAME_WE)
     list(APPEND RS_OBJ_FILES ${PROJECT_SOURCE_DIR}/src/main/obj/local/${ANDROID_ABI}/objs/voicerecognition/${name}.o)
-    configure_file(${PROJECT_SOURCE_DIR}/src/main/obj/local/${ANDROID_ABI}/librs.${name}.so ${PROJECT_SOURCE_DIR}/src/main/jniLibs/${ANDROID_ABI} COPYONLY)
+    configure_file(${PROJECT_SOURCE_DIR}/src/main/obj/local/${ANDROID_ABI}/librs.${name}.so ${PROJECT_SOURCE_DIR}/src/main/rs_libs/${ANDROID_ABI} COPYONLY)
 endforeach()
 
 # Creates and names a library, sets it as either STATIC
@@ -84,6 +85,12 @@ add_library( # Sets the name of the library.
 
               # VOICE ACTIVITY DETECTION
               src/main/cpp/Voice_Activity_Detection/VoiceActivityDetector.cpp
+
+              # THREADS
+              src/main/cpp/threads/SafeQueue.cpp
+              src/main/cpp/threads/MelBankThread.cpp
+              src/main/cpp/threads/NNThread.cpp
+              src/main/cpp/threads/DecoderThread.cpp
 
               ${RS_OBJ_FILES}
               ${RS_FILES}

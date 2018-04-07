@@ -18,8 +18,10 @@
 #include <AudioSubsampler.h>
 #include <Decoder.h>
 #include <Utils.h>
-#include "Voice_Activity_Detection/VoiceActivityDetector.h"
+#include <VoiceActivityDetector.h>
 #include <unistd.h>
+#include <MelBankThread.h>
+#include <NNThread.h>
 
 #define LOGI(...) \
   ((void)__android_log_print(ANDROID_LOG_INFO, APPNAME, __VA_ARGS__))
@@ -163,6 +165,11 @@ void calculateMelbanksThread(){
 }
 
 void threadTest(){
+    MelBankThread melBankThread(cacheDir);
+
+    NNThread nnThread(cacheDir);
+
+    return;
     startRecording();
     std::thread testThread(calculateMelbanksThread);
     testThread.join();
