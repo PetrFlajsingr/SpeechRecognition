@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements SpeechRecognition
     public void recordingControl(View view){
         recording = !recording;
         if(recording){
-            VADTextView.setVisibility(View.INVISIBLE);
+            VADTextView.setVisibility(View.VISIBLE);
             resultTextView.setText("");
             new Thread(new Runnable() {
                 @Override
