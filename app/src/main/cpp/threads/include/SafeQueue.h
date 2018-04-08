@@ -11,6 +11,9 @@
 #include <queue>
 #include <atomic>
 
+/**
+ * Queue for passing data between worker threads.
+ */
 template<typename T> class SafeQueue {
 private:
     std::mutex queueMutex;
@@ -20,6 +23,10 @@ private:
 public:
     SafeQueue():keep_running(true){};
 
+    /**
+     * Add an item to the end of the queue
+     * @param item item to be added
+     */
     void enqueue(T item){
         std::unique_lock<std::mutex> lock(queueMutex);
         bool wasEmpty = queue.empty();
@@ -31,6 +38,11 @@ public:
             conditionVariable.notify_one();
     }
 
+    /**
+     * Get a first item from the queue and delete it from the queue
+     * @param item returned item
+     * @return true if queue is still active, else false
+     */
     bool dequeue(T& item){
         std::unique_lock<std::mutex> lock(queueMutex);
         while(keep_running && queue.empty()){

@@ -16,6 +16,9 @@ DecoderThread::~DecoderThread() {
     delete decoder;
 }
 
+/**
+ * Method to be run in thread. Decodes data given by neural network thread and notifies listeners.
+ */
 void DecoderThread::threadDecoder(){
     Q_NNData* data;
     std::string result;

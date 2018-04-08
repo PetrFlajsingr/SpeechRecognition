@@ -14,7 +14,9 @@ NNThread::~NNThread() {
     delete neuralNetwork;
 }
 
-
+/**
+ * Function to be run in a thread. Takes data from inputQueue.
+ */
 void NNThread::threadNN() {
     Q_MelData* data;
 
@@ -50,6 +52,9 @@ void NNThread::threadNN() {
     JavaCallbacks::DetachJava();
 }
 
+/**
+ * Deletion of frame buffer. Called on finishing sequence.
+ */
 void NNThread::deleteBuffer(std::vector<float *> &data) {
     for(auto iterator = data.begin();
             iterator != data.end();){
@@ -58,6 +63,9 @@ void NNThread::deleteBuffer(std::vector<float *> &data) {
     }
 }
 
+/**
+ * Prepares the input for neural network
+ */
 void NNThread::prepareInput(float *result, std::vector<float *> &data) {
     const int ROLLING_WINDOW_SIZE = 7;
     const int OFFSET = ROLLING_WINDOW_SIZE * 2 + 1;

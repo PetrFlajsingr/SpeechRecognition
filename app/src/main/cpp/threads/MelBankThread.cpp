@@ -22,6 +22,9 @@ MelBankThread::~MelBankThread() {
     delete this->VADetector;
 }
 
+/**
+ * Method to be run in thread. Buffers audio sent from recoder.
+ */
 void MelBankThread::threadMelBank() {
     AudioFrame::calcHammingCoef();
     Q_AudioData* data;
@@ -85,6 +88,9 @@ void MelBankThread::stopThread() {
 
 }
 
+/**
+ * Moves data in memory to simulate frame creation
+ */
 void MelBankThread::prepareAudioData(short* data, short* newData) {
     for(int i = 0; i < SUBSAMPLED_OVERLAP_LENGTH * 2; i++){
         data[i] = data[i + SUBSAMPLED_OVERLAP_LENGTH];

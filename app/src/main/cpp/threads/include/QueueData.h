@@ -4,6 +4,10 @@
 
 #ifndef VOICERECOGNITION_QUEUEDATA_H
 #define VOICERECOGNITION_QUEUEDATA_H
+/**
+ * Data types for passing between worker threads
+ */
+
 enum DATA_TYPE{
     SEQUENCE_DATA,
     SEQUENCE_INACTIVE,

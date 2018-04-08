@@ -7,7 +7,11 @@
 
 JavaVM* JavaCallbacks::g_VM = NULL;
 
-
+/**
+ * Attach to JVM. If the thread isn't attached the call of Java functions would fail.
+ * @param attached
+ * @return
+ */
 JNIEnv* JavaCallbacks::AttachJava(bool* attached) {
     JavaVMAttachArgs args = {JNI_VERSION_1_2, 0, 0};
     JNIEnv* java;
@@ -22,11 +26,12 @@ void JavaCallbacks::DetachJava(){
     g_VM->DetachCurrentThread();
 }
 
+/**
+ * Notifies listeners about change of voice activity.
+ */
 void JavaCallbacks::notifyVADChanged(bool activity){
     bool attached;
     JNIEnv* env = AttachJava(&attached);
-    //jclass tmpClazz = env->FindClass("cz/vutbr/fit/xflajs00/voicerecognition/SpeechRecognitionAPI");
-    //tmpClazz = (jclass)env->NewGlobalRef(tmpClazz);
     for(auto iterator = callbackObjects.begin();
         iterator != callbackObjects.end();
         iterator++){
@@ -38,6 +43,10 @@ void JavaCallbacks::notifyVADChanged(bool activity){
         DetachJava();
 }
 
+/**
+ * Notifies listeners about recognized sequence
+ * @param sequence recognized sequence
+ */
 void JavaCallbacks::notifySequenceRecognized(std::string sequence){
     bool attached;
     JNIEnv* env = AttachJava(&attached);
@@ -51,6 +60,9 @@ void JavaCallbacks::notifySequenceRecognized(std::string sequence){
         DetachJava();
 }
 
+/**
+ * Notifies listeners about all threads finishing.
+ */
 void JavaCallbacks::notifyRecognitionDone(){
     bool attached;
     JNIEnv* env = AttachJava(&attached);
