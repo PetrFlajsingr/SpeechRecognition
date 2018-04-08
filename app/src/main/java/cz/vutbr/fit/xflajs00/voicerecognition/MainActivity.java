@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity implements SpeechRecognitionAPI.ISpeechRecognitionAPICallback{
     private boolean recording = false;
@@ -117,6 +118,11 @@ public class MainActivity extends AppCompatActivity implements SpeechRecognition
 
     @Override
     public void onRecognitionDone() {
-        // not implemented
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getApplicationContext(), "RECOGNITION DONE", Toast.LENGTH_LONG).show();
+            }
+        });
     }
 }

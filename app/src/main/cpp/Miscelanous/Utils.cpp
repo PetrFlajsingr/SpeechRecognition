@@ -81,3 +81,18 @@ void dumpToFile(std::string path, short *array, unsigned int length) {
     }
     out.close();
 }
+
+void dumpToFile(std::string path, float **array, unsigned int length1, unsigned int length2) {
+    std::ofstream out;
+    out.open(path.c_str());
+
+    for(int i = 0; i < length1; ++i){
+        for(int j = 0; j < length1; ++j) {
+            std::stringstream ss;
+            ss << array[i][j];
+            out.write(ss.str().c_str(), ss.str().size());
+            out.write("\n", 1);
+        }
+    }
+    out.close();
+}

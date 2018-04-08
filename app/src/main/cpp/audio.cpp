@@ -34,6 +34,8 @@
 #define LOGE(...) \
   ((void)__android_log_print(ANDROID_LOG_ERROR, APPNAME, __VA_ARGS__))
 
+static JavaVM *g_VM;
+
 JavaCallbacks callbacks;
 
 std::vector<T_registeredObject> callbackObjects;
@@ -81,6 +83,7 @@ void threads(){
     recorder->startRecording();
 
     decoderThread.thread.join();
+    JavaCallbacks::DetachJava();
 }
 
 // set the recording state for the audio recorder
@@ -209,7 +212,7 @@ FeatureMatrix* melFromTestFile(){
     const int FRAME_OVERLEAP = (const int) (TARGET_SAMPLING_RATE * 0.010);
     int recordingSize = 0;
 
-    short* data = readAudioFromFile("/sdcard/AA_test.raw.filepart", &recordingSize);
+    short* data = readAudioFromFile("/sdcard/aacheck/audio.raw", &recordingSize);
 
     int frameCount = (recordingSize - FRAME_SIZE) / FRAME_OVERLEAP;
 
@@ -246,6 +249,9 @@ FeatureMatrix* melFromTestFile(){
         rsMelBankResults->getFeaturesMatrix()[i] = rsMelBank->calculateMelBank(fftFrames[i]);
     }
     rsMelBank->substractMean(rsMelBankResults);
+
+    dumpToFile("/sdcard/aacheck/rsMelBankResults.txt", rsMelBankResults->getFeaturesMatrix(),
+               rsMelBankResults->getFramesNum(), rsMelBankResults->getFrameSize());
     __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "RS mel bank end");
 
    return rsMelBankResults;
@@ -298,8 +304,6 @@ void VADtest(){
 
     __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "VADtest() ended");
 }
-
-static JavaVM *g_VM;
 
 JNIEnv* AttachJava(bool* attached) {
     JavaVMAttachArgs args = {JNI_VERSION_1_2, 0, 0};

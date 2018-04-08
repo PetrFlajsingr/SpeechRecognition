@@ -18,6 +18,8 @@ const int SAMPLING_RATE = 48000;
 const int ORIG_FRAME_LENGTH = SAMPLING_RATE * 0.025;
 const int SMALL_RECORDER_FRAMES = SAMPLING_RATE * 0.010; // min length of recorded frame - 10ms
 
+const int SUBSAMPLED_OVERLAP_LENGTH = TARGET_SAMPLING_RATE * 0.010;
+
 const float LOW_FREQ = 64.0;
 const float HIGH_FREQ = 3800.0;
 

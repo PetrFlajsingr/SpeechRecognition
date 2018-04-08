@@ -5,6 +5,7 @@
 #include <NNThread.h>
 #include <constants.h>
 #include <android/log.h>
+#include <JavaCallbacks.h>
 
 NNThread::NNThread(const char* cacheDir): thread(&NNThread::threadNN, this) {
     neuralNetwork = new RSNeuralNetwork("/sdcard/NNnew.bin", cacheDir);
@@ -24,7 +25,11 @@ void NNThread::threadNN() {
     float* result;
     bool active = false;
     while(inputQueue.dequeue(data)){
-        if(data->type == SEQUENCE_DATA){
+        if(data->type == TERMINATE){
+            decoderQueue->enqueue(new Q_NNData{TERMINATE, NULL});
+            delete data;
+            //break;
+        }else if(data->type == SEQUENCE_DATA){
             active = true;
             buffer.push_back(data->data);
             if(buffer.size() < 7){

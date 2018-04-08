@@ -92,3 +92,11 @@ void RSMelFilterBank::substractMean(FeatureMatrix *featuresMatrix) {
                                                featuresMatrix->getFeaturesMatrix()[i]);
 
 }
+
+void RSMelFilterBank::normalise(float *data) {
+    for(int i = 0; i < MEL_BANK_FRAME_LENGTH; i++){
+        meanForNormalisation[i] = (meanForNormalisation[i] * elementCount + data[i]) / (elementCount + 1);
+        data[i] = data[i] - meanForNormalisation[i];
+    }
+    elementCount++;
+}

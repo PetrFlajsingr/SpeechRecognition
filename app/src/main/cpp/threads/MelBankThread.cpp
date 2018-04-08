@@ -5,7 +5,6 @@
 #include <AudioFrame.h>
 #include <AudioSubsampler.h>
 #include <MelBankThread.h>
-#include <android/log.h>
 #include <constants.h>
 #include <Utils.h>
 #include <fstream>
@@ -32,17 +31,22 @@ void MelBankThread::threadMelBank() {
     kiss_fftr_cfg cfg = kiss_fftr_alloc(FFT_FRAME_LENGTH, 0, NULL, NULL);
 
 
-    short* newAudioData = new short[240];
+    short* newAudioData = new short[SUBSAMPLED_OVERLAP_LENGTH * 3];
 
     AudioSubsampler subsampler;
 
     short dataCount = 0;
     while(inputQueue.dequeue(data)){
+        if(data->type == TERMINATE){
+            nnQueue->enqueue(new Q_MelData{TERMINATE, NULL});
+            delete data;
+            break;
+        }
         short* subsampledAudio = subsampler.sample(data->data, SMALL_RECORDER_FRAMES);
 
         if(dataCount < 3){
-            std::copy(subsampledAudio, subsampledAudio + 80,
-                      newAudioData + dataCount * 80);
+            std::copy(subsampledAudio, subsampledAudio + SUBSAMPLED_OVERLAP_LENGTH,
+                      newAudioData + dataCount * SUBSAMPLED_OVERLAP_LENGTH);
             dataCount++;
             continue;
         }
@@ -64,15 +68,17 @@ void MelBankThread::threadMelBank() {
         VADetector->checkData(result);
 
         if(VADetector->isActive()){
+            melFilterBank->normalise(result);
             nnQueue->enqueue(new Q_MelData{SEQUENCE_DATA, result});
             callbacks->notifyVADChanged(true);
-            //TODO callback VADchanged(true)
         } else {
             nnQueue->enqueue(new Q_MelData{SEQUENCE_INACTIVE, NULL});
             callbacks->notifyVADChanged(false);
-            //TODO callback VADchanged(false)
+            dataCount = 0;
         }
     }
+    delete[] newAudioData;
+    callbacks->DetachJava();
 }
 
 void MelBankThread::stopThread() {
@@ -80,11 +86,11 @@ void MelBankThread::stopThread() {
 }
 
 void MelBankThread::prepareAudioData(short* data, short* newData) {
-    for(int i = 0; i < 80 * 2; i++){
-        data[i] = data[i + 80];
+    for(int i = 0; i < SUBSAMPLED_OVERLAP_LENGTH * 2; i++){
+        data[i] = data[i + SUBSAMPLED_OVERLAP_LENGTH];
     }
     int j = 0;
-    for(int i = 80 * 2; i < 80 * 3; i++, j++){
+    for(int i = SUBSAMPLED_OVERLAP_LENGTH * 2; i < SUBSAMPLED_OVERLAP_LENGTH * 3; i++, j++){
         data[i] = newData[j];
     }
     return;

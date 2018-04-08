@@ -21,7 +21,10 @@ void DecoderThread::threadDecoder(){
     std::string result;
     bool first = true;
     while(inputQueue.dequeue(data)){
-        if(data->type == SEQUENCE_DATA){
+        if(data->type == TERMINATE){
+            delete data;
+            break;
+        }else if(data->type == SEQUENCE_DATA){
             if(first){
                 first = false;
             }
@@ -32,11 +35,11 @@ void DecoderThread::threadDecoder(){
             result = decoder->getWinner();
             decoder->reset();
             __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "RESULT: %s", result.c_str());
-            //TODO callback sequenceDone
             callbacks->notifySequenceRecognized(result);
         }
         delete data;
     }
     callbacks->notifyRecognitionDone();
-    //TODO callback recognitionDone
+
+    callbacks->DetachJava();
 }

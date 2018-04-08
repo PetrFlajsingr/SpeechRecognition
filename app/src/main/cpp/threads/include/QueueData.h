@@ -6,9 +6,11 @@
 #define VOICERECOGNITION_QUEUEDATA_H
 enum DATA_TYPE{
     SEQUENCE_DATA,
-    SEQUENCE_INACTIVE
+    SEQUENCE_INACTIVE,
+    TERMINATE
 };
 typedef struct s_AudioData{
+    DATA_TYPE type;
     short* data;
 }Q_AudioData;
 

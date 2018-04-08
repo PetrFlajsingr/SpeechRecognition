@@ -12,5 +12,6 @@ std::vector<std::string> split(char* str, std::string delimiter);
 void dumpToFile(std::string path, bool* array, unsigned int length);
 void dumpToFile(std::string path, short* array, unsigned int length);
 void dumpToFile(std::string path, float* array, unsigned int length);
+void dumpToFile(std::string path, float** array, unsigned int length1, unsigned int length2);
 
 #endif //VOICERECOGNITION_UTILS_H

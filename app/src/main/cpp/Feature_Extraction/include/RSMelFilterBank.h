@@ -8,6 +8,7 @@
 #include <RenderScript.h>
 #include <FeatureMatrix.h>
 #include <kiss_fft.h>
+#include <constants.h>
 #include "ScriptC_RSmelfilterbank.h"
 
 using namespace android::RSC;
@@ -24,12 +25,18 @@ private:
     sp<Allocation> fftFrameAllocation;
     sp<Allocation> melIterationAllocation;
     sp<Allocation> melBankAllocation;
+
+    float meanForNormalisation[MEL_BANK_FRAME_LENGTH] = {0};
+
+    unsigned int elementCount = 0;
 public:
     RSMelFilterBank(const char* cacheDir);
 
     float* calculateMelBank(kiss_fft_cpx* fftData);
 
     void substractMean(FeatureMatrix* featuresMatrix);
+
+    void normalise(float* data);
 };
 
 

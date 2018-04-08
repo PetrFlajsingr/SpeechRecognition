@@ -64,7 +64,11 @@ void RawAudioRecorder::bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void
     short* data = new short[SMALL_RECORDER_FRAMES];
     std::copy(recorderBuffer, recorderBuffer + SMALL_RECORDER_FRAMES,
                 data);
-    melQueue->enqueue(new Q_AudioData{data});
+    melQueue->enqueue(new Q_AudioData{SEQUENCE_DATA, data});
+
+    if(!recording){
+        melQueue->enqueue(new Q_AudioData{TERMINATE, data});
+    }
 
     pthread_mutex_unlock(&audioEngineLock);
 }

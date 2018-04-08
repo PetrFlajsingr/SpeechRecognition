@@ -21,9 +21,9 @@ private:
 
     static JavaVM *g_VM;
 public:
-    JNIEnv* AttachJava(bool* attached);
+    static JNIEnv* AttachJava(bool* attached);
 
-    void DetachJava();
+    static void DetachJava();
 
     void notifyVADChanged(bool activity);
 
