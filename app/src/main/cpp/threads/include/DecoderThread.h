@@ -10,18 +10,18 @@
 #include <Decoder.h>
 #include <QueueData.h>
 #include <SafeQueue.h>
+#include "JavaCallbacks.h"
 
 class DecoderThread {
 private:
     Decoder* decoder;
 
-
-    bool run = true;
+    JavaCallbacks* callbacks;
 
     void threadDecoder();
 public:
     std::thread thread;
-    DecoderThread();
+    DecoderThread(JavaCallbacks& callbacks);
 
     virtual ~DecoderThread();
 

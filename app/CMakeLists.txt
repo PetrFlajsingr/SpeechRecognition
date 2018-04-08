@@ -90,6 +90,7 @@ add_library( # Sets the name of the library.
               src/main/cpp/threads/MelBankThread.cpp
               src/main/cpp/threads/NNThread.cpp
               src/main/cpp/threads/DecoderThread.cpp
+              src/main/cpp/threads/JavaCallbacks.cpp
 
               ${RS_OBJ_FILES}
               ${RS_FILES}

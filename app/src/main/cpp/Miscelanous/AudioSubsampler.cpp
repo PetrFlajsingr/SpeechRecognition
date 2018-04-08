@@ -36,3 +36,32 @@ short *AudioSubsampler::subsample48kHzto8kHz(short *data, int dataLength) {
 
     return resultArray;
 }
+
+AudioSubsampler::AudioSubsampler() {
+    lpFIRFilter = new Filter(LPF, 8, 48.0, 4.0);
+}
+
+AudioSubsampler::~AudioSubsampler() {
+    delete lpFIRFilter;
+}
+
+short *AudioSubsampler::sample(short *data, int dataLength) {
+    for(int i = 0; i < dataLength; ++i) {
+        data[i] = (short) lpFIRFilter->do_sample((double) data[i]);
+    }
+
+    const int RATIO = 6; // ratio for size difference
+    int newDataLength = dataLength / RATIO + 1; //length of new array, +1 because of integer division
+
+    short *resultArray = new short[newDataLength];
+
+
+    int arrayIterator = 0;
+    // copying every important data(short), given by RATIO
+    for(int i = 0; i < dataLength; i += RATIO) {
+        resultArray[arrayIterator] = data[i];
+        arrayIterator++;
+    }
+
+    return resultArray;
+}

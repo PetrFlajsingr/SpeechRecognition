@@ -20,6 +20,10 @@ private:
     bool run = true;
 
     void threadNN();
+
+    void prepareInput(float* result, std::vector<float*>& data);
+
+    void deleteBuffer(std::vector<float*>& data);
 public:
     NNThread(const char* cacheDir);
 

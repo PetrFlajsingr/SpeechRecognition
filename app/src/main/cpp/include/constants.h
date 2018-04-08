@@ -21,4 +21,6 @@ const int SMALL_RECORDER_FRAMES = SAMPLING_RATE * 0.010; // min length of record
 const float LOW_FREQ = 64.0;
 const float HIGH_FREQ = 3800.0;
 
+const unsigned int NN_INPUT_SIZE = 360;
+
 #endif //VOICERECOGNITION_CONSTANTS_H

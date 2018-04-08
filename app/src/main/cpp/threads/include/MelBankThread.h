@@ -12,6 +12,7 @@
 #include <QueueData.h>
 #include <kiss_fftr.h>
 #include <VoiceActivityDetector.h>
+#include "JavaCallbacks.h"
 
 class MelBankThread{
 private:
@@ -21,13 +22,13 @@ private:
 
     std::thread thread;
 
-    bool run = true;
+    JavaCallbacks* callbacks;
 
     void threadMelBank();
 
     void prepareAudioData(short* data, short* newData);
 public:
-    MelBankThread(const char* cacheDir);
+    MelBankThread(const char* cacheDir, JavaCallbacks& callbacks);
 
     virtual ~MelBankThread();
 

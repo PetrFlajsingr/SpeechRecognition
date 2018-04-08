@@ -23,6 +23,7 @@
 #include <MelBankThread.h>
 #include <NNThread.h>
 #include <DecoderThread.h>
+#include <JavaCallbacks.h>
 
 #define LOGI(...) \
   ((void)__android_log_print(ANDROID_LOG_INFO, APPNAME, __VA_ARGS__))
@@ -33,9 +34,7 @@
 #define LOGE(...) \
   ((void)__android_log_print(ANDROID_LOG_ERROR, APPNAME, __VA_ARGS__))
 
-typedef struct registeredObject{
-    jobject obj;
-}T_registeredObject;
+JavaCallbacks callbacks;
 
 std::vector<T_registeredObject> callbackObjects;
 
@@ -70,13 +69,10 @@ void stopRecording(){
     recorder->stopRecording();
 }
 
-
-// set the recording state for the audio recorder
-void startRecording()
-{
-    MelBankThread melBankThread(cacheDir);
+void threads(){
+    MelBankThread melBankThread(cacheDir, callbacks);
     NNThread nnThread(cacheDir);
-    DecoderThread decoderThread;
+    DecoderThread decoderThread(callbacks);
 
     recorder->melQueue = &melBankThread.inputQueue;
     melBankThread.nnQueue = &nnThread.inputQueue;
@@ -85,6 +81,13 @@ void startRecording()
     recorder->startRecording();
 
     decoderThread.thread.join();
+}
+
+// set the recording state for the audio recorder
+void startRecording()
+{
+   std::thread thread(threads);
+    thread.detach();
 }
 
 //\ threads
@@ -364,7 +367,12 @@ extern "C"{
             ( JNIEnv* env, jobject obj){
         T_registeredObject object;
         object.obj = env->NewGlobalRef(obj);
+        object.clazz = env->FindClass("cz/vutbr/fit/xflajs00/voicerecognition/SpeechRecognitionAPI");
+        object.clazz = (jclass)env->NewGlobalRef(object.clazz);
         env->GetJavaVM(&g_VM);
+        callbacks.setJavaVM(g_VM);
+        callbacks.addListener(object);
+
         callbackObjects.push_back(object);
     }
     //\ CALLBACKS
