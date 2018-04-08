@@ -15,9 +15,6 @@
 class NNThread{
 private:
     RSNeuralNetwork* neuralNetwork;
-    std::thread thread;
-
-    bool run = true;
 
     void threadNN();
 
@@ -32,6 +29,8 @@ public:
     SafeQueue<Q_MelData*> inputQueue;
 
     SafeQueue<Q_NNData*>* decoderQueue;
+
+    std::thread thread;
 };
 
 

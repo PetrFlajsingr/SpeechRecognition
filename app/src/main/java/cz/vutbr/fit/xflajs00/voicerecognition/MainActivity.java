@@ -6,6 +6,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,6 +19,8 @@ public class MainActivity extends AppCompatActivity implements SpeechRecognition
     private TextView resultTextView;
 
     private TextView VADTextView;
+
+    private ScrollView scrollView;
 
     /**
      * Requests permissions on start.
@@ -37,6 +40,15 @@ public class MainActivity extends AppCompatActivity implements SpeechRecognition
 
         resultTextView = (TextView) findViewById(R.id.textViewRecognitionResult);
         VADTextView = (TextView) findViewById(R.id.VADTextView);
+
+        scrollView = (ScrollView)findViewById(R.id.scrollView2);
+
+        scrollView.post(new Runnable() {
+            @Override
+            public void run() {
+                scrollView.fullScroll(ScrollView.FOCUS_DOWN);
+            }
+        });
     }
 
     @Override
@@ -56,6 +68,8 @@ public class MainActivity extends AppCompatActivity implements SpeechRecognition
     public void recordingControl(View view){
         recording = !recording;
         if(recording){
+            VADTextView.setVisibility(View.INVISIBLE);
+            resultTextView.setText("");
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -112,6 +126,7 @@ public class MainActivity extends AppCompatActivity implements SpeechRecognition
             @Override
             public void run() {
                 resultTextView.setText(String.format("%s\n%s", resultTextView.getText(), finalSequence));
+                scrollView.fullScroll(ScrollView.FOCUS_DOWN);
             }
         });
     }
@@ -122,6 +137,7 @@ public class MainActivity extends AppCompatActivity implements SpeechRecognition
             @Override
             public void run() {
                 Toast.makeText(getApplicationContext(), "RECOGNITION DONE", Toast.LENGTH_LONG).show();
+                VADTextView.setVisibility(View.INVISIBLE);
             }
         });
     }

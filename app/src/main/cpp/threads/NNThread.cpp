@@ -4,7 +4,6 @@
 
 #include <NNThread.h>
 #include <constants.h>
-#include <android/log.h>
 #include <JavaCallbacks.h>
 
 NNThread::NNThread(const char* cacheDir): thread(&NNThread::threadNN, this) {
@@ -28,7 +27,7 @@ void NNThread::threadNN() {
         if(data->type == TERMINATE){
             decoderQueue->enqueue(new Q_NNData{TERMINATE, NULL});
             delete data;
-            //break;
+            break;
         }else if(data->type == SEQUENCE_DATA){
             active = true;
             buffer.push_back(data->data);
@@ -47,6 +46,8 @@ void NNThread::threadNN() {
         }
         delete data;
     }
+
+    JavaCallbacks::DetachJava();
 }
 
 void NNThread::deleteBuffer(std::vector<float *> &data) {

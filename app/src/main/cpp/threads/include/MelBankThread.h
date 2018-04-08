@@ -20,8 +20,6 @@ private:
 
     VoiceActivityDetector* VADetector;
 
-    std::thread thread;
-
     JavaCallbacks* callbacks;
 
     void threadMelBank();
@@ -37,6 +35,8 @@ public:
     SafeQueue<Q_AudioData*> inputQueue;
 
     SafeQueue<Q_MelData*>* nnQueue;
+
+    std::thread thread;
 };
 
 

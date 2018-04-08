@@ -82,8 +82,9 @@ void threads(){
 
     recorder->startRecording();
 
+    melBankThread.thread.join();
+    nnThread.thread.join();
     decoderThread.thread.join();
-    JavaCallbacks::DetachJava();
 }
 
 // set the recording state for the audio recorder
