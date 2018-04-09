@@ -27,7 +27,15 @@ void NNThread::threadNN() {
 
     float* result;
     bool active = false;
+
+    unsigned long startTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+    unsigned long totalTime = 0;
+    unsigned long runTime = 0;
+
+
     while(inputQueue.dequeue(data)){
+        unsigned long sTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+
         if(data->type == TERMINATE){
             decoderQueue->enqueue(new Q_NNData{TERMINATE, NULL});
             delete data;
@@ -50,6 +58,11 @@ void NNThread::threadNN() {
             deleteBuffer(buffer);
         }
         delete data;
+
+        unsigned long nTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+        totalTime = nTime - startTime;
+        runTime += nTime - sTime;
+        callbacks->notifyNNDone(runTime/(double)totalTime*100);
     }
 
     JavaCallbacks::DetachJava();

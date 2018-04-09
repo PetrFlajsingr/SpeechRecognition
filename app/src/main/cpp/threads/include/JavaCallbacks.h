@@ -31,6 +31,12 @@ public:
 
     void notifyRecognitionDone();
 
+    void notifyMelDone(int percentage);
+
+    void notifyNNDone(int percentage);
+
+    void notifyDecoderDone(int percentage);
+
     void addListener(T_registeredObject obj);
 
     void setJavaVM(JavaVM* vm);

@@ -40,8 +40,14 @@ void MelBankThread::threadMelBank() {
 
     AudioSubsampler subsampler;
 
+    unsigned long startTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+    unsigned long totalTime = 0;
+    unsigned long runTime = 0;
+
     short dataCount = 0;
     while(inputQueue.dequeue(data)){
+        unsigned long sTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+
         if(data->type == TERMINATE){
             nnQueue->enqueue(new Q_MelData{TERMINATE, NULL});
             delete data;
@@ -87,6 +93,11 @@ void MelBankThread::threadMelBank() {
             callbacks->notifyVADChanged(false);
             dataCount = 0;
         }
+
+        unsigned long nTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+        totalTime = nTime - startTime;
+        runTime += nTime - sTime;
+        callbacks->notifyMelDone(runTime/(double)totalTime*100);
     }
     delete[] newAudioData;
     callbacks->DetachJava();

@@ -24,7 +24,15 @@ void DecoderThread::threadDecoder(){
     Q_NNData* data;
     std::string result;
     bool first = true;
+
+    unsigned long startTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+    unsigned long totalTime = 0;
+    unsigned long runTime = 0;
+
+
     while(inputQueue.dequeue(data)){
+        unsigned long sTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+
         if(data->type == TERMINATE){
             delete data;
             __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "DECODER: TERMINATE");
@@ -43,6 +51,11 @@ void DecoderThread::threadDecoder(){
             callbacks->notifySequenceRecognized(result);
         }
         delete data;
+
+        unsigned long nTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+        totalTime = nTime - startTime;
+        runTime += nTime - sTime;
+        callbacks->notifyDecoderDone(runTime/(double)totalTime*100);
     }
     callbacks->notifyRecognitionDone();
 

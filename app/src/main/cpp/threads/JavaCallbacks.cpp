@@ -84,3 +84,42 @@ void JavaCallbacks::setJavaVM(JavaVM* vm) {
     if(g_VM == NULL)
         g_VM = vm;
 }
+
+void JavaCallbacks::notifyMelDone(int percentage) {
+    bool attached;
+    JNIEnv* env = AttachJava(&attached);
+    for(auto iterator = callbackObjects.begin();
+        iterator != callbackObjects.end();
+        iterator++){
+        jmethodID methodID = env->GetMethodID(iterator->clazz, "melDone", "(I)V");
+        env->CallVoidMethod(iterator->obj, methodID, percentage);
+    }
+    if(attached)
+        DetachJava();
+}
+
+void JavaCallbacks::notifyNNDone(int percentage) {
+    bool attached;
+    JNIEnv* env = AttachJava(&attached);
+    for(auto iterator = callbackObjects.begin();
+        iterator != callbackObjects.end();
+        iterator++){
+        jmethodID methodID = env->GetMethodID(iterator->clazz, "nnDone", "(I)V");
+        env->CallVoidMethod(iterator->obj, methodID, percentage);
+    }
+    if(attached)
+        DetachJava();
+}
+
+void JavaCallbacks::notifyDecoderDone(int percentage) {
+    bool attached;
+    JNIEnv* env = AttachJava(&attached);
+    for(auto iterator = callbackObjects.begin();
+        iterator != callbackObjects.end();
+        iterator++){
+        jmethodID methodID = env->GetMethodID(iterator->clazz, "decoderDone", "(I)V");
+        env->CallVoidMethod(iterator->obj, methodID, percentage);
+    }
+    if(attached)
+        DetachJava();
+}

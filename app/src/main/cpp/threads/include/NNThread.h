@@ -10,6 +10,7 @@
 #include <RSNeuralNetwork.h>
 #include <SafeQueue.h>
 #include <QueueData.h>
+#include "JavaCallbacks.h"
 
 
 class NNThread{
@@ -31,6 +32,8 @@ public:
     SafeQueue<Q_NNData*>* decoderQueue;
 
     std::thread thread;
+
+    JavaCallbacks* callbacks;
 };
 
 

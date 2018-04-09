@@ -184,4 +184,61 @@ public class SpeechRecognitionAPI {
         void onRecognitionDone();
     }
     //\ LISTENERS
+
+    private List<ISpeechRecognitionAPIDebugCallbacks> debugListeners = new ArrayList<>();
+
+    public void addDebugListener(ISpeechRecognitionAPIDebugCallbacks listener){
+        debugListeners.add(listener);
+    }
+
+    private void melDone(int percentage){
+        notifyMelDone(percentage);
+    }
+
+    private void notifyMelDone(final int percentage){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                for(ISpeechRecognitionAPIDebugCallbacks listener : debugListeners) {
+                    listener.onMelDone(percentage);
+                }
+            }
+        }).run();
+    }
+
+    private void nnDone(int percentage){
+        notifyNNDone(percentage);
+    }
+
+    private void notifyNNDone(final int percentage){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                for(ISpeechRecognitionAPIDebugCallbacks listener : debugListeners) {
+                    listener.onNNDone(percentage);
+                }
+            }
+        }).run();
+    }
+
+    private void decoderDone(int percentage){
+        notifyDecoderDone(percentage);
+    }
+
+    private void notifyDecoderDone(final int percentage){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                for(ISpeechRecognitionAPIDebugCallbacks listener : debugListeners) {
+                    listener.onDecoderDone(percentage);
+                }
+            }
+        }).run();
+    }
+
+    public interface ISpeechRecognitionAPIDebugCallbacks{
+        void onMelDone(final int percentage);
+        void onNNDone(final int percentage);
+        void onDecoderDone(final int percentage);
+    }
 }

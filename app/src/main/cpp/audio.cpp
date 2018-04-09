@@ -76,6 +76,8 @@ void threads(){
     NNThread nnThread(cacheDir);
     DecoderThread decoderThread(callbacks);
 
+    nnThread.callbacks = &callbacks;
+
     recorder->melQueue = &melBankThread.inputQueue;
     melBankThread.nnQueue = &nnThread.inputQueue;
     nnThread.decoderQueue = &decoderThread.inputQueue;

@@ -10,7 +10,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity implements SpeechRecognitionAPI.ISpeechRecognitionAPICallback{
+public class MainActivity extends AppCompatActivity implements SpeechRecognitionAPI.ISpeechRecognitionAPICallback, SpeechRecognitionAPI.ISpeechRecognitionAPIDebugCallbacks{
     private boolean recording = false;
     private boolean created = false;
 
@@ -21,6 +21,10 @@ public class MainActivity extends AppCompatActivity implements SpeechRecognition
     private TextView VADTextView;
 
     private ScrollView scrollView;
+
+    private TextView melThreadTextView;
+    private TextView nnThreadTextView;
+    private TextView decoderThreadTextView;
 
     /**
      * Requests permissions on start.
@@ -38,6 +42,8 @@ public class MainActivity extends AppCompatActivity implements SpeechRecognition
         speechAPI = new SpeechRecognitionAPI(this.getCacheDir().toString());
         speechAPI.addListener(this);
 
+        speechAPI.addDebugListener(this);
+
         resultTextView = (TextView) findViewById(R.id.textViewRecognitionResult);
         VADTextView = (TextView) findViewById(R.id.VADTextView);
 
@@ -49,6 +55,10 @@ public class MainActivity extends AppCompatActivity implements SpeechRecognition
                 scrollView.fullScroll(ScrollView.FOCUS_DOWN);
             }
         });
+
+        melThreadTextView = (TextView) findViewById(R.id.melThreadTextView);
+        nnThreadTextView = (TextView) findViewById(R.id.nnThreadTextView);
+        decoderThreadTextView = (TextView) findViewById(R.id.decoderThreadTextView);
     }
 
     @Override
@@ -138,6 +148,36 @@ public class MainActivity extends AppCompatActivity implements SpeechRecognition
             public void run() {
                 Toast.makeText(getApplicationContext(), "RECOGNITION DONE", Toast.LENGTH_LONG).show();
                 VADTextView.setVisibility(View.INVISIBLE);
+            }
+        });
+    }
+
+    @Override
+    public void onMelDone(final int percentage) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                melThreadTextView.setText(Integer.toString(percentage) + "%");
+            }
+        });
+    }
+
+    @Override
+    public void onNNDone(final int percentage) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                nnThreadTextView.setText(Integer.toString(percentage) + "%");
+            }
+        });
+    }
+
+    @Override
+    public void onDecoderDone(final int percentage) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                decoderThreadTextView.setText(Integer.toString(percentage) + "%");
             }
         });
     }
