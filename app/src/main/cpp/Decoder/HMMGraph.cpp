@@ -44,6 +44,7 @@ HMMGraph::~HMMGraph() {
     delete outputNode;
 }
 
+// TODO dynamic
 /**
  * Adds/removes states from the graph.
  * @param model Acoustic model
@@ -131,7 +132,8 @@ void HMMGraph::applyViterbiCriterium(GraphNode* node) {
     if(node == outputNode)
         return;
 
-    keepMax(node->tokens);
+    if(node != rootNode)
+        keepMax(node->tokens);
 
     if(node->successorNodes.size() <= 1)
         return;
@@ -173,6 +175,15 @@ std::string getMostLikely(std::vector<Token*>& vector, AcousticModel* model){
  * @return
  */
 void HMMGraph::clearOutputNode() {
+    for(auto iterator = outputNode->tokens.begin();
+        iterator != outputNode->tokens.end();){
+        (*iterator)->currentNode = rootNode;
+        rootNode->tokens.push_back(*iterator);
+        outputNode->tokens.erase(iterator);
+    }
+
+
+    return;
     for(auto iterator = outputNode->tokens.begin();
         iterator != outputNode->tokens.end();
         iterator++){
@@ -293,4 +304,11 @@ void HMMGraph::applyViterbiCriterium() {
 
 void HMMGraph::eraseTokenRecords() {
     eraseTokenRecords(rootNode);
+}
+
+void HMMGraph::saveWords() {
+    for(auto iterator = outputNode->tokens.begin();
+        iterator != outputNode->tokens.end();){
+        (*iterator)->addWordToHistory();
+    }
 }

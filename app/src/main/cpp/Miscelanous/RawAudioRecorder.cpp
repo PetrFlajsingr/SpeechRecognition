@@ -5,6 +5,7 @@
 #include <assert.h>
 #include <RawAudioRecorder.h>
 #include <algorithm>
+#include <android/log.h>
 
 bool RawAudioRecorder::recordingStopBool = false;
 pthread_mutex_t RawAudioRecorder::audioEngineLock = PTHREAD_MUTEX_INITIALIZER;
@@ -55,6 +56,7 @@ void RawAudioRecorder::bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void
     if(recordingStopBool) {
         // stopping the recording engine
         result = (*recorderRecord)->SetRecordState(recorderRecord, SL_RECORDSTATE_STOPPED);
+        __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "RECORDER: stopbool set");
         recording = false;
     }else {
         result = (*recorderBufferQueue)->Enqueue(recorderBufferQueue, recorderBuffer,
@@ -68,6 +70,7 @@ void RawAudioRecorder::bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void
 
     if(!recording){
         melQueue->enqueue(new Q_AudioData{TERMINATE, data});
+        __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "RECORDER: TERMINATE");
     }
 
     pthread_mutex_unlock(&audioEngineLock);

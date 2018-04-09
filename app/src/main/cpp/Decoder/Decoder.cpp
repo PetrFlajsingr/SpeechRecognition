@@ -25,6 +25,8 @@ Decoder::Decoder(std::string pathToLexicon, std::string pathToNgram) {
 
     this->graph = new HMMGraph(this->acousticModel);
     graph->rootNode->tokens.push_back(new Token(graph->rootNode, -1));
+
+    Token::setAcousticModel(*acousticModel);
 }
 
 Decoder::~Decoder() {
@@ -42,7 +44,7 @@ Decoder::~Decoder() {
 void Decoder::decode(float *input) {
     graph->update(acousticModel);
     graph->clearOutputNode();
-    Token::deleteInvalidTokens();
+    //Token::deleteInvalidTokens();
 
     Token::passAllTokens(input);
     graph->applyViterbiCriterium();
@@ -50,6 +52,8 @@ void Decoder::decode(float *input) {
 
     graph->applyPruning();
     Token::deleteInvalidTokens();
+
+    //graph->saveWords();
 }
 
 /**
@@ -66,6 +70,17 @@ void Decoder::reset() {
     Token::deleteStatic();
     graph->eraseTokenRecords();
     graph->rootNode->tokens.push_back(new Token(graph->rootNode, -1));
+}
+
+std::string buildString(Token& token){
+    std::string result = "";
+    for(auto iterator = token.wordHistory.begin();
+            iterator != token.wordHistory.end();
+            iterator++){
+        result += iterator->writtenForm + " ";
+    }
+
+    return result;
 }
 
 /**
@@ -85,5 +100,6 @@ std::string Decoder::getWinner() {
         }
     }
 
-    return acousticModel->words.at(vector.at(maxIndex)->word).writtenForm;
+    //return acousticModel->words.at(vector.at(maxIndex)->word).writtenForm;
+    return buildString(*vector.at(maxIndex));
 }

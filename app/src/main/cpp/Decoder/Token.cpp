@@ -9,6 +9,7 @@
 std::vector<Token*> Token::tokenVector;
 std::vector<unsigned int> Token::indexesToDelete;
 unsigned int Token::tokenCounter;
+AcousticModel* Token::acousticModel;
 /**
  * Registers token in static vector for all tokens.
  * Saves index in the vector for fast deletion from the vector.
@@ -28,14 +29,20 @@ Token::Token(GraphNode* currentNode, int word) : currentNode(currentNode) {
  * @param inputVector vector of NN outputs
  */
 void Token::passInGraph(float *inputVector) {
-    if(currentNode->wordID == -1)
+    if(currentNode->wordID == -1){
+        needWord = true;
         return;
+    } else if(currentNode->xPos == 1 && needWord){
+        addWordToHistory();
+        needWord = false;
+    }
     int i = 0;
     for(auto iterator = currentNode->successorNodes.begin() + 1;
             iterator != currentNode->successorNodes.end();
             iterator++, i++){
         int wordID = ((*iterator)->wordID >= 0) ? (*iterator)->wordID : currentNode->wordID;
         Token* newToken = new Token(*iterator, wordID);
+        newToken->wordHistory = this->wordHistory;
         newToken->likelihood = calculateLikelihood(inputVector, i);
         (*iterator)->tokens.push_back(newToken);
     }
@@ -138,5 +145,16 @@ void Token::deleteStatic() {
     indexesToDelete.clear();
 
     tokenCounter = 0;
+}
+
+void Token::addWordToHistory() {
+    LMWord word(acousticModel->words.at(this->word).writtenForm);
+    wordHistory.push_back(word);
+}
+
+Token* Token::clone() {
+    Token* token = new Token(this->currentNode, this->word);
+    token->wordHistory = this->wordHistory;
+    return token;
 }
 

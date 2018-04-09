@@ -11,7 +11,7 @@
 class VoiceActivityDetector {
 private:
     const unsigned int FRAMES_FOR_TRANSITION_INACTIVE = 10;
-    const unsigned int FRAMES_FOR_TRANSITION_ACTIVE = 10;
+    const unsigned int FRAMES_FOR_TRANSITION_ACTIVE = 5;
 
     enum STATE {
         ACTIVE = 0,

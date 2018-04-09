@@ -9,6 +9,7 @@
 #include <Utils.h>
 #include <fstream>
 #include <JavaCallbacks.h>
+#include <android/log.h>
 
 MelBankThread::MelBankThread(const char* cacheDir, JavaCallbacks& callbacks): thread(&MelBankThread::threadMelBank, this){
     this->melFilterBank = new RSMelFilterBank(cacheDir);
@@ -26,6 +27,7 @@ MelBankThread::~MelBankThread() {
  * Method to be run in thread. Buffers audio sent from recoder.
  */
 void MelBankThread::threadMelBank() {
+    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "MEL: START");
     AudioFrame::calcHammingCoef();
     Q_AudioData* data;
     AudioFrame frame;
@@ -43,6 +45,7 @@ void MelBankThread::threadMelBank() {
         if(data->type == TERMINATE){
             nnQueue->enqueue(new Q_MelData{TERMINATE, NULL});
             delete data;
+            __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "MEL: TERMINATE");
             break;
         }
         short* subsampledAudio = subsampler.sample(data->data, SMALL_RECORDER_FRAMES);
@@ -87,6 +90,7 @@ void MelBankThread::threadMelBank() {
     }
     delete[] newAudioData;
     callbacks->DetachJava();
+    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "MEL: END");
 }
 
 void MelBankThread::stopThread() {

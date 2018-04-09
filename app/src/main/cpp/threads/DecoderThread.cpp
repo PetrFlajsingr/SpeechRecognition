@@ -20,12 +20,14 @@ DecoderThread::~DecoderThread() {
  * Method to be run in thread. Decodes data given by neural network thread and notifies listeners.
  */
 void DecoderThread::threadDecoder(){
+    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "DECODER: START");
     Q_NNData* data;
     std::string result;
     bool first = true;
     while(inputQueue.dequeue(data)){
         if(data->type == TERMINATE){
             delete data;
+            __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "DECODER: TERMINATE");
             break;
         }else if(data->type == SEQUENCE_DATA){
             if(first){
@@ -45,4 +47,5 @@ void DecoderThread::threadDecoder(){
     callbacks->notifyRecognitionDone();
 
     callbacks->DetachJava();
+    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "DECODER: END");
 }
