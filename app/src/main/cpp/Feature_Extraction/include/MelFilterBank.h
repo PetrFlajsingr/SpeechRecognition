@@ -29,9 +29,6 @@ private:
 
     FeatureMatrix* melBankFrames;
 public:
-    FeatureMatrix *getMelBankFrames() const;
-
-public:
     MelFilterBank();
 
     virtual ~MelFilterBank();
@@ -43,6 +40,8 @@ public:
     void calculateMelBanks(int frameCount, kiss_fft_cpx** fftFrames);
 
     void dumpResultToFile(std::string path);
+
+    FeatureMatrix *getMelBankFrames() const;
 };
 
 

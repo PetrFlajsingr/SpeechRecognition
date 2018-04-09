@@ -44,8 +44,6 @@ public:
     void clearOutputNode();
 
     void eraseTokenRecords();
-
-    void saveWords();
 };
 
 

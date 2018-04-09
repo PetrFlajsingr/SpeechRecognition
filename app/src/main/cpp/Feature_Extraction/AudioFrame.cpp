@@ -63,10 +63,6 @@ void AudioFrame::applyFFT(kiss_fftr_cfg *cfg) {
         fftInput[i] = 0;
 
     kiss_fftr(*cfg, fftInput, this->fftData);
-
-    // freeing not needed data
-    //delete[] hammingData;
-    //hammingData = NULL;
 }
 
 kiss_fft_cpx *AudioFrame::getFftData() const {

@@ -124,8 +124,6 @@ void Token::deleteInvalidTokens() {
                       -(int)deletedCounter);
     }
     indexesToDelete.clear();
-
-    //__android_log_print(ANDROID_LOG_DEBUG, APPNAME, "Token count after deletion %d", Token::tokenCounter);
 }
 
 Token::~Token() {
@@ -151,10 +149,3 @@ void Token::addWordToHistory() {
     LMWord word(acousticModel->words.at(this->word).writtenForm);
     wordHistory.push_back(word);
 }
-
-Token* Token::clone() {
-    Token* token = new Token(this->currentNode, this->word);
-    token->wordHistory = this->wordHistory;
-    return token;
-}
-

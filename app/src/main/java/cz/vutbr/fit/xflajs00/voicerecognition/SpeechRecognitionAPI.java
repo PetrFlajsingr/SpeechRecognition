@@ -131,22 +131,37 @@ public class SpeechRecognitionAPI {
     // LISTENERS
     private List<ISpeechRecognitionAPICallback> listeners = new ArrayList<>();
 
-    private void notifyVADChanged(VAD_ACTIVITY activity){
-        for(ISpeechRecognitionAPICallback listener : listeners) {
-            listener.onVADChanged(activity);
-        }
+    private void notifyVADChanged(final VAD_ACTIVITY activity){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                for(ISpeechRecognitionAPICallback listener : listeners) {
+                    listener.onVADChanged(activity);
+                }
+            }
+        }).run();
     }
 
-    private void notifySequenceRecognized(String sequence){
-        for(ISpeechRecognitionAPICallback listener : listeners) {
-            listener.onSequenceRecognized(sequence);
-        }
+    private void notifySequenceRecognized(final String sequence){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                for(ISpeechRecognitionAPICallback listener : listeners) {
+                    listener.onSequenceRecognized(sequence);
+                }
+            }
+        }).run();
     }
 
     private void notifyRecognitionDone(){
-        for(ISpeechRecognitionAPICallback listener : listeners) {
-            listener.onRecognitionDone();
-        }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                for(ISpeechRecognitionAPICallback listener : listeners) {
+                    listener.onRecognitionDone();
+                }
+            }
+        }).run();
     }
 
     public void addListener(ISpeechRecognitionAPICallback listener){

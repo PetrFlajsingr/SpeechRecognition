@@ -266,15 +266,6 @@ void HMMGraph::searchTokens(std::vector<std::vector<Token *>> &allTokens, GraphN
  * Viterbi criterium has to be applied before using this function (only one token per node).
  */
 void HMMGraph::applyPruning() {
-    /*
-     * TODO get vector of all tokens in a "level"
-     * sort using Token::sortByLikelihood
-     * keep MAX_TOKEN_COUNT of best tokens
-     * register the rest for deletion using Token::addIndexToDelete
-     * remove record from node.tokens
-     * destroy the vector
-     */
-
     // each inner vector represents tokens in one level
     std::vector<std::vector<Token*>> allTokens;
 
@@ -302,11 +293,4 @@ void HMMGraph::applyViterbiCriterium() {
 
 void HMMGraph::eraseTokenRecords() {
     eraseTokenRecords(rootNode);
-}
-
-void HMMGraph::saveWords() {
-    for(auto iterator = outputNode->tokens.begin();
-        iterator != outputNode->tokens.end();){
-        (*iterator)->addWordToHistory();
-    }
 }

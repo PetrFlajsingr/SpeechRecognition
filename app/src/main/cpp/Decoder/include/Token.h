@@ -60,9 +60,6 @@ public:
 
     void addWordToHistory();
 
-    Token* clone();
-
-    // TODO function for deletion
     GraphNode* currentNode; //< node in which the token is placed
 };
 

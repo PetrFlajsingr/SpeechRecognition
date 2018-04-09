@@ -6,7 +6,7 @@
 #define VOICERECOGNITION_ACOUSTICMODEL_H
 
 
-#include "Word.h"
+#include <Word.h>
 
 /**
  * Contains information about acoustic model.
