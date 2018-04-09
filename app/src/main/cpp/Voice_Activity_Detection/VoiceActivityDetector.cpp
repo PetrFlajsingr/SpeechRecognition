@@ -9,6 +9,9 @@ VoiceActivityDetector::VoiceActivityDetector() {}
 VoiceActivityDetector::~VoiceActivityDetector() {}
 
 void VoiceActivityDetector::checkData(float* melBankData) {
+    buffer.push_back(melBankData);
+    if(buffer.size() > FRAMES_FOR_TRANSITION_ACTIVE)
+        buffer.erase(buffer.begin());
     float sum = 0;
     for(int i = 0; i < MEL_BANK_FRAME_LENGTH; i++){
         meanForNormalisation[i] = (meanForNormalisation[i] * elementCount + melBankData[i]) / (elementCount + 1);
@@ -33,4 +36,8 @@ void VoiceActivityDetector::checkData(float* melBankData) {
 
 bool VoiceActivityDetector::isActive() {
     return currentState == ACTIVE;
+}
+
+std::vector<float *> &VoiceActivityDetector::getBuffer() {
+    return buffer;
 }

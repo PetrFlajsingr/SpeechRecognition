@@ -6,11 +6,12 @@
 #define VOICERECOGNITION_VOICEACTIVITYDETECTOR_H
 
 #include <constants.h>
+#include <vector>
 
 class VoiceActivityDetector {
 private:
-    const unsigned int FRAMES_FOR_TRANSITION_INACTIVE = 25;
-    const unsigned int FRAMES_FOR_TRANSITION_ACTIVE = 4;
+    const unsigned int FRAMES_FOR_TRANSITION_INACTIVE = 10;
+    const unsigned int FRAMES_FOR_TRANSITION_ACTIVE = 10;
 
     enum STATE {
         ACTIVE = 0,
@@ -24,6 +25,11 @@ private:
     float meanForNormalisation[MEL_BANK_FRAME_LENGTH] = {0};
 
     unsigned int elementCount = 0;
+
+    std::vector<float*> buffer;
+public:
+    std::vector<float *> &getBuffer();
+
 public:
     VoiceActivityDetector();
 

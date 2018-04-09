@@ -71,8 +71,13 @@ void MelBankThread::threadMelBank() {
         VADetector->checkData(result);
 
         if(VADetector->isActive()){
-            melFilterBank->normalise(result);
-            nnQueue->enqueue(new Q_MelData{SEQUENCE_DATA, result});
+            for(auto iterator = VADetector->getBuffer().begin();
+                    iterator != VADetector->getBuffer().end();){
+                result = *iterator;
+                melFilterBank->normalise(result);
+                nnQueue->enqueue(new Q_MelData{SEQUENCE_DATA, result});
+                VADetector->getBuffer().erase(iterator);
+            }
             callbacks->notifyVADChanged(true);
         } else {
             nnQueue->enqueue(new Q_MelData{SEQUENCE_INACTIVE, NULL});
