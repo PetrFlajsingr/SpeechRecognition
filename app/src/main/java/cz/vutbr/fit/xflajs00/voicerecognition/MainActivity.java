@@ -2,6 +2,8 @@ package cz.vutbr.fit.xflajs00.voicerecognition;
 
 import android.Manifest;
 import android.graphics.Color;
+import android.os.Build;
+import android.os.Debug;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -9,6 +11,9 @@ import android.view.View;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity implements SpeechRecognitionAPI.ISpeechRecognitionAPICallback, SpeechRecognitionAPI.ISpeechRecognitionAPIDebugCallbacks{
     private boolean recording = false;
@@ -25,6 +30,9 @@ public class MainActivity extends AppCompatActivity implements SpeechRecognition
     private TextView melThreadTextView;
     private TextView nnThreadTextView;
     private TextView decoderThreadTextView;
+    private TextView memoryUsageTextView;
+
+    private Timer timer = new Timer();
 
     /**
      * Requests permissions on start.
@@ -59,6 +67,9 @@ public class MainActivity extends AppCompatActivity implements SpeechRecognition
         melThreadTextView = (TextView) findViewById(R.id.melThreadTextView);
         nnThreadTextView = (TextView) findViewById(R.id.nnThreadTextView);
         decoderThreadTextView = (TextView) findViewById(R.id.decoderThreadTextView);
+        memoryUsageTextView = (TextView) findViewById(R.id.memoryUsageTextView);
+
+        timer.schedule(new memoryTask(), 0, 500);
     }
 
     @Override
@@ -135,7 +146,10 @@ public class MainActivity extends AppCompatActivity implements SpeechRecognition
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                resultTextView.setText(String.format("%s\n%s", resultTextView.getText(), finalSequence));
+                String origText = resultTextView.getText().toString();
+                if(origText.length() > 2)
+                    origText = origText.substring(0, origText.length() - 1);
+                resultTextView.setText(String.format("%s\n%s\n", origText, finalSequence));
                 scrollView.fullScroll(ScrollView.FOCUS_DOWN);
             }
         });
@@ -180,5 +194,31 @@ public class MainActivity extends AppCompatActivity implements SpeechRecognition
                 decoderThreadTextView.setText(Integer.toString(percentage) + "%");
             }
         });
+    }
+
+    private String getMemoryUsage(){
+        Debug.MemoryInfo memInfo = new Debug.MemoryInfo();
+
+        Debug.getMemoryInfo(memInfo);
+
+        long res = memInfo.getTotalPrivateDirty();
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
+            res += memInfo.getTotalPrivateClean();
+        }
+
+        return Long.toString(res/1000) + " MB";
+    }
+
+    class memoryTask extends TimerTask{
+        @Override
+        public void run() {
+            final String memInfo = getMemoryUsage();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    memoryUsageTextView.setText(memInfo);
+                }
+            });
+        }
     }
 }

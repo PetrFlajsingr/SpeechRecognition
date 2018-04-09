@@ -6,5 +6,6 @@
     <string name="stopRecording">Ukončit nahrávání</string>
     <string name="active">Aktivní</string>
     <string name="inactive">Neaktivní</string>
-    <string name="threadActivity">Aktivita vláken:</string>
+    <string name="threadActivity">Aktivita vláken</string>
+    <string name="memoryUsage">Využitá paměť</string>
 </resources>

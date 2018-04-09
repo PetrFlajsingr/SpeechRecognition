@@ -10,8 +10,10 @@ VoiceActivityDetector::~VoiceActivityDetector() {}
 
 void VoiceActivityDetector::checkData(float* melBankData) {
     buffer.push_back(melBankData);
-    if(buffer.size() > FRAMES_FOR_TRANSITION_ACTIVE)
+    if(buffer.size() > FRAMES_FOR_TRANSITION_ACTIVE) {
+        delete[] buffer.at(0);
         buffer.erase(buffer.begin());
+    }
     float sum = 0;
     for(int i = 0; i < MEL_BANK_FRAME_LENGTH; i++){
         meanForNormalisation[i] = (meanForNormalisation[i] * elementCount + melBankData[i]) / (elementCount + 1);
@@ -19,13 +21,13 @@ void VoiceActivityDetector::checkData(float* melBankData) {
     }
     elementCount++;
 
-    if(currentState == ACTIVE && sum <= 0) {
+    if(currentState == ACTIVE && sum <= POWER_LIMIT) {
         counterForTransition[ACTIVE] = 0;
         counterForTransition[INACTIVE]++;
         if(counterForTransition[INACTIVE] == FRAMES_FOR_TRANSITION_INACTIVE){
             currentState = INACTIVE;
         }
-    } else if(sum > 0) {
+    } else if(sum > POWER_LIMIT) {
         counterForTransition[INACTIVE] = 0;
         counterForTransition[ACTIVE]++;
         if(counterForTransition[ACTIVE] == FRAMES_FOR_TRANSITION_ACTIVE){

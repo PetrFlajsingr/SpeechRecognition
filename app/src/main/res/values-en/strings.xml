@@ -6,5 +6,6 @@
     <string name="stopRecording">Stop recording</string>
     <string name="active">Active</string>
     <string name="inactive">Inactive</string>
-    <string name="threadActivity">Thread activity:</string>
+    <string name="threadActivity">Thread activity</string>
+    <string name="memoryUsage">Memory usage:</string>
 </resources>
