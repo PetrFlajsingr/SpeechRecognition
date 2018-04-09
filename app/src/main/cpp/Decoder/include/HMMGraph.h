@@ -25,6 +25,8 @@ private:
     void deleteLowLikelihood(std::vector<Token*>& tokens);
 
     void searchTokens(std::vector<std::vector<Token*>>& allTokens, GraphNode* node, unsigned int level);
+
+    void addSILNode(GraphNode *node, int wordID, int phonemeIndex);
 public:
     GraphNode* rootNode;
     GraphNode* outputNode;
@@ -33,7 +35,7 @@ public:
 
     virtual ~HMMGraph();
 
-    void update(AcousticModel* model);
+    void build(AcousticModel *model);
 
     void applyViterbiCriterium();
 

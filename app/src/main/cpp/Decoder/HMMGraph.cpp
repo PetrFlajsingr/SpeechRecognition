@@ -49,17 +49,24 @@ HMMGraph::~HMMGraph() {
  * Adds/removes states from the graph.
  * @param model Acoustic model
  */
-void HMMGraph::update(AcousticModel* model) {
+void HMMGraph::build(AcousticModel *model) {
     int i = 0;
     for(auto iterator = rootNode->successorNodes.begin();
             iterator != rootNode->successorNodes.end();
             iterator++, i++){
-        //if((*iterator)->tokens.empty()) {
-            //destroySuccessors((*iterator));
-        //}else{
-            addSuccessors(*iterator, model, i, 1);
-        //}
+        addSuccessors(*iterator, model, i, 1);
     }
+}
+
+void HMMGraph::addSILNode(GraphNode *node, int wordID, int phonemeIndex) {
+    GraphNode* newNode = new GraphNode(
+            TEMP_PROB, wordID,
+            phonemeIndex, SIL);
+    node->successorNodes.push_back(newNode);
+    node->successorNodes.push_back(outputNode);
+
+    newNode->successorNodes.push_back(newNode);
+    newNode->successorNodes.push_back(outputNode);
 }
 
 /**
@@ -71,7 +78,8 @@ void HMMGraph::addSuccessors(GraphNode *node, AcousticModel* model, int wordID, 
     if(node->successorNodes.empty()) {
         node->successorNodes.push_back(node);
         if(phonemeIndex == model->words.at(wordID).phonemes.size()){
-            node->successorNodes.push_back(this->outputNode);
+            addSILNode(node, wordID, phonemeIndex + 1);
+            //node->successorNodes.push_back(this->outputNode);
         }else{
             GraphNode* newNode = new GraphNode(
                     TEMP_PROB, wordID,
@@ -180,16 +188,6 @@ void HMMGraph::clearOutputNode() {
         (*iterator)->currentNode = rootNode;
         rootNode->tokens.push_back(*iterator);
         outputNode->tokens.erase(iterator);
-    }
-
-
-    return;
-    for(auto iterator = outputNode->tokens.begin();
-        iterator != outputNode->tokens.end();
-        iterator++){
-            Token::addIndexToDelete((*iterator)->index_TokenVector);
-            outputNode->tokens.erase(iterator);
-            iterator--;
     }
 }
 

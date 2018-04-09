@@ -27,6 +27,8 @@ Decoder::Decoder(std::string pathToLexicon, std::string pathToNgram) {
     graph->rootNode->tokens.push_back(new Token(graph->rootNode, -1));
 
     Token::setAcousticModel(*acousticModel);
+
+    graph->build(acousticModel);
 }
 
 Decoder::~Decoder() {
@@ -42,18 +44,15 @@ Decoder::~Decoder() {
  * @param input clearOutputNode of NN
  */
 void Decoder::decode(float *input) {
-    graph->update(acousticModel);
     graph->clearOutputNode();
-    //Token::deleteInvalidTokens();
 
     Token::passAllTokens(input);
+
     graph->applyViterbiCriterium();
     Token::deleteInvalidTokens();
 
     graph->applyPruning();
     Token::deleteInvalidTokens();
-
-    //graph->saveWords();
 }
 
 /**
