@@ -42,7 +42,7 @@ void DecoderThread::threadDecoder(){
                 first = false;
             }
             decoder->decode(data->data);
-            delete [] data->data;
+            delete[] data->data;
         } else{
             first = true;
             result = decoder->getWinner();

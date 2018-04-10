@@ -7,6 +7,7 @@
 #include <fstream>
 #include <Utils.h>
 #include <cstdlib>
+#include <android/asset_manager.h>
 
 /**
  * Reads a lexicon from file.
@@ -14,6 +15,7 @@
  */
 AcousticModel::AcousticModel(std::string path) {
     std::ifstream file;
+
     file.open(path.c_str(), std::ios::in|std::ios::binary);
     if(file.is_open()){
         uint32_t wordCount;
@@ -40,7 +42,6 @@ AcousticModel::AcousticModel(std::string path) {
                 amWord.phonemes.push_back((PHONEME_ENUM)phoneme);
             }
             this->words.push_back(amWord);
-
         }
     }
     file.close();

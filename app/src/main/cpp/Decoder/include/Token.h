@@ -19,19 +19,21 @@
 class Token {
     static unsigned int tokenCounter;
 
-    static std::vector<Token*> tokenVector; //< vector of all tokens in the graph
-        // serves as an access point for faster cloning
-
-    static std::vector<unsigned int> indexesToDelete;
+    //static std::vector<unsigned int> indexesToDelete;
 
     float calculateLikelihood(float* inputVector, unsigned int pathNumber);
 
-    static void updateIndexes(unsigned int beginIndex, unsigned int endIndex, int toAdd);
+    //static void updateIndexes(unsigned int beginIndex, unsigned int endIndex, int toAdd);
 
     static AcousticModel* acousticModel;
 
     bool needWord = true;
+
+    bool markedToKill = false;
 public:
+    static std::vector<Token*> tokenVector; //< vector of all tokens in the graph
+    // serves as an access point for faster cloning
+
     float likelihood = 0.0f;
 
     int word;
@@ -48,7 +50,7 @@ public:
 
     static void passAllTokens(float* inputVector);
 
-    static void addIndexToDelete(unsigned int index);
+    //static void addIndexToDelete(unsigned int index);
 
     static void deleteInvalidTokens();
 
@@ -59,6 +61,8 @@ public:
     }
 
     void addWordToHistory();
+
+    void markToKill();
 
     GraphNode* currentNode; //< node in which the token is placed
 };

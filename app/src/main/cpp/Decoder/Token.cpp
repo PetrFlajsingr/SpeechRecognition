@@ -7,7 +7,7 @@
 #include <GraphNode.h>
 
 std::vector<Token*> Token::tokenVector;
-std::vector<unsigned int> Token::indexesToDelete;
+//std::vector<unsigned int> Token::indexesToDelete;
 unsigned int Token::tokenCounter;
 AcousticModel* Token::acousticModel;
 /**
@@ -32,7 +32,8 @@ void Token::passInGraph(float *inputVector) {
     if(currentNode->wordID == -1){
         needWord = true;
         return;
-    } else if(currentNode->xPos == 1 && needWord){
+    } else if(currentNode->xPos == 0 && needWord){
+        this->word = this->currentNode->wordID;
         addWordToHistory();
         needWord = false;
     }
@@ -53,7 +54,6 @@ void Token::passInGraph(float *inputVector) {
     //adding record of token in node
     this->currentNode->tokens.push_back(this);
     this->likelihood = calculateLikelihood(inputVector, 0);
-    this->word = this->currentNode->wordID;
 }
 
 /**
@@ -73,37 +73,47 @@ float Token::calculateLikelihood(float* inputVector, unsigned int pathNumber) {
  * @param inputVector
  */
 void Token::passAllTokens(float *inputVector) {
-    //__android_log_print(ANDROID_LOG_DEBUG, APPNAME, "Token count on start %d", Token::tokenCounter);
     unsigned int oldTokenCount = tokenVector.size();
     for(unsigned int i = 0; i < oldTokenCount; i++){
         tokenVector.at(i)->passInGraph(inputVector);
     }
-    //__android_log_print(ANDROID_LOG_DEBUG, APPNAME, "Token count before deletion %d", Token::tokenCounter);
 }
 
 /**
  * Registers token for deletion
  */
-void Token::addIndexToDelete(unsigned int index) {
+/*void Token::addIndexToDelete(unsigned int index) {
     indexesToDelete.push_back(index);
-}
+}*/
 
 /**
  * Updates indexes for deletion in given range
  */
-void Token::updateIndexes(unsigned int beginIndex, unsigned int endIndex, int toAdd){
+/*void Token::updateIndexes(unsigned int beginIndex, unsigned int endIndex, int toAdd){
     for(auto iterator = tokenVector.begin() + beginIndex;
             iterator != tokenVector.begin() + endIndex;
             iterator++){
         (*iterator)->index_TokenVector += toAdd;
     }
-}
+}*/
 
+// TODO speed up, a lot
 /**
  * Deletes all tokens marked for deletion in "indexesToDelete".
  * Updates "index_TokenVector" for all remaining.
  */
 void Token::deleteInvalidTokens() {
+    for(auto iterator = tokenVector.begin();
+            iterator != tokenVector.end();
+            iterator++){
+        if((*iterator)->markedToKill){
+            delete *iterator;
+            tokenVector.erase(iterator);
+            iterator--;
+        }
+    }
+    // TODO remove
+/*
     std::sort(indexesToDelete.begin(), indexesToDelete.end());
     unsigned int deletedCounter = 0;
     unsigned int startIndex, endIndex;
@@ -124,6 +134,7 @@ void Token::deleteInvalidTokens() {
                       -(int)deletedCounter);
     }
     indexesToDelete.clear();
+    */
 }
 
 Token::~Token() {
@@ -140,7 +151,7 @@ void Token::deleteStatic() {
         tokenVector.erase(iterator);
     }
     tokenVector.clear();
-    indexesToDelete.clear();
+    //indexesToDelete.clear();
 
     tokenCounter = 0;
 }
@@ -148,4 +159,8 @@ void Token::deleteStatic() {
 void Token::addWordToHistory() {
     LMWord word(acousticModel->words.at(this->word).writtenForm);
     wordHistory.push_back(word);
+}
+
+void Token::markToKill() {
+    this->markedToKill = true;
 }

@@ -81,7 +81,6 @@ public class MainActivity extends AppCompatActivity implements SpeechRecognition
     @Override
     protected void onDestroy()
     {
-        //shutdown();
         speechAPI.shutdown();
         super.onDestroy();
     }

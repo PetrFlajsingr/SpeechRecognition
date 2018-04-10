@@ -120,14 +120,31 @@ void keepMax(std::vector<Token*>& tokens){
     if(tokens.size() <= 1)
         return;
     float maxLikelihood = -std::numeric_limits<float>::max();
+    unsigned int maxIndex = 0;
+    unsigned int i = 0;
     for(auto iterator = tokens.begin();
          iterator != tokens.end();
-         iterator++){
-        if((*iterator)->likelihood > maxLikelihood)
+         iterator++, i++){
+        if((*iterator)->likelihood > maxLikelihood) {
             maxLikelihood = (*iterator)->likelihood;
+            maxIndex = i;
+        }
     }
 
+    i = 0;
     for(auto iterator = tokens.begin();
+            iterator != tokens.end();i++){
+        if(i == maxIndex) {
+            iterator++;
+        }else {
+            (*iterator)->markToKill();
+            //Token::addIndexToDelete((*iterator)->index_TokenVector);
+            tokens.erase(iterator);
+        }
+    }
+
+    // TODO remove
+    /*for(auto iterator = tokens.begin();
         iterator != tokens.end();
         iterator++){
         if((*iterator)->likelihood < maxLikelihood){
@@ -135,7 +152,7 @@ void keepMax(std::vector<Token*>& tokens){
             tokens.erase(iterator);
             iterator--;
         }
-    }
+    }*/
 }
 
 /**
@@ -238,7 +255,8 @@ void HMMGraph::deleteLowLikelihood(std::vector<Token*>& tokens){
     for(auto iterator = tokens.begin() + MAX_TOKEN_COUNT;
             iterator != tokens.end();
             iterator++){
-        Token::addIndexToDelete((*iterator)->index_TokenVector);
+        (*iterator)->markToKill();
+        //Token::addIndexToDelete((*iterator)->index_TokenVector);
         (*iterator)->currentNode->tokens.clear();
     }
 

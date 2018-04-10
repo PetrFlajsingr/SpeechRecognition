@@ -274,7 +274,7 @@ void VADtest(){
     __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "VAD end");
 
 
-    RSNeuralNetwork nn("/sdcard/NNnew.bin", cacheDir);
+    RSNeuralNetwork nn("/sdcard/neural_network.bin", cacheDir);
 
     FeatureMatrix* nnResult = nn.forwardAll(melResult);
 
