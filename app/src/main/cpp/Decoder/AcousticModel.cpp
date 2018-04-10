@@ -6,6 +6,7 @@
 #include <AcousticModel.h>
 #include <fstream>
 #include <Utils.h>
+#include <cstdlib>
 
 /**
  * Reads a lexicon from file.
@@ -15,19 +16,31 @@ AcousticModel::AcousticModel(std::string path) {
     std::ifstream file;
     file.open(path.c_str(), std::ios::in|std::ios::binary);
     if(file.is_open()){
-        char inputBuffer[1024];
+        uint32_t wordCount;
+        file.read((char*)(&wordCount), 4);
 
-        std::vector<std::string> splitString;
-        while(!file.eof()) {
-            file.getline(inputBuffer, 1024);
 
-            splitString = split(inputBuffer, " ");
+        for(int i = 0; i < wordCount; i++){
+            uint8_t wordLength;
+            file.read((char*)(&wordLength), 1);
+            char word[wordLength + 1];
+            for(int i = 0; i < wordLength; i++)
+                file.read(&word[i], 1);
+            word[wordLength] = '\0';
 
-            Word word(splitString.at(0));
-            for(int i = 1; i < splitString.size();i++) {
-                word.phonemes.push_back(Phoneme::stringToPhoneme(splitString.at(i)));
+            std::string strWord = word;
+            Word amWord(word);
+
+            uint8_t phonemeCount;
+            file.read((char*)(&phonemeCount), 1);
+            uint8_t phoneme;
+
+            for(int j = 0; j < phonemeCount;j++) {
+                file.read((char*)(&phoneme), 1);
+                amWord.phonemes.push_back((PHONEME_ENUM)phoneme);
             }
-            this->words.push_back(word);
+            this->words.push_back(amWord);
+
         }
     }
     file.close();

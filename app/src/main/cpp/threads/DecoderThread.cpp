@@ -7,7 +7,7 @@
 #include <android/log.h>
 
 DecoderThread::DecoderThread(JavaCallbacks& callbacks): thread(&DecoderThread::threadDecoder, this)  {
-    this->decoder = new Decoder("/sdcard/lexicon.txt", "/sdcard/LM.arpa");
+    this->decoder = new Decoder("/sdcard/lexicon.bin", "/sdcard/LM.arpa");
 
     this->callbacks = &callbacks;
 }
