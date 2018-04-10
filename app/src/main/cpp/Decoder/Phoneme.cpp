@@ -8,7 +8,7 @@
  * Returns enum value of a phoneme given string form.
  * @param phoneme string form of a phoneme
  */
-PHONEME_ENUM Phoneme::stringToPhoneme(std::string phoneme) {
+SpeechRecognition::Decoder::PHONEME_ENUM SpeechRecognition::Decoder::Phoneme::stringToPhoneme(std::string phoneme) {
     if(phoneme == "AA") return PHONEME_ENUM::AA;
     if(phoneme == "AE") return PHONEME_ENUM::AE;
     if(phoneme == "AH") return PHONEME_ENUM::AH;

@@ -8,18 +8,21 @@
 #include <vector>
 #include <Phoneme.h>
 
-class Word {
-private:
-    static int idCounter;
+namespace SpeechRecognition::Decoder {
+    class Word {
+    private:
+        static int idCounter;
 
-    static void resetIdCounter();
-public:
-    int id;
-    std::string writtenForm;
-    std::vector<PHONEME_ENUM> phonemes;
+        static void resetIdCounter();
 
-    Word(const std::string &writtenForm);
-};
+    public:
+        int id;
+        std::string writtenForm;
+        std::vector<PHONEME_ENUM> phonemes;
+
+        Word(const std::string &writtenForm);
+    };
+}
 
 
 #endif //VOICERECOGNITION_WORD_H

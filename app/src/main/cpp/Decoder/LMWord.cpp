@@ -5,8 +5,8 @@
 
 #include <LMWord.h>
 
-unsigned int LMWord::idCounter = 0;
+unsigned int SpeechRecognition::Decoder::LMWord::idCounter = 0;
 
-LMWord::LMWord(const std::string &writtenForm) : writtenForm(writtenForm) {
+SpeechRecognition::Decoder::LMWord::LMWord(const std::string &writtenForm) : writtenForm(writtenForm) {
     id = idCounter++;
 }

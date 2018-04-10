@@ -9,6 +9,8 @@
 #include <FeatureMatrix.h>
 #include <kiss_fft.h>
 
+
+using namespace SpeechRecognition::Utility;
 class MelFilterBank {
 private:
     static float* melFBin;

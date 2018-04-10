@@ -13,59 +13,60 @@
 #include <Word.h>
 #include "AcousticModel.h"
 
+namespace SpeechRecognition::Decoder {
 /**
  * Represents a token in a HMM graph.
  */
-class Token {
-    static unsigned int tokenCounter;
+    class Token {
+        static unsigned int tokenCounter;
 
-    //static std::vector<unsigned int> indexesToDelete;
+        //static std::vector<unsigned int> indexesToDelete;
 
-    float calculateLikelihood(float* inputVector, unsigned int pathNumber);
+        float calculateLikelihood(float *inputVector, unsigned int pathNumber);
 
-    //static void updateIndexes(unsigned int beginIndex, unsigned int endIndex, int toAdd);
+        //static void updateIndexes(unsigned int beginIndex, unsigned int endIndex, int toAdd);
 
-    static AcousticModel* acousticModel;
+        static AcousticModel *acousticModel;
 
-    bool needWord = true;
+        bool needWord = true;
 
-    bool markedToKill = false;
-public:
-    static std::vector<Token*> tokenVector; //< vector of all tokens in the graph
-    // serves as an access point for faster cloning
+        bool markedToKill = false;
+    public:
+        static std::vector<Token *> tokenVector; //< vector of all tokens in the graph
+        // serves as an access point for faster cloning
 
-    float likelihood = 0.0f;
+        float likelihood = 0.0f;
 
-    int word;
+        int word;
 
-    unsigned long index_TokenVector; //< index in tokenVector, for fast deletion from tokenVector
+        unsigned long index_TokenVector; //< index in tokenVector, for fast deletion from tokenVector
 
-    std::vector<LMWord> wordHistory; //< word history for ngrams
+        std::vector<LMWord> wordHistory; //< word history for ngrams
 
-    Token(GraphNode *currentNode, int word);
+        Token(GraphNode *currentNode, int word);
 
-    virtual ~Token();
+        virtual ~Token();
 
-    void passInGraph(float *inputVector);
+        void passInGraph(float *inputVector);
 
-    static void passAllTokens(float* inputVector);
+        static void passAllTokens(float *inputVector);
 
-    //static void addIndexToDelete(unsigned int index);
+        //static void addIndexToDelete(unsigned int index);
 
-    static void deleteInvalidTokens();
+        static void deleteInvalidTokens();
 
-    static void deleteStatic();
+        static void deleteStatic();
 
-    static void setAcousticModel(AcousticModel& model){
-        acousticModel = &model;
-    }
+        static void setAcousticModel(AcousticModel &model) {
+            acousticModel = &model;
+        }
 
-    void addWordToHistory();
+        void addWordToHistory();
 
-    void markToKill();
+        void markToKill();
 
-    GraphNode* currentNode; //< node in which the token is placed
-};
-
+        GraphNode *currentNode; //< node in which the token is placed
+    };
+}
 
 #endif //VOICERECOGNITION_TOKEN_H

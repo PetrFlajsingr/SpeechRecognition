@@ -9,33 +9,33 @@
 #include <sstream>
 #include <fstream>
 
-std::string toString(float& value){
+std::string SpeechRecognition::Utility::toString(float &value) {
     std::ostringstream ss;
     ss << value;
     return ss.str();
 }
 
-std::string toString(int& value){
+std::string SpeechRecognition::Utility::toString(int &value) {
     std::ostringstream ss;
     ss << value;
     return ss.str();
 }
 
-std::vector<std::string> split(char* str, std::string delimiter){
+std::vector<std::string> SpeechRecognition::Utility::split(char *str, std::string delimiter) {
     std::vector<std::string> result;
 
     std::string toSplit(str);
     size_t pos = 0;
     std::string token;
 
-    while((pos = toSplit.find(delimiter)) != std::string::npos){
+    while((pos = toSplit.find(delimiter)) != std::string::npos) {
         token = toSplit.substr(0, pos);
         result.push_back(token);
         toSplit.erase(0, pos + delimiter.length());
     }
 
     token = toSplit;
-    if(token.find('\n') != std::string::npos){
+    if(token.find('\n') != std::string::npos) {
         token.pop_back();
     }
     result.push_back(token);
@@ -43,11 +43,11 @@ std::vector<std::string> split(char* str, std::string delimiter){
     return result;
 }
 
-void dumpToFile(std::string path, bool* array, unsigned int length) {
+void SpeechRecognition::Utility::dumpToFile(std::string path, bool *array, unsigned int length) {
     std::ofstream out;
     out.open(path.c_str());
 
-    for(int i = 0; i < length; ++i){
+    for(int i = 0; i < length; ++i) {
         if(array[i])
             out.write("true", 4);
         else
@@ -56,11 +56,12 @@ void dumpToFile(std::string path, bool* array, unsigned int length) {
     }
     out.close();
 }
-void dumpToFile(std::string path, float* array, unsigned int length) {
+
+void SpeechRecognition::Utility::dumpToFile(std::string path, float *array, unsigned int length) {
     std::ofstream out;
     out.open(path.c_str());
 
-    for(int i = 0; i < length; ++i){
+    for(int i = 0; i < length; ++i) {
         std::stringstream ss;
         ss << array[i];
         out.write(ss.str().c_str(), ss.str().size());
@@ -69,11 +70,11 @@ void dumpToFile(std::string path, float* array, unsigned int length) {
     out.close();
 }
 
-void dumpToFile(std::string path, short *array, unsigned int length) {
+void SpeechRecognition::Utility::dumpToFile(std::string path, short *array, unsigned int length) {
     std::ofstream out;
     out.open(path.c_str());
 
-    for(int i = 0; i < length; ++i){
+    for(int i = 0; i < length; ++i) {
         std::stringstream ss;
         ss << array[i];
         out.write(ss.str().c_str(), ss.str().size());
@@ -82,11 +83,11 @@ void dumpToFile(std::string path, short *array, unsigned int length) {
     out.close();
 }
 
-void dumpToFile(std::string path, float **array, unsigned int length1, unsigned int length2) {
+void SpeechRecognition::Utility::dumpToFile(std::string path, float **array, unsigned int length1, unsigned int length2) {
     std::ofstream out;
     out.open(path.c_str());
 
-    for(int i = 0; i < length1; ++i){
+    for(int i = 0; i < length1; ++i) {
         for(int j = 0; j < length1; ++j) {
             std::stringstream ss;
             ss << array[i][j];

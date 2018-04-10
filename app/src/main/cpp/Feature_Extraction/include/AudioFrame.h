@@ -10,31 +10,34 @@
 #include <kiss_fft.h>
 #include <kiss_fftr.h>
 
-class AudioFrame {
-private:
-    // hamming window coeficients
-    static const double ALPHA;
-    static const double BETA;
-    static float hammingCoef[AUDIO_FRAME_LENGTH];
+namespace SpeechRecognition::Feature_Extraction {
+    class AudioFrame {
+    private:
+        // hamming window coeficients
+        static const double ALPHA;
+        static const double BETA;
+        static float hammingCoef[AUDIO_FRAME_LENGTH];
 
-    float* hammingData; //< data after using hamming window
+        float *hammingData; //< data after using hamming window
 
-    kiss_fft_cpx* fftData;
-public:
-    float *getHammingData() const;
+        kiss_fft_cpx *fftData;
+    public:
+        float *getHammingData() const;
 
-    kiss_fft_cpx *getFftData() const;
+        kiss_fft_cpx *getFftData() const;
 
-    AudioFrame();
+        AudioFrame();
 
-    virtual ~AudioFrame();
+        virtual ~AudioFrame();
 
-    void applyHammingWindow(short* data);
+        void applyHammingWindow(short *data);
 
-    void applyFFT(kiss_fftr_cfg* cfg);
+        void applyFFT(kiss_fftr_cfg *cfg);
 
-    static void calcHammingCoef();
-};
+        static void calcHammingCoef();
+    };
+
+}
 
 
 #endif //VOICERECOGNITION_AUDIOFRAME_H

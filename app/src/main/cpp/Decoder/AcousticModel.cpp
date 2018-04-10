@@ -13,7 +13,7 @@
  * Reads a lexicon from file.
  * @param path path to lexicon file
  */
-AcousticModel::AcousticModel(std::string path) {
+SpeechRecognition::Decoder::AcousticModel::AcousticModel(std::string path) {
     std::ifstream file;
 
     file.open(path.c_str(), std::ios::in|std::ios::binary);

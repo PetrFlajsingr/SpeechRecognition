@@ -5,17 +5,19 @@
 #include <algorithm>
 #include <Token.h>
 #include <GraphNode.h>
+#include <android/log.h>
+#include <constants.h>
 
-std::vector<Token*> Token::tokenVector;
+std::vector<SpeechRecognition::Decoder::Token*> SpeechRecognition::Decoder::Token::tokenVector;
 //std::vector<unsigned int> Token::indexesToDelete;
-unsigned int Token::tokenCounter;
-AcousticModel* Token::acousticModel;
+unsigned int SpeechRecognition::Decoder::Token::tokenCounter;
+SpeechRecognition::Decoder::AcousticModel* SpeechRecognition::Decoder::Token::acousticModel;
 /**
  * Registers token in static vector for all tokens.
  * Saves index in the vector for fast deletion from the vector.
  * @param currentNode node of graph
  */
-Token::Token(GraphNode* currentNode, int word) : currentNode(currentNode) {
+SpeechRecognition::Decoder::Token::Token(GraphNode* currentNode, int word) : currentNode(currentNode) {
     index_TokenVector = tokenVector.size();
     tokenVector.push_back(this);
     tokenCounter++;
@@ -28,11 +30,11 @@ Token::Token(GraphNode* currentNode, int word) : currentNode(currentNode) {
  * Step in an algorithm. Clones the token into next states and calculates new likelihood.
  * @param inputVector vector of NN outputs
  */
-void Token::passInGraph(float *inputVector) {
+void SpeechRecognition::Decoder::Token::passInGraph(float *inputVector) {
     if(currentNode->wordID == -1){
         needWord = true;
         return;
-    } else if(currentNode->xPos == 0 && needWord){
+    } else if(needWord && currentNode->xPos == 0){
         this->word = this->currentNode->wordID;
         addWordToHistory();
         needWord = false;
@@ -62,7 +64,7 @@ void Token::passInGraph(float *inputVector) {
  * @param pathNumber connection number
  * @return new likelihood
  */
-float Token::calculateLikelihood(float* inputVector, unsigned int pathNumber) {
+float SpeechRecognition::Decoder::Token::calculateLikelihood(float* inputVector, unsigned int pathNumber) {
     return likelihood
            + inputVector[currentNode->successorNodes.at(pathNumber)->inputVectorIndex]
              + currentNode->pathProbablity.at(pathNumber);
@@ -72,7 +74,7 @@ float Token::calculateLikelihood(float* inputVector, unsigned int pathNumber) {
  * Passes all tokens through the graph (one step)
  * @param inputVector
  */
-void Token::passAllTokens(float *inputVector) {
+void SpeechRecognition::Decoder::Token::passAllTokens(float *inputVector) {
     unsigned int oldTokenCount = tokenVector.size();
     for(unsigned int i = 0; i < oldTokenCount; i++){
         tokenVector.at(i)->passInGraph(inputVector);
@@ -102,7 +104,7 @@ void Token::passAllTokens(float *inputVector) {
  * Deletes all tokens marked for deletion in "indexesToDelete".
  * Updates "index_TokenVector" for all remaining.
  */
-void Token::deleteInvalidTokens() {
+void SpeechRecognition::Decoder::Token::deleteInvalidTokens() {
     for(auto iterator = tokenVector.begin();
             iterator != tokenVector.end();
             iterator++){
@@ -137,14 +139,14 @@ void Token::deleteInvalidTokens() {
     */
 }
 
-Token::~Token() {
+SpeechRecognition::Decoder::Token::~Token() {
     tokenCounter--;
 }
 
 /**
  * Deletes all tokens recorded in tokenVector.
  */
-void Token::deleteStatic() {
+void SpeechRecognition::Decoder::Token::deleteStatic() {
     for(auto iterator = tokenVector.begin();
             iterator != tokenVector.end();){
         delete *iterator;
@@ -156,11 +158,11 @@ void Token::deleteStatic() {
     tokenCounter = 0;
 }
 
-void Token::addWordToHistory() {
+void SpeechRecognition::Decoder::Token::addWordToHistory() {
     LMWord word(acousticModel->words.at(this->word).writtenForm);
     wordHistory.push_back(word);
 }
 
-void Token::markToKill() {
+void SpeechRecognition::Decoder::Token::markToKill() {
     this->markedToKill = true;
 }

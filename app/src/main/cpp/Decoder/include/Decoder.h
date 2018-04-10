@@ -10,26 +10,28 @@
 #include <LanguageModel.h>
 #include <HMMGraph.h>
 
+namespace SpeechRecognition::Decoder {
 /**
  * Wrapper for all functions of Viterbi decoding.
  */
-class Decoder {
-private:
-    AcousticModel* acousticModel;
-    LanguageModel* languageModel;
+    class ViterbiDecoder {
+    private:
+        AcousticModel *acousticModel;
+        LanguageModel *languageModel;
 
-    HMMGraph* graph;
-public:
-    Decoder(std::string pathToLexicon, std::string pathToNgram);
+        HMMGraph *graph;
+    public:
+        ViterbiDecoder(std::string pathToLexicon, std::string pathToNgram);
 
-    virtual ~Decoder();
+        virtual ~ViterbiDecoder();
 
-    void decode(float* input);
+        void decode(float *input);
 
-    std::string getWinner();
+        std::string getWinner();
 
-    void reset();
-};
+        void reset();
+    };
+}
 
 
 #endif //VOICERECOGNITION_DECODER_H

@@ -6,13 +6,13 @@
 
 #include <Word.h>
 
-int Word::idCounter = 0;
+int SpeechRecognition::Decoder::Word::idCounter = 0;
 
-Word::Word(const std::string &writtenForm) {
+SpeechRecognition::Decoder::Word::Word(const std::string &writtenForm) {
     this->writtenForm = writtenForm;
     this->id = idCounter++;
 }
 
-void Word::resetIdCounter() {
+void SpeechRecognition::Decoder::Word::resetIdCounter() {
     idCounter = 0;
 }

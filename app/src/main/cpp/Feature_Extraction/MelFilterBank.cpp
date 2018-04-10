@@ -7,7 +7,7 @@
 #include <fstream>
 #include <sstream>
 #include <constants.h>
-
+using namespace SpeechRecognition::Utility;
 //STATIC
 float* MelFilterBank::melFBin = NULL;
 

@@ -5,6 +5,7 @@
 #ifndef VOICERECOGNITION_GRAPHNODEFWD_H
 #define VOICERECOGNITION_GRAPHNODEFWD_H
 // file created to avoid confusing the compiler with cycling dependency
-class GraphNode;
-
+namespace SpeechRecognition::Decoder {
+    class GraphNode;
+}
 #endif //VOICERECOGNITION_GRAPHNODEFWD_H

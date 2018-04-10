@@ -12,7 +12,7 @@
  * Requires cache directory of the application for use in RenderScript
  * @param cacheDir cache directory of the application
  */
-RSMelFilterBank::RSMelFilterBank(const char* cacheDir) {
+SpeechRecognition::Feature_Extraction::RSMelFilterBank::RSMelFilterBank(const char* cacheDir) {
     this->renderScriptObject = new RS();
     this->renderScriptObject->init(cacheDir);
     this->melRSinstance = new ScriptC_RSmelfilterbank(this->renderScriptObject);
@@ -23,7 +23,7 @@ RSMelFilterBank::RSMelFilterBank(const char* cacheDir) {
 /**
  * Prepares allocations for Renderscript.
  */
-void RSMelFilterBank::prepareAllocations() {
+void SpeechRecognition::Feature_Extraction::RSMelFilterBank::prepareAllocations() {
     Element::Builder* elBuilder = new Element::Builder(this->renderScriptObject);
     elBuilder->add(Element::F32(this->renderScriptObject), "", FFT_FRAME_LENGTH);
 
@@ -48,7 +48,7 @@ void RSMelFilterBank::prepareAllocations() {
 /**
  * Calculates mel bank filters for given data.
  */
-float *RSMelFilterBank::calculateMelBank(kiss_fft_cpx *fftData) {
+float *SpeechRecognition::Feature_Extraction::RSMelFilterBank::calculateMelBank(kiss_fft_cpx *fftData) {
     fftFrameAllocation->copy1DFrom(fftData);
 
     this->melRSinstance->set_fftFrame(fftFrameAllocation);
@@ -67,7 +67,7 @@ float *RSMelFilterBank::calculateMelBank(kiss_fft_cpx *fftData) {
 /**
  * Mean normalization
  */
-void RSMelFilterBank::substractMean(FeatureMatrix *featuresMatrix) {
+void SpeechRecognition::Feature_Extraction::RSMelFilterBank::substractMean(FeatureMatrix *featuresMatrix) {
     this->melRSinstance->set_frameCount(featuresMatrix->getFramesNum());
 
     sp<Allocation> melCalcFramesAllocation = Allocation::createSized(renderScriptObject,
@@ -93,7 +93,7 @@ void RSMelFilterBank::substractMean(FeatureMatrix *featuresMatrix) {
 
 }
 
-void RSMelFilterBank::normalise(float *data) {
+void SpeechRecognition::Feature_Extraction::RSMelFilterBank::normalise(float *data) {
     for(int i = 0; i < MEL_BANK_FRAME_LENGTH; i++){
         meanForNormalisation[i] = (meanForNormalisation[i] * elementCount + data[i]) / (elementCount + 1);
         data[i] = data[i] - meanForNormalisation[i];

@@ -13,31 +13,34 @@
 
 using namespace android::RSC;
 
-class RSMelFilterBank {
-private:
-    sp<RS> renderScriptObject;
+namespace SpeechRecognition::Feature_Extraction {
+    using namespace Utility;
+    class RSMelFilterBank {
+    private:
+        sp<RS> renderScriptObject;
 
-    ScriptC_RSmelfilterbank* melRSinstance;
+        ScriptC_RSmelfilterbank *melRSinstance;
 
-    void prepareAllocations();
+        void prepareAllocations();
 
-    // Allocations
-    sp<Allocation> fftFrameAllocation;
-    sp<Allocation> melIterationAllocation;
-    sp<Allocation> melBankAllocation;
+        // Allocations
+        sp<Allocation> fftFrameAllocation;
+        sp<Allocation> melIterationAllocation;
+        sp<Allocation> melBankAllocation;
 
-    float meanForNormalisation[MEL_BANK_FRAME_LENGTH] = {0};
+        float meanForNormalisation[MEL_BANK_FRAME_LENGTH] = {0};
 
-    unsigned int elementCount = 0;
-public:
-    RSMelFilterBank(const char* cacheDir);
+        unsigned int elementCount = 0;
+    public:
+        RSMelFilterBank(const char *cacheDir);
 
-    float* calculateMelBank(kiss_fft_cpx* fftData);
+        float *calculateMelBank(kiss_fft_cpx *fftData);
 
-    void substractMean(FeatureMatrix* featuresMatrix);
+        void substractMean(FeatureMatrix *featuresMatrix);
 
-    void normalise(float* data);
-};
+        void normalise(float *data);
+    };
+}
 
 
 #endif //VOICERECOGNITION_RSMELFILTERBANK_H

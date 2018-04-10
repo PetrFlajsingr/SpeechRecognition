@@ -7,35 +7,37 @@
 
 #include <string>
 
-class FeatureMatrix {
-private:
-    float** featuresMatrix = NULL; //< matrix data
+namespace SpeechRecognition::Utility {
+    class FeatureMatrix {
+    private:
+        float **featuresMatrix = NULL; //< matrix data
 
-    int framesNum = 0;
-public:
-    void setFramesNum(int framesNum);
+        int framesNum = 0;
+    public:
+        void setFramesNum(int framesNum);
 
-private:
-    //< height
-    int frameSize = 0; //< width
-public:
-    int getFrameSize() const;
+    private:
+        //< height
+        int frameSize = 0; //< width
+    public:
+        int getFrameSize() const;
 
 
-    int getFramesNum() const;
+        int getFramesNum() const;
 
-    void init(int framesNum, int frameSize);
+        void init(int framesNum, int frameSize);
 
-    float **getFeaturesMatrix();
+        float **getFeaturesMatrix();
 
-    void setFeatureMatrix(float **featureMatrix);
+        void setFeatureMatrix(float **featureMatrix);
 
-    void setFeatureMatrixFrame(int frameNum, float* data);
+        void setFeatureMatrixFrame(int frameNum, float *data);
 
-    virtual ~FeatureMatrix();
+        virtual ~FeatureMatrix();
 
-    void dumpResultToFile(std::string path);
-};
+        void dumpResultToFile(std::string path);
+    };
+}
 
 
 #endif //VOICERECOGNITION_FEATURESMATRIXFLOAT_H

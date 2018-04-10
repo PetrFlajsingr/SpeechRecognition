@@ -11,14 +11,14 @@
 #include <JavaCallbacks.h>
 #include <android/log.h>
 
-MelBankThread::MelBankThread(const char* cacheDir, JavaCallbacks& callbacks): thread(&MelBankThread::threadMelBank, this){
+SpeechRecognition::Threads::MelBankThread::MelBankThread(const char* cacheDir, JavaCallbacks& callbacks): thread(&MelBankThread::threadMelBank, this){
     this->melFilterBank = new RSMelFilterBank(cacheDir);
 
     this->VADetector = new VoiceActivityDetector();
     this->callbacks = &callbacks;
 }
 
-MelBankThread::~MelBankThread() {
+SpeechRecognition::Threads::MelBankThread::~MelBankThread() {
     delete this->melFilterBank;
     delete this->VADetector;
 }
@@ -26,7 +26,7 @@ MelBankThread::~MelBankThread() {
 /**
  * Method to be run in thread. Buffers audio sent from recoder.
  */
-void MelBankThread::threadMelBank() {
+void SpeechRecognition::Threads::MelBankThread::threadMelBank() {
     __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "MEL: START");
     AudioFrame::calcHammingCoef();
     Q_AudioData* data;
@@ -45,6 +45,8 @@ void MelBankThread::threadMelBank() {
     unsigned long runTime = 0;
 
     short dataCount = 0;
+
+    unsigned long counter = 0;
 
     bool notified = false;
     while(inputQueue.dequeue(data)){
@@ -110,21 +112,23 @@ void MelBankThread::threadMelBank() {
         unsigned long nTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
         totalTime = nTime - startTime;
         runTime += nTime - sTime;
-        callbacks->notifyMelDone(runTime/(double)totalTime*100);
+        counter++;
+        if(counter % 100 == 0)
+            callbacks->notifyMelDone(runTime/(double)totalTime*100);
     }
     delete[] newAudioData;
     callbacks->DetachJava();
     __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "MEL: END");
 }
 
-void MelBankThread::stopThread() {
+void SpeechRecognition::Threads::MelBankThread::stopThread() {
 
 }
 
 /**
  * Moves data in memory to simulate frame creation
  */
-void MelBankThread::prepareAudioData(short* data, short* newData) {
+void SpeechRecognition::Threads::MelBankThread::prepareAudioData(short* data, short* newData) {
     for(int i = 0; i < SUBSAMPLED_OVERLAP_LENGTH * 2; i++){
         data[i] = data[i + SUBSAMPLED_OVERLAP_LENGTH];
     }

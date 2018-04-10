@@ -11,26 +11,27 @@
 #include <TokenFWD.h>
 #include <Phoneme.h>
 
+namespace SpeechRecognition::Decoder {
 /**
  * Represents one node in the HMM graph.
  */
-class GraphNode {
-public:
-    // indexes of these vectors correlate
-    std::vector<float> pathProbablity; //< probability of path to the next node
-    std::vector<GraphNode*> successorNodes; //< next nodes
+    class GraphNode {
+    public:
+        // indexes of these vectors correlate
+        std::vector<float> pathProbablity; //< probability of path to the next node
+        std::vector<GraphNode *> successorNodes; //< next nodes
 
-    std::vector<Token*> tokens; //< tokens currently residing in this node
+        std::vector<Token *> tokens; //< tokens currently residing in this node
 
-    int wordID; //< id of acoustic model ("row")
+        int wordID; //< id of acoustic model ("row")
 
-    short xPos; //< position in sequence ("column")
+        short xPos; //< position in sequence ("column")
 
-    PHONEME_ENUM inputVectorIndex; //< index for NN clearOutputNode
+        PHONEME_ENUM inputVectorIndex; //< index for NN clearOutputNode
 
-    GraphNode(const std::vector<float> &pathProbablity, int wordID, short xPos,
-              PHONEME_ENUM inputVectorIndex);
-};
-
+        GraphNode(const std::vector<float> &pathProbablity, int wordID, short xPos,
+                  PHONEME_ENUM inputVectorIndex);
+    };
+}
 
 #endif //VOICERECOGNITION_GRAPHNODE_H

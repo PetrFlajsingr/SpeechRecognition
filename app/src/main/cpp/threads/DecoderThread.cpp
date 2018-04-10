@@ -6,20 +6,20 @@
 #include <constants.h>
 #include <android/log.h>
 
-DecoderThread::DecoderThread(JavaCallbacks& callbacks): thread(&DecoderThread::threadDecoder, this)  {
-    this->decoder = new Decoder("/sdcard/lexicon.bin", "/sdcard/LM.arpa");
+SpeechRecognition::Threads::DecoderThread::DecoderThread(JavaCallbacks& callbacks): thread(&DecoderThread::threadDecoder, this)  {
+    this->decoder = new ViterbiDecoder("/sdcard/lexicon.bin", "/sdcard/LM.arpa");
 
     this->callbacks = &callbacks;
 }
 
-DecoderThread::~DecoderThread() {
+SpeechRecognition::Threads::DecoderThread::~DecoderThread() {
     delete decoder;
 }
 
 /**
  * Method to be run in thread. Decodes data given by neural network thread and notifies listeners.
  */
-void DecoderThread::threadDecoder(){
+void SpeechRecognition::Threads::DecoderThread::threadDecoder(){
     __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "DECODER: START");
     Q_NNData* data;
     std::string result;
@@ -29,6 +29,7 @@ void DecoderThread::threadDecoder(){
     unsigned long totalTime = 0;
     unsigned long runTime = 0;
 
+    unsigned long counter = 0;
 
     while(inputQueue.dequeue(data)){
         unsigned long sTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
@@ -55,7 +56,9 @@ void DecoderThread::threadDecoder(){
         unsigned long nTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
         totalTime = nTime - startTime;
         runTime += nTime - sTime;
-        callbacks->notifyDecoderDone(runTime/(double)totalTime*100);
+        counter++;
+        if(counter % 100 == 0)
+            callbacks->notifyDecoderDone(runTime/(double)totalTime*100);
     }
     callbacks->notifyRecognitionDone();
 

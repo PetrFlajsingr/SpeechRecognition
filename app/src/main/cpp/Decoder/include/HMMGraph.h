@@ -8,45 +8,50 @@
 #include <GraphNode.h>
 #include <AcousticModel.h>
 
-class HMMGraph {
-private:
-    const unsigned int MAX_TOKEN_COUNT = 500; //< pruning: max count per "step" (1 level of graph)
+namespace SpeechRecognition::Decoder {
+    class HMMGraph {
+    private:
+        const unsigned int MAX_TOKEN_COUNT = 500; //< pruning: max count per "step" (1 level of graph)
 
-    const float WORD_INSERTION_PENALTY = -15;
+        const float WORD_INSERTION_PENALTY = -15;
 
-    void addSuccessors(GraphNode *node, AcousticModel* model, int wordID, int phonemeIndex);
+        void addSuccessors(GraphNode *node, AcousticModel *model, int wordID, int phonemeIndex);
 
-    void destroySuccessors(GraphNode* node);
+        void destroySuccessors(GraphNode *node);
 
-    void destroyGraph(GraphNode* node);
+        void destroyGraph(GraphNode *node);
 
-    void applyViterbiCriterium(GraphNode* node);
+        void applyViterbiCriterium(GraphNode *node);
 
-    void eraseTokenRecords(GraphNode* node);
+        void eraseTokenRecords(GraphNode *node);
 
-    void deleteLowLikelihood(std::vector<Token*>& tokens);
+        void deleteLowLikelihood(std::vector<Token *> &tokens);
 
-    void searchTokens(std::vector<std::vector<Token*>>& allTokens, GraphNode* node, unsigned int level);
+        void searchTokens(std::vector<std::vector<Token *>> &allTokens, GraphNode *node,
+                          unsigned int level);
 
-    void addSILNode(GraphNode *node, int wordID, int phonemeIndex);
-public:
-    GraphNode* rootNode;
-    GraphNode* outputNode;
+        void addSILNode(GraphNode *node, int wordID, int phonemeIndex);
 
-    HMMGraph(AcousticModel* model);
+    public:
+        GraphNode *rootNode;
+        GraphNode *outputNode;
 
-    virtual ~HMMGraph();
+        HMMGraph(AcousticModel *model);
 
-    void build(AcousticModel *model);
+        virtual ~HMMGraph();
 
-    void applyViterbiCriterium();
+        void build(AcousticModel *model);
 
-    void applyPruning();
+        void applyViterbiCriterium();
 
-    void clearOutputNode();
+        void applyPruning();
 
-    void eraseTokenRecords();
-};
+        void clearOutputNode();
 
+        void eraseTokenRecords();
+
+        void addLM();
+    };
+}
 
 #endif //VOICERECOGNITION_GRAPH_H

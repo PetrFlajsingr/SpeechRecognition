@@ -7,25 +7,25 @@
 #include <algorithm>
 #include <android/log.h>
 
-bool RawAudioRecorder::recordingStopBool = false;
-pthread_mutex_t RawAudioRecorder::audioEngineLock = PTHREAD_MUTEX_INITIALIZER;
-SLAndroidSimpleBufferQueueItf RawAudioRecorder::recorderBufferQueue;
-short* RawAudioRecorder::recorderBuffer;
-SLRecordItf RawAudioRecorder::recorderRecord;
-bool RawAudioRecorder::recording = false;
-SafeQueue<Q_AudioData*>* RawAudioRecorder::melQueue;
+bool SpeechRecognition::Utility::RawAudioRecorder::recordingStopBool = false;
+pthread_mutex_t SpeechRecognition::Utility::RawAudioRecorder::audioEngineLock = PTHREAD_MUTEX_INITIALIZER;
+SLAndroidSimpleBufferQueueItf SpeechRecognition::Utility::RawAudioRecorder::recorderBufferQueue;
+short* SpeechRecognition::Utility::RawAudioRecorder::recorderBuffer;
+SLRecordItf SpeechRecognition::Utility::RawAudioRecorder::recorderRecord;
+bool SpeechRecognition::Utility::RawAudioRecorder::recording = false;
+SafeQueue<Q_AudioData*>* SpeechRecognition::Utility::RawAudioRecorder::melQueue;
 
 /**
  * Prepares the engine for recording audio.
  */
-RawAudioRecorder::RawAudioRecorder() {
+SpeechRecognition::Utility::RawAudioRecorder::RawAudioRecorder() {
     createEngine();
 }
 
 /**
  * Prepares interfaces necessary for recording audio
  */
-void RawAudioRecorder::createEngine() {
+void SpeechRecognition::Utility::RawAudioRecorder::createEngine() {
     SLresult result;
 
     // create engine
@@ -48,7 +48,7 @@ void RawAudioRecorder::createEngine() {
  * Gets called when a queued buffer is full. Prepares the next part of a buffer or stops recording.
  * @param bq queue of buffers
  */
-void RawAudioRecorder::bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context) {
+void SpeechRecognition::Utility::RawAudioRecorder::bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context) {
     assert(bq == recorderBufferQueue);
     assert(NULL == context);
     SLresult result;
@@ -81,7 +81,7 @@ void RawAudioRecorder::bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void
  * Settings: 48 kHz sample rate, little endian, 16 bit, raw data (PCM)
  * @return true if OK, otherwise false
  */
-bool RawAudioRecorder::createAudioRecorder() {
+bool SpeechRecognition::Utility::RawAudioRecorder::createAudioRecorder() {
     SLresult result;
 
     // configure audio source
@@ -135,7 +135,7 @@ bool RawAudioRecorder::createAudioRecorder() {
 /**
  * Stops current recording
  */
-void RawAudioRecorder::stopRecording() {
+void SpeechRecognition::Utility::RawAudioRecorder::stopRecording() {
     recordingStopBool = true;
 }
 
@@ -143,7 +143,7 @@ void RawAudioRecorder::stopRecording() {
  * Starts recording. Allocates the necessary memory, sets the OPENSL parameters.
  * @param max_length_sec maximum length of recorded audio
  */
-void RawAudioRecorder::startRecording() {
+void SpeechRecognition::Utility::RawAudioRecorder::startRecording() {
     if(recorderBuffer != NULL){
         delete[] recorderBuffer;
     }
@@ -182,7 +182,7 @@ void RawAudioRecorder::startRecording() {
 /**
  * Destroys all used audio objects and releases allocated memory.
  */
-RawAudioRecorder::~RawAudioRecorder() {
+SpeechRecognition::Utility::RawAudioRecorder::~RawAudioRecorder() {
     // destroy audio recorder object, and invalidate all associated interfaces
     if (recorderObject != NULL) {
         (*recorderObject)->Destroy(recorderObject);
@@ -204,6 +204,6 @@ RawAudioRecorder::~RawAudioRecorder() {
     pthread_mutex_destroy(&audioEngineLock);
 }
 
-bool RawAudioRecorder::isRecording() {
+bool SpeechRecognition::Utility::RawAudioRecorder::isRecording() {
     return recording;
 }

@@ -10,7 +10,7 @@
 #include <sstream>
 #include <string>
 
-float **FeatureMatrix::getFeaturesMatrix() {
+float **SpeechRecognition::Utility::FeatureMatrix::getFeaturesMatrix() {
     return featuresMatrix;
 }
 
@@ -19,7 +19,7 @@ float **FeatureMatrix::getFeaturesMatrix() {
  * @param framesNum Number of frames
  * @param frameSize Size of each frame
  */
-void FeatureMatrix::init(int framesNum, int frameSize) {
+void SpeechRecognition::Utility::FeatureMatrix::init(int framesNum, int frameSize) {
     if(featuresMatrix == NULL || this->framesNum < framesNum || this->frameSize < frameSize){
         if(featuresMatrix != NULL){
             for(int i = 0; i < framesNum; ++i){
@@ -37,7 +37,7 @@ void FeatureMatrix::init(int framesNum, int frameSize) {
     this->frameSize = frameSize;
 }
 
-void FeatureMatrix::setFeatureMatrix(float **featureMatrix) {
+void SpeechRecognition::Utility::FeatureMatrix::setFeatureMatrix(float **featureMatrix) {
     this->featuresMatrix = featureMatrix;
     if(this->featuresMatrix == NULL){
         this->frameSize = 0;
@@ -45,27 +45,27 @@ void FeatureMatrix::setFeatureMatrix(float **featureMatrix) {
     }
 }
 
-void FeatureMatrix::setFeatureMatrixFrame(int frameNum, float *data) {
+void SpeechRecognition::Utility::FeatureMatrix::setFeatureMatrixFrame(int frameNum, float *data) {
     for(int i = 0; i < MEL_BANK_FRAME_LENGTH; ++i) {
         this->featuresMatrix[frameNum][i] = data[i];
     }
 }
 
-FeatureMatrix::~FeatureMatrix() {
+SpeechRecognition::Utility::FeatureMatrix::~FeatureMatrix() {
     for(int i = 0; i < framesNum; ++i){
         delete[] featuresMatrix[i];
     }
 }
 
-int FeatureMatrix::getFramesNum() const {
+int SpeechRecognition::Utility::FeatureMatrix::getFramesNum() const {
     return framesNum;
 }
 
-int FeatureMatrix::getFrameSize() const {
+int SpeechRecognition::Utility::FeatureMatrix::getFrameSize() const {
     return frameSize;
 }
 
-void FeatureMatrix::dumpResultToFile(std::string path) {
+void SpeechRecognition::Utility::FeatureMatrix::dumpResultToFile(std::string path) {
     std::ofstream out;
     out.open(path.c_str());
 
@@ -80,6 +80,6 @@ void FeatureMatrix::dumpResultToFile(std::string path) {
     out.close();
 }
 
-void FeatureMatrix::setFramesNum(int framesNum) {
+void SpeechRecognition::Utility::FeatureMatrix::setFramesNum(int framesNum) {
     FeatureMatrix::framesNum = framesNum;
 }

@@ -8,14 +8,15 @@
 
 #include <Word.h>
 
+namespace SpeechRecognition::Decoder {
 /**
  * Contains information about acoustic model.
  */
-class AcousticModel {
-public:
-    std::vector<Word> words; //< vector of all words in the model
-    AcousticModel(std::string path);
-};
-
+    class AcousticModel {
+    public:
+        std::vector<Word> words; //< vector of all words in the model
+        AcousticModel(std::string path);
+    };
+}
 
 #endif //VOICERECOGNITION_ACOUSTICMODEL_H

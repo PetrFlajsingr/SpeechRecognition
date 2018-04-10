@@ -13,31 +13,35 @@
 #include <kiss_fftr.h>
 #include <VoiceActivityDetector.h>
 #include "JavaCallbacks.h"
+namespace SpeechRecognition::Threads {
+    using namespace Feature_Extraction;
+    using namespace VoiceActivityDetection;
+    class MelBankThread {
+    private:
+        RSMelFilterBank *melFilterBank;
 
-class MelBankThread{
-private:
-    RSMelFilterBank* melFilterBank;
+        VoiceActivityDetector *VADetector;
 
-    VoiceActivityDetector* VADetector;
+        JavaCallbacks *callbacks;
 
-    JavaCallbacks* callbacks;
+        void threadMelBank();
 
-    void threadMelBank();
+        void prepareAudioData(short *data, short *newData);
 
-    void prepareAudioData(short* data, short* newData);
-public:
-    MelBankThread(const char* cacheDir, JavaCallbacks& callbacks);
+    public:
+        MelBankThread(const char *cacheDir, JavaCallbacks &callbacks);
 
-    virtual ~MelBankThread();
+        virtual ~MelBankThread();
 
-    void stopThread();
+        void stopThread();
 
-    SafeQueue<Q_AudioData*> inputQueue;
+        SafeQueue<Q_AudioData *> inputQueue;
 
-    SafeQueue<Q_MelData*>* nnQueue;
+        SafeQueue<Q_MelData *> *nnQueue;
 
-    std::thread thread;
-};
+        std::thread thread;
+    };
+}
 
 
 #endif //VOICERECOGNITION_MELBANKTHREAD_H

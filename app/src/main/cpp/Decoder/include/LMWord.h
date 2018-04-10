@@ -7,19 +7,21 @@
 
 #include <string>
 
-class LMWord {
-private:
-    static unsigned int idCounter; //< static counter
-public:
-    std::string writtenForm;
+namespace SpeechRecognition::Decoder {
+    class LMWord {
+    private:
+        static unsigned int idCounter; //< static counter
+    public:
+        std::string writtenForm;
 
-    unsigned int id;
+        unsigned int id;
 
-    float unigramProbability;
+        float unigramProbability;
 
-    LMWord(const std::string &writtenForm);
+        LMWord(const std::string &writtenForm);
 
-};
+    };
+}
 
 
 #endif //VOICERECOGNITION_LMWORD_H

@@ -13,6 +13,8 @@
 #include <limits>
 #include <algorithm>
 
+// TODO remove using
+using namespace SpeechRecognition::Decoder;
 //TODO temp variable, remove
 std::vector<float> TEMP_PROB = {
         static_cast<float>(log(0.87)),
@@ -23,7 +25,7 @@ std::vector<float> TEMP_PROB = {
  * Prepares root node of a graph and creates first token;
  * @param model Acoustic model
  */
-HMMGraph::HMMGraph(AcousticModel* model) {
+SpeechRecognition::Decoder::HMMGraph::HMMGraph(AcousticModel* model) {
     std::vector<float> probabilities;
     std::vector<GraphNode*> nodes;
 
@@ -39,7 +41,7 @@ HMMGraph::HMMGraph(AcousticModel* model) {
     this->outputNode = new GraphNode(TEMP_PROB, -1, -1, NONE);
 }
 
-HMMGraph::~HMMGraph() {
+SpeechRecognition::Decoder::HMMGraph::~HMMGraph() {
     destroyGraph(rootNode);
     delete outputNode;
 }
@@ -49,7 +51,7 @@ HMMGraph::~HMMGraph() {
  * Adds/removes states from the graph.
  * @param model Acoustic model
  */
-void HMMGraph::build(AcousticModel *model) {
+void SpeechRecognition::Decoder::HMMGraph::build(AcousticModel *model) {
     int i = 0;
     for(auto iterator = rootNode->successorNodes.begin();
             iterator != rootNode->successorNodes.end();
@@ -58,7 +60,7 @@ void HMMGraph::build(AcousticModel *model) {
     }
 }
 
-void HMMGraph::addSILNode(GraphNode *node, int wordID, int phonemeIndex) {
+void SpeechRecognition::Decoder::HMMGraph::addSILNode(GraphNode *node, int wordID, int phonemeIndex) {
     std::vector<float> TO_SIL_PROB = {
             static_cast<float>(log(0.80)),
             static_cast<float>(log(0.08)),
@@ -80,7 +82,7 @@ void HMMGraph::addSILNode(GraphNode *node, int wordID, int phonemeIndex) {
  * @param wordID id of word in Acoustic model
  * @param phonemeIndex index of a phoneme
  */
-void HMMGraph::addSuccessors(GraphNode *node, AcousticModel* model, int wordID, int phonemeIndex) {
+void SpeechRecognition::Decoder::HMMGraph::addSuccessors(GraphNode *node, AcousticModel* model, int wordID, int phonemeIndex) {
     if(node->successorNodes.empty()) {
         node->successorNodes.push_back(node);
         if(phonemeIndex == model->words.at(wordID).phonemes.size()){
@@ -101,7 +103,7 @@ void HMMGraph::addSuccessors(GraphNode *node, AcousticModel* model, int wordID, 
  * Deletes all nodes behind the given one.
  * @param node
  */
-void HMMGraph::destroySuccessors(GraphNode *node) {
+void SpeechRecognition::Decoder::HMMGraph::destroySuccessors(GraphNode *node) {
     for(auto iterator = node->successorNodes.begin();
             iterator != node->successorNodes.end();
             iterator++){
@@ -113,6 +115,7 @@ void HMMGraph::destroySuccessors(GraphNode *node) {
     node->successorNodes.clear();
 }
 
+// TODO add to object
 /**
  * Iterates through all tokens in a node, finds the one with highest likelihood.
  */
@@ -158,7 +161,7 @@ void keepMax(std::vector<Token*>& tokens){
 /**
  * Recursively iterates through all nodes in a graph and find tokens with highest likelihood.
  */
-void HMMGraph::applyViterbiCriterium(GraphNode* node) {
+void SpeechRecognition::Decoder::HMMGraph::applyViterbiCriterium(GraphNode* node) {
     // exit condition
     if(node == outputNode)
         return;
@@ -179,36 +182,18 @@ void HMMGraph::applyViterbiCriterium(GraphNode* node) {
     }
 }
 
-/**
- * Returns most likely word.
- * @param vector Vector of tokens to check
- * @param model Acoustic model
- */
-std::string getMostLikely(std::vector<Token*>& vector, AcousticModel* model){
-    int index = -1;
-    float maxSoFar = -std::numeric_limits<float>::max();
-    int i = 0;
-    for(auto iterator = vector.begin();
-            iterator != vector.end();
-            iterator++, i++){
-        if((*iterator)->likelihood > maxSoFar){
-            maxSoFar = (*iterator)->likelihood;
-            index = i;
-        }
-    }
 
-    return model->words.at(vector.at(index)->word).writtenForm;
-}
 
 /**
  * Debug clearOutputNode
  * @param model
  * @return
  */
-void HMMGraph::clearOutputNode() {
+void SpeechRecognition::Decoder::HMMGraph::clearOutputNode() {
     for(auto iterator = outputNode->tokens.begin();
         iterator != outputNode->tokens.end();){
         (*iterator)->currentNode = rootNode;
+        // TODO add backoff
         (*iterator)->likelihood += WORD_INSERTION_PENALTY;
         rootNode->tokens.push_back(*iterator);
         outputNode->tokens.erase(iterator);
@@ -218,7 +203,7 @@ void HMMGraph::clearOutputNode() {
 /**
  * Recursive deletion of GraphNodes
  */
-void HMMGraph::destroyGraph(GraphNode* node) {
+void SpeechRecognition::Decoder::HMMGraph::destroyGraph(GraphNode* node) {
     // exit condition
     if(node == outputNode)
         return;
@@ -234,7 +219,7 @@ void HMMGraph::destroyGraph(GraphNode* node) {
  * Recursive deletion of Token records inside nodes.
  * @param node
  */
-void HMMGraph::eraseTokenRecords(GraphNode* node) {
+void SpeechRecognition::Decoder::HMMGraph::eraseTokenRecords(GraphNode* node) {
     node->tokens.clear();
     // exit condition
     if(node == outputNode)
@@ -249,7 +234,7 @@ void HMMGraph::eraseTokenRecords(GraphNode* node) {
     }
 }
 
-void HMMGraph::deleteLowLikelihood(std::vector<Token*>& tokens){
+void SpeechRecognition::Decoder::HMMGraph::deleteLowLikelihood(std::vector<Token*>& tokens){
     if(tokens.size() <= MAX_TOKEN_COUNT)
         return;
     for(auto iterator = tokens.begin() + MAX_TOKEN_COUNT;
@@ -263,7 +248,7 @@ void HMMGraph::deleteLowLikelihood(std::vector<Token*>& tokens){
     tokens.clear();
 }
 
-void HMMGraph::searchTokens(std::vector<std::vector<Token *>> &allTokens, GraphNode* node, unsigned int level) {
+void SpeechRecognition::Decoder::HMMGraph::searchTokens(std::vector<std::vector<Token *>> &allTokens, GraphNode* node, unsigned int level) {
     if(node == outputNode)
         return;
 
@@ -290,7 +275,7 @@ void HMMGraph::searchTokens(std::vector<std::vector<Token *>> &allTokens, GraphN
  * Marks tokens with low likelihood for deletion.
  * Viterbi criterium has to be applied before using this function (only one token per node).
  */
-void HMMGraph::applyPruning() {
+void SpeechRecognition::Decoder::HMMGraph::applyPruning() {
     // each inner vector represents tokens in one level
     std::vector<std::vector<Token*>> allTokens;
 
@@ -312,10 +297,19 @@ void HMMGraph::applyPruning() {
     allTokens.clear();
 }
 
-void HMMGraph::applyViterbiCriterium() {
+void SpeechRecognition::Decoder::HMMGraph::applyViterbiCriterium() {
     applyViterbiCriterium(rootNode);
 }
 
-void HMMGraph::eraseTokenRecords() {
+void SpeechRecognition::Decoder::HMMGraph::eraseTokenRecords() {
     eraseTokenRecords(rootNode);
+}
+
+void SpeechRecognition::Decoder::HMMGraph::addLM() {
+    for(auto iterator = outputNode->tokens.begin();
+            iterator != outputNode->tokens.end();
+            iterator++){
+        // TODO add LM unigram
+        (*iterator)->likelihood += WORD_INSERTION_PENALTY;
+    }
 }

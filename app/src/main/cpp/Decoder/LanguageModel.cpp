@@ -22,7 +22,7 @@ enum FSM_LM{
  * Reads language model from an .arpa formatted file
  * @param path path to .arpa file
  */
-LanguageModel::LanguageModel(std::string path) {
+SpeechRecognition::Decoder::LanguageModel::LanguageModel(std::string path) {
     std::ifstream file;
     file.open(path.c_str(), std::ios::in|std::ios::binary);
     if(file.is_open()){
@@ -74,7 +74,7 @@ LanguageModel::LanguageModel(std::string path) {
  * Saves word into representation using LMWord.
  * @param input data from file (f.e. "-0.1110232 car")
  */
-void LanguageModel::saveWord(char *input) {
+void SpeechRecognition::Decoder::LanguageModel::saveWord(char *input) {
     std::vector<std::string> record = split(input, "\t");
 
     LMWord word(record.at(1));

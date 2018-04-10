@@ -17,12 +17,14 @@
 #include <android/log.h>
 #include <constants.h>
 
+// TODO remove using
+
 /**
  * Prepares language and acoustic models and lays foundation for a graph.
  * @param pathToLexicon
  * @param pathToNgram
  */
-Decoder::Decoder(std::string pathToLexicon, std::string pathToNgram) {
+SpeechRecognition::Decoder::ViterbiDecoder::ViterbiDecoder(std::string pathToLexicon, std::string pathToNgram) {
     this->acousticModel = new AcousticModel(pathToLexicon);
     this->languageModel = new LanguageModel(pathToNgram);
 
@@ -34,7 +36,7 @@ Decoder::Decoder(std::string pathToLexicon, std::string pathToNgram) {
     graph->build(acousticModel);
 }
 
-Decoder::~Decoder() {
+SpeechRecognition::Decoder::ViterbiDecoder::~ViterbiDecoder() {
     delete this->acousticModel;
     delete this->languageModel;
     delete this->graph;
@@ -50,11 +52,12 @@ unsigned long sum3 = 0;
 unsigned long sum4 = 0;
 unsigned long sum5 = 0;
 unsigned long sum6 = 0;
+unsigned long sum7 = 0;
 /**
  * Sends data through the graph.
  * @param input clearOutputNode of NN
  */
-void Decoder::decode(float *input) {
+void SpeechRecognition::Decoder::ViterbiDecoder::decode(float *input) {
     unsigned long startTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
     test++;
 
@@ -82,9 +85,13 @@ void Decoder::decode(float *input) {
     unsigned long timestamp6 = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
     sum6 += timestamp6-timestamp5;
 
-    if(test % 1000 == 0){
-        __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "clear: %d, pass: %d, viterbi: %d, viterbi del: %d, pruning: %d, pruning del: %d",
-        sum1, sum2, sum3, sum4, sum5, sum6);
+    graph->addLM();
+    unsigned long timestamp7 = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+    sum7 += timestamp7-timestamp6;
+
+    if(test % 500 == 0){
+        __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "clear: %d, pass: %d, viterbi: %d, viterbi del: %d, pruning: %d, pruning del: %d, LM: %d",
+        sum1, sum2, sum3, sum4, sum5, sum6, sum7);
         __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "TOKEN COUNT: %d", Token::tokenVector.size());
     }
 
@@ -94,7 +101,7 @@ void Decoder::decode(float *input) {
 /**
  * Resets the decoder. Removes all tokens.
  */
-void Decoder::reset() {
+void SpeechRecognition::Decoder::ViterbiDecoder::reset() {
     for(auto iterator = graph->outputNode->tokens.begin();
             iterator != graph->outputNode->tokens.end();){
         (*iterator)->markToKill();
@@ -108,7 +115,8 @@ void Decoder::reset() {
     graph->rootNode->tokens.push_back(new Token(graph->rootNode, -1));
 }
 
-std::string buildString(Token& token){
+//TODO add to utils
+std::string buildString(SpeechRecognition::Decoder::Token& token){
     std::string result = "";
     for(auto iterator = token.wordHistory.begin();
             iterator != token.wordHistory.end();
@@ -122,7 +130,7 @@ std::string buildString(Token& token){
 /**
  * Returns the word with the highest likelihood from the clearOutputNode node.
  */
-std::string Decoder::getWinner() {
+std::string SpeechRecognition::Decoder::ViterbiDecoder::getWinner() {
     auto vector = this->graph->outputNode->tokens;
 
     float maxLikelihood = -std::numeric_limits<float>::max();
@@ -135,7 +143,5 @@ std::string Decoder::getWinner() {
             maxIndex = i;
         }
     }
-
-    //return acousticModel->words.at(vector.at(maxIndex)->word).writtenForm;
     return buildString(*vector.at(maxIndex));
 }

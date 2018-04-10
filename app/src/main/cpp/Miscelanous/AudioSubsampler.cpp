@@ -15,7 +15,7 @@
  * @param dataLength length of valid data in an array
  * @return data in 8 kHz sample rate
  */
-short *AudioSubsampler::subsample48kHzto8kHz(short *data, int dataLength) {
+short *SpeechRecognition::Utility::AudioSubsampler::subsample48kHzto8kHz(short *data, int dataLength) {
     Filter lpFIRFiler(LPF, 8, 48.0, 4.0);
     for(int i = 0; i < dataLength; ++i) {
         data[i] = (short) lpFIRFiler.do_sample((double) data[i]);
@@ -37,15 +37,15 @@ short *AudioSubsampler::subsample48kHzto8kHz(short *data, int dataLength) {
     return resultArray;
 }
 
-AudioSubsampler::AudioSubsampler() {
+SpeechRecognition::Utility::AudioSubsampler::AudioSubsampler() {
     lpFIRFilter = new Filter(LPF, 8, 48.0, 4.0);
 }
 
-AudioSubsampler::~AudioSubsampler() {
+SpeechRecognition::Utility::AudioSubsampler::~AudioSubsampler() {
     delete lpFIRFilter;
 }
 
-short *AudioSubsampler::sample(short *data, int dataLength) {
+short *SpeechRecognition::Utility::AudioSubsampler::sample(short *data, int dataLength) {
     for(int i = 0; i < dataLength; ++i) {
         data[i] = (short) lpFIRFilter->do_sample((double) data[i]);
     }

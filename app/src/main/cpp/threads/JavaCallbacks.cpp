@@ -5,14 +5,14 @@
 #include <jni.h>
 #include "JavaCallbacks.h"
 
-JavaVM* JavaCallbacks::g_VM = NULL;
+JavaVM* SpeechRecognition::Threads::JavaCallbacks::g_VM = NULL;
 
 /**
  * Attach to JVM. If the thread isn't attached the call of Java functions would fail.
  * @param attached
  * @return
  */
-JNIEnv* JavaCallbacks::AttachJava(bool* attached) {
+JNIEnv* SpeechRecognition::Threads::JavaCallbacks::AttachJava(bool* attached) {
     JavaVMAttachArgs args = {JNI_VERSION_1_2, 0, 0};
     JNIEnv* java;
     if(g_VM->AttachCurrentThread(&java, &args) == JNI_FALSE)
@@ -22,14 +22,14 @@ JNIEnv* JavaCallbacks::AttachJava(bool* attached) {
     return java;
 }
 
-void JavaCallbacks::DetachJava(){
+void SpeechRecognition::Threads::JavaCallbacks::DetachJava(){
     g_VM->DetachCurrentThread();
 }
 
 /**
  * Notifies listeners about change of voice activity.
  */
-void JavaCallbacks::notifyVADChanged(bool activity){
+void SpeechRecognition::Threads::JavaCallbacks::notifyVADChanged(bool activity){
     bool attached;
     JNIEnv* env = AttachJava(&attached);
     for(auto iterator = callbackObjects.begin();
@@ -47,7 +47,7 @@ void JavaCallbacks::notifyVADChanged(bool activity){
  * Notifies listeners about recognized sequence
  * @param sequence recognized sequence
  */
-void JavaCallbacks::notifySequenceRecognized(std::string sequence){
+void SpeechRecognition::Threads::JavaCallbacks::notifySequenceRecognized(std::string sequence){
     bool attached;
     JNIEnv* env = AttachJava(&attached);
     for(auto iterator = callbackObjects.begin();
@@ -63,7 +63,7 @@ void JavaCallbacks::notifySequenceRecognized(std::string sequence){
 /**
  * Notifies listeners about all threads finishing.
  */
-void JavaCallbacks::notifyRecognitionDone(){
+void SpeechRecognition::Threads::JavaCallbacks::notifyRecognitionDone(){
     bool attached;
     JNIEnv* env = AttachJava(&attached);
     for(auto iterator = callbackObjects.begin();
@@ -76,16 +76,16 @@ void JavaCallbacks::notifyRecognitionDone(){
         DetachJava();
 }
 
-void JavaCallbacks::addListener(T_registeredObject obj) {
+void SpeechRecognition::Threads::JavaCallbacks::addListener(T_registeredObject obj) {
     callbackObjects.push_back(obj);
 }
 
-void JavaCallbacks::setJavaVM(JavaVM* vm) {
+void SpeechRecognition::Threads::JavaCallbacks::setJavaVM(JavaVM* vm) {
     if(g_VM == NULL)
         g_VM = vm;
 }
 
-void JavaCallbacks::notifyMelDone(int percentage) {
+void SpeechRecognition::Threads::JavaCallbacks::notifyMelDone(int percentage) {
     bool attached;
     JNIEnv* env = AttachJava(&attached);
     for(auto iterator = callbackObjects.begin();
@@ -98,7 +98,7 @@ void JavaCallbacks::notifyMelDone(int percentage) {
         DetachJava();
 }
 
-void JavaCallbacks::notifyNNDone(int percentage) {
+void SpeechRecognition::Threads::JavaCallbacks::notifyNNDone(int percentage) {
     bool attached;
     JNIEnv* env = AttachJava(&attached);
     for(auto iterator = callbackObjects.begin();
@@ -111,7 +111,7 @@ void JavaCallbacks::notifyNNDone(int percentage) {
         DetachJava();
 }
 
-void JavaCallbacks::notifyDecoderDone(int percentage) {
+void SpeechRecognition::Threads::JavaCallbacks::notifyDecoderDone(int percentage) {
     bool attached;
     JNIEnv* env = AttachJava(&attached);
     for(auto iterator = callbackObjects.begin();

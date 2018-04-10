@@ -9,6 +9,8 @@
 #include <NNInitInfo.h>
 #include <FeatureMatrix.h>
 
+using namespace SpeechRecognition::Feature_Extraction;
+using namespace SpeechRecognition::Utility;
 class NeuralNetwork {
 private:
     NNInitInfo info;

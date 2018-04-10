@@ -9,38 +9,38 @@
 #include <jni.h>
 #include <string>
 #include <vector>
+namespace SpeechRecognition::Threads {
+    typedef struct registeredObject {
+        jobject obj;
+        jclass clazz;
+    } T_registeredObject;
 
-typedef struct registeredObject{
-    jobject obj;
-    jclass clazz;
-}T_registeredObject;
+    class JavaCallbacks {
+    private:
+        std::vector<T_registeredObject> callbackObjects;
 
-class JavaCallbacks {
-private:
-    std::vector<T_registeredObject> callbackObjects;
+        static JavaVM *g_VM;
+    public:
+        static JNIEnv *AttachJava(bool *attached);
 
-    static JavaVM *g_VM;
-public:
-    static JNIEnv* AttachJava(bool* attached);
+        static void DetachJava();
 
-    static void DetachJava();
+        void notifyVADChanged(bool activity);
 
-    void notifyVADChanged(bool activity);
+        void notifySequenceRecognized(std::string sequence);
 
-    void notifySequenceRecognized(std::string sequence);
+        void notifyRecognitionDone();
 
-    void notifyRecognitionDone();
+        void notifyMelDone(int percentage);
 
-    void notifyMelDone(int percentage);
+        void notifyNNDone(int percentage);
 
-    void notifyNNDone(int percentage);
+        void notifyDecoderDone(int percentage);
 
-    void notifyDecoderDone(int percentage);
+        void addListener(T_registeredObject obj);
 
-    void addListener(T_registeredObject obj);
-
-    void setJavaVM(JavaVM* vm);
-};
-
+        void setJavaVM(JavaVM *vm);
+    };
+}
 
 #endif //VOICERECOGNITION_JAVACALLBACKS_H

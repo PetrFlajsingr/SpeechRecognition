@@ -25,6 +25,11 @@
 #include <DecoderThread.h>
 #include <JavaCallbacks.h>
 
+using namespace SpeechRecognition::Feature_Extraction;
+using namespace SpeechRecognition::Threads;
+using namespace SpeechRecognition::VoiceActivityDetection;
+using namespace SpeechRecognition::Decoder;
+using namespace SpeechRecognition::Utility;
 #define LOGI(...) \
   ((void)__android_log_print(ANDROID_LOG_INFO, APPNAME, __VA_ARGS__))
 #define LOGW(...) \
@@ -278,7 +283,7 @@ void VADtest(){
 
     FeatureMatrix* nnResult = nn.forwardAll(melResult);
 
-    Decoder decoder("/sdcard/lexicon.txt", "/sdcard/LM.arpa");
+    ViterbiDecoder decoder("/sdcard/lexicon.txt", "/sdcard/LM.arpa");
 
     bool active = false;
 

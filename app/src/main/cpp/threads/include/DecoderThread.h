@@ -11,22 +11,27 @@
 #include <QueueData.h>
 #include <SafeQueue.h>
 #include "JavaCallbacks.h"
+namespace SpeechRecognition::Threads {
+    using namespace Decoder;
+    class DecoderThread {
+    private:
+        ViterbiDecoder *decoder;
 
-class DecoderThread {
-private:
-    Decoder* decoder;
+        JavaCallbacks *callbacks;
 
-    JavaCallbacks* callbacks;
+        void threadDecoder();
 
-    void threadDecoder();
-public:
-    std::thread thread;
-    DecoderThread(JavaCallbacks& callbacks);
+    public:
+        std::thread thread;
 
-    virtual ~DecoderThread();
+        DecoderThread(JavaCallbacks &callbacks);
 
-    SafeQueue<Q_NNData*> inputQueue;
-};
+        virtual ~DecoderThread();
+
+        SafeQueue<Q_NNData *> inputQueue;
+    };
+
+}
 
 
 #endif //VOICERECOGNITION_DECODERTHREAD_H

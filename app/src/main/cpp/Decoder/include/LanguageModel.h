@@ -7,15 +7,21 @@
 
 
 #include <vector>
+#include <AudioSubsampler.h>
 #include "LMWord.h"
 
-class LanguageModel {
-private:
-    void saveWord(char* input);
-public:
-    std::vector<LMWord> words;
-    LanguageModel(std::string path);
-};
+namespace SpeechRecognition::Decoder {
+    using namespace Utility;
+    class LanguageModel {
+    private:
+        void saveWord(char *input);
+
+    public:
+        std::vector<LMWord> words;
+
+        LanguageModel(std::string path);
+    };
+}
 
 
 #endif //VOICERECOGNITION_LANGUAGEMODEL_H

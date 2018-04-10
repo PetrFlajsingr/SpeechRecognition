@@ -12,29 +12,33 @@
 #include <QueueData.h>
 #include "JavaCallbacks.h"
 
+namespace SpeechRecognition::Threads {
+    using namespace Feature_Extraction;
 
-class NNThread{
-private:
-    RSNeuralNetwork* neuralNetwork;
+    class NNThread {
+    private:
+        RSNeuralNetwork *neuralNetwork;
 
-    void threadNN();
+        void threadNN();
 
-    void prepareInput(float* result, std::vector<float*>& data);
+        void prepareInput(float *result, std::vector<float *> &data);
 
-    void deleteBuffer(std::vector<float*>& data);
-public:
-    NNThread(const char* cacheDir);
+        void deleteBuffer(std::vector<float *> &data);
 
-    virtual ~NNThread();
+    public:
+        NNThread(const char *cacheDir);
 
-    SafeQueue<Q_MelData*> inputQueue;
+        virtual ~NNThread();
 
-    SafeQueue<Q_NNData*>* decoderQueue;
+        SafeQueue<Q_MelData *> inputQueue;
 
-    std::thread thread;
+        SafeQueue<Q_NNData *> *decoderQueue;
 
-    JavaCallbacks* callbacks;
-};
+        std::thread thread;
+
+        JavaCallbacks *callbacks;
+    };
+}
 
 
 #endif //VOICERECOGNITION_NNTHREAD_H

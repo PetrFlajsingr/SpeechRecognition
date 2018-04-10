@@ -4,11 +4,11 @@
 
 #include <VoiceActivityDetector.h>
 
-VoiceActivityDetector::VoiceActivityDetector() {}
+SpeechRecognition::VoiceActivityDetection::VoiceActivityDetector::VoiceActivityDetector() {}
 
-VoiceActivityDetector::~VoiceActivityDetector() {}
+SpeechRecognition::VoiceActivityDetection::VoiceActivityDetector::~VoiceActivityDetector() {}
 
-void VoiceActivityDetector::checkData(float* melBankData) {
+void SpeechRecognition::VoiceActivityDetection::VoiceActivityDetector::checkData(float* melBankData) {
     buffer.push_back(melBankData);
     if(buffer.size() > FRAMES_FOR_TRANSITION_ACTIVE) {
         delete[] buffer.at(0);
@@ -36,10 +36,10 @@ void VoiceActivityDetector::checkData(float* melBankData) {
     }
 }
 
-bool VoiceActivityDetector::isActive() {
+bool SpeechRecognition::VoiceActivityDetection::VoiceActivityDetector::isActive() {
     return currentState == ACTIVE;
 }
 
-std::vector<float *> &VoiceActivityDetector::getBuffer() {
+std::vector<float *> &SpeechRecognition::VoiceActivityDetection::VoiceActivityDetector::getBuffer() {
     return buffer;
 }

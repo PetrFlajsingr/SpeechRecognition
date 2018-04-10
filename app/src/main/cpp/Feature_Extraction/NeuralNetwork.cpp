@@ -9,6 +9,8 @@
 #include <constants.h>
 #include <cmath>
 
+using namespace SpeechRecognition::Feature_Extraction;
+using namespace SpeechRecognition::Utility;
 NeuralNetwork::NeuralNetwork(std::string filepath) {
     NNInitInfo initInfo;
     initInfo.layerCount = 3;

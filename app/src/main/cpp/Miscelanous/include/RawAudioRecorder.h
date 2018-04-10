@@ -16,45 +16,47 @@
 #include <QueueData.h>
 #include <SafeQueue.h>
 
-class RawAudioRecorder {
-private:
-    static short *recorderBuffer; //< buffer for recorded data
+namespace SpeechRecognition::Utility {
+    class RawAudioRecorder {
+    private:
+        static short *recorderBuffer; //< buffer for recorded data
 
-    static bool recording;
+        static bool recording;
 
-    // engine interfaces
-    SLObjectItf engineObject = NULL;
-    SLEngineItf engineEngine;
+        // engine interfaces
+        SLObjectItf engineObject = NULL;
+        SLEngineItf engineEngine;
 
-    //stops the recording when user requests it
-    static bool recordingStopBool;
+        //stops the recording when user requests it
+        static bool recordingStopBool;
 
-    // recorder interfaces
-    SLObjectItf recorderObject = NULL;
-    static SLRecordItf recorderRecord;
-    static SLAndroidSimpleBufferQueueItf recorderBufferQueue;
+        // recorder interfaces
+        SLObjectItf recorderObject = NULL;
+        static SLRecordItf recorderRecord;
+        static SLAndroidSimpleBufferQueueItf recorderBufferQueue;
 
-    static pthread_mutex_t  audioEngineLock;
+        static pthread_mutex_t audioEngineLock;
 
-    void createEngine();
+        void createEngine();
 
-    static void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context);
+        static void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context);
 
-public:
-    RawAudioRecorder();
+    public:
+        RawAudioRecorder();
 
-    bool createAudioRecorder();
+        bool createAudioRecorder();
 
-    virtual ~RawAudioRecorder();
+        virtual ~RawAudioRecorder();
 
-    void startRecording();
+        void startRecording();
 
-    void stopRecording();
+        void stopRecording();
 
-    static bool isRecording();
+        static bool isRecording();
 
-    static SafeQueue<Q_AudioData*>* melQueue;
-};
+        static SafeQueue<Q_AudioData *> *melQueue;
+    };
+}
 
 
 #endif //NATIVEAUDIO_RAWAUDIORECORDER_H
