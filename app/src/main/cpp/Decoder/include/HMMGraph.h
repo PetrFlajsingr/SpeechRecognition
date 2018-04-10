@@ -12,6 +12,8 @@ class HMMGraph {
 private:
     const unsigned int MAX_TOKEN_COUNT = 500; //< pruning: max count per "step" (1 level of graph)
 
+    const float WORD_INSERTION_PENALTY = -10;
+
     void addSuccessors(GraphNode *node, AcousticModel* model, int wordID, int phonemeIndex);
 
     void destroySuccessors(GraphNode* node);

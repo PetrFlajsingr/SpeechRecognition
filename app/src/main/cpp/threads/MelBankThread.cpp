@@ -45,6 +45,8 @@ void MelBankThread::threadMelBank() {
     unsigned long runTime = 0;
 
     short dataCount = 0;
+
+    bool notified = false;
     while(inputQueue.dequeue(data)){
         unsigned long sTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
@@ -60,6 +62,9 @@ void MelBankThread::threadMelBank() {
             std::copy(subsampledAudio, subsampledAudio + SUBSAMPLED_OVERLAP_LENGTH,
                       newAudioData + dataCount * SUBSAMPLED_OVERLAP_LENGTH);
             dataCount++;
+            delete[] subsampledAudio;
+            delete[] data->data;
+            delete data;
             continue;
         }
 
@@ -73,6 +78,7 @@ void MelBankThread::threadMelBank() {
         frame.applyFFT(&cfg);
 
         fftFrame = frame.getFftData();
+
         float* result = this->melFilterBank->calculateMelBank(fftFrame);
 
         delete[] fftFrame;
@@ -87,10 +93,17 @@ void MelBankThread::threadMelBank() {
                 nnQueue->enqueue(new Q_MelData{SEQUENCE_DATA, result});
                 VADetector->getBuffer().erase(iterator);
             }
-            callbacks->notifyVADChanged(true);
+            if(!notified) {
+                callbacks->notifyVADChanged(true);
+                notified = true;
+            }
         } else {
-            nnQueue->enqueue(new Q_MelData{SEQUENCE_INACTIVE, NULL});
-            callbacks->notifyVADChanged(false);
+            if(notified) {
+                notified = false;
+                nnQueue->enqueue(new Q_MelData{SEQUENCE_INACTIVE, NULL});
+                callbacks->notifyVADChanged(false);
+            }
+
             dataCount = 0;
         }
 

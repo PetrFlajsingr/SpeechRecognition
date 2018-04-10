@@ -15,8 +15,8 @@
 
 //TODO temp variable, remove
 std::vector<float> TEMP_PROB = {
-        static_cast<float>(log(0.6)),
-        static_cast<float>(log(0.4))
+        static_cast<float>(log(0.87)),
+        static_cast<float>(log(0.13))
 };
 
 /**
@@ -59,6 +59,12 @@ void HMMGraph::build(AcousticModel *model) {
 }
 
 void HMMGraph::addSILNode(GraphNode *node, int wordID, int phonemeIndex) {
+    std::vector<float> TO_SIL_PROB = {
+            static_cast<float>(log(0.80)),
+            static_cast<float>(log(0.08)),
+            static_cast<float>(log(0.12))
+    };
+    node->pathProbablity = TO_SIL_PROB;
     GraphNode* newNode = new GraphNode(
             TEMP_PROB, wordID,
             phonemeIndex, SIL);
@@ -186,6 +192,7 @@ void HMMGraph::clearOutputNode() {
     for(auto iterator = outputNode->tokens.begin();
         iterator != outputNode->tokens.end();){
         (*iterator)->currentNode = rootNode;
+        (*iterator)->likelihood += WORD_INSERTION_PENALTY;
         rootNode->tokens.push_back(*iterator);
         outputNode->tokens.erase(iterator);
     }
