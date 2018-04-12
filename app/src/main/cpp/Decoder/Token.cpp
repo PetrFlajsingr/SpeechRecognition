@@ -8,22 +8,23 @@
 #include <android/log.h>
 #include <constants.h>
 
-std::vector<SpeechRecognition::Decoder::Token*> SpeechRecognition::Decoder::Token::tokenVector;
-//std::vector<unsigned int> Token::indexesToDelete;
-unsigned int SpeechRecognition::Decoder::Token::tokenCounter;
+//std::vector<SpeechRecognition::Decoder::Token*> SpeechRecognition::Decoder::Token::tokenVector;
+int SpeechRecognition::Decoder::Token::tokenCount = 0;
 SpeechRecognition::Decoder::AcousticModel* SpeechRecognition::Decoder::Token::acousticModel;
+SpeechRecognition::Decoder::LanguageModel* SpeechRecognition::Decoder::Token::languageModel;
+
 /**
  * Registers token in static vector for all tokens.
  * Saves index in the vector for fast deletion from the vector.
  * @param currentNode node of graph
  */
 SpeechRecognition::Decoder::Token::Token(GraphNode* currentNode, int word) : currentNode(currentNode) {
-    index_TokenVector = tokenVector.size();
-    tokenVector.push_back(this);
-    tokenCounter++;
+    //tokenVector.push_back(this);
 
     if(word >= 0)
         this->word = word;
+
+    tokenCount++;
 }
 
 /**
@@ -74,28 +75,10 @@ float SpeechRecognition::Decoder::Token::calculateLikelihood(float* inputVector,
  * Passes all tokens through the graph (one step)
  * @param inputVector
  */
-void SpeechRecognition::Decoder::Token::passAllTokens(float *inputVector) {
+/*void SpeechRecognition::Decoder::Token::passAllTokens(float *inputVector) {
     unsigned int oldTokenCount = tokenVector.size();
     for(unsigned int i = 0; i < oldTokenCount; i++){
         tokenVector.at(i)->passInGraph(inputVector);
-    }
-}
-
-/**
- * Registers token for deletion
- */
-/*void Token::addIndexToDelete(unsigned int index) {
-    indexesToDelete.push_back(index);
-}*/
-
-/**
- * Updates indexes for deletion in given range
- */
-/*void Token::updateIndexes(unsigned int beginIndex, unsigned int endIndex, int toAdd){
-    for(auto iterator = tokenVector.begin() + beginIndex;
-            iterator != tokenVector.begin() + endIndex;
-            iterator++){
-        (*iterator)->index_TokenVector += toAdd;
     }
 }*/
 
@@ -104,65 +87,37 @@ void SpeechRecognition::Decoder::Token::passAllTokens(float *inputVector) {
  * Deletes all tokens marked for deletion in "indexesToDelete".
  * Updates "index_TokenVector" for all remaining.
  */
-void SpeechRecognition::Decoder::Token::deleteInvalidTokens() {
+/*void SpeechRecognition::Decoder::Token::deleteInvalidTokens() {
     for(auto iterator = tokenVector.begin();
-            iterator != tokenVector.end();
-            iterator++){
+            iterator != tokenVector.end();){
         if((*iterator)->markedToKill){
             delete *iterator;
             tokenVector.erase(iterator);
-            iterator--;
-        }
+        } else
+            iterator++;
     }
-    // TODO remove
-/*
-    std::sort(indexesToDelete.begin(), indexesToDelete.end());
-    unsigned int deletedCounter = 0;
-    unsigned int startIndex, endIndex;
-    for(auto indexIterator = indexesToDelete.begin();
-            indexIterator != indexesToDelete.end();
-            indexIterator++){
-        startIndex = *indexIterator - deletedCounter;
-
-        delete tokenVector.at(startIndex);
-        tokenVector.erase(tokenVector.begin() + startIndex);
-        deletedCounter++;
-
-        endIndex = (indexIterator == indexesToDelete.end() - 1)
-                   ? tokenVector.size() : *(indexIterator + 1) - deletedCounter;
-
-        updateIndexes(startIndex,
-                      endIndex,
-                      -(int)deletedCounter);
-    }
-    indexesToDelete.clear();
-    */
-}
+}*/
 
 SpeechRecognition::Decoder::Token::~Token() {
-    tokenCounter--;
+    tokenCount--;
 }
 
 /**
  * Deletes all tokens recorded in tokenVector.
  */
-void SpeechRecognition::Decoder::Token::deleteStatic() {
+/*void SpeechRecognition::Decoder::Token::deleteStatic() {
     for(auto iterator = tokenVector.begin();
             iterator != tokenVector.end();){
         delete *iterator;
         tokenVector.erase(iterator);
     }
     tokenVector.clear();
-    //indexesToDelete.clear();
-
-    tokenCounter = 0;
-}
+}*/
 
 void SpeechRecognition::Decoder::Token::addWordToHistory() {
-    LMWord word(acousticModel->words.at(this->word).writtenForm);
-    wordHistory.push_back(word);
+    wordHistory.push_back(languageModel->getLMWord(acousticModel->words.at(this->word).writtenForm));
 }
 
-void SpeechRecognition::Decoder::Token::markToKill() {
+/*void SpeechRecognition::Decoder::Token::markToKill() {
     this->markedToKill = true;
-}
+}*/

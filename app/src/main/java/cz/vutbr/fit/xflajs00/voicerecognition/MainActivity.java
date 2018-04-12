@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity implements SpeechRecognition
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // nefunguje request persmission
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, 1);
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.MODIFY_AUDIO_SETTINGS}, 1);
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
@@ -69,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements SpeechRecognition
         decoderThreadTextView = (TextView) findViewById(R.id.decoderThreadTextView);
         memoryUsageTextView = (TextView) findViewById(R.id.memoryUsageTextView);
 
-        timer.schedule(new memoryTask(), 0, 1500);
+        timer.schedule(new memoryTask(), 0, 2000);
     }
 
     @Override

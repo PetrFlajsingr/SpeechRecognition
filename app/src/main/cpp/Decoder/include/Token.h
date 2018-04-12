@@ -12,36 +12,27 @@
 #include <LMWord.h>
 #include <Word.h>
 #include "AcousticModel.h"
+#include "LanguageModel.h"
+#include <list>
 
 namespace SpeechRecognition::Decoder {
 /**
  * Represents a token in a HMM graph.
  */
     class Token {
-        static unsigned int tokenCounter;
-
-        //static std::vector<unsigned int> indexesToDelete;
-
         float calculateLikelihood(float *inputVector, unsigned int pathNumber);
-
-        //static void updateIndexes(unsigned int beginIndex, unsigned int endIndex, int toAdd);
 
         static AcousticModel *acousticModel;
 
+        static LanguageModel* languageModel;
+
         bool needWord = true;
-
-        bool markedToKill = false;
     public:
-        static std::vector<Token *> tokenVector; //< vector of all tokens in the graph
-        // serves as an access point for faster cloning
-
         float likelihood = 0.0f;
 
         int word;
 
-        unsigned long index_TokenVector; //< index in tokenVector, for fast deletion from tokenVector
-
-        std::vector<LMWord> wordHistory; //< word history for ngrams
+        std::list<LMWord*> wordHistory; //< word history for ngrams
 
         Token(GraphNode *currentNode, int word);
 
@@ -49,21 +40,17 @@ namespace SpeechRecognition::Decoder {
 
         void passInGraph(float *inputVector);
 
-        static void passAllTokens(float *inputVector);
-
-        //static void addIndexToDelete(unsigned int index);
-
-        static void deleteInvalidTokens();
-
-        static void deleteStatic();
-
         static void setAcousticModel(AcousticModel &model) {
             acousticModel = &model;
         }
 
+        static void setLanguageModel(LanguageModel &model){
+            languageModel = &model;
+        }
+
         void addWordToHistory();
 
-        void markToKill();
+        static int tokenCount;
 
         GraphNode *currentNode; //< node in which the token is placed
     };

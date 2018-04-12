@@ -11,7 +11,7 @@ namespace SpeechRecognition::Utility {
 
     std::string toString(int &value);
 
-    std::vector<std::string> split(char *str, std::string delimiter);
+    std::vector<std::string> split(const char *str, std::string delimiter);
 
     void dumpToFile(std::string path, bool *array, unsigned int length);
 

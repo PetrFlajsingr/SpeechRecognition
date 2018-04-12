@@ -25,11 +25,12 @@
 #include <DecoderThread.h>
 #include <JavaCallbacks.h>
 
-using namespace SpeechRecognition::Feature_Extraction;
-using namespace SpeechRecognition::Threads;
-using namespace SpeechRecognition::VoiceActivityDetection;
-using namespace SpeechRecognition::Decoder;
-using namespace SpeechRecognition::Utility;
+using namespace SpeechRecognition;
+using namespace Feature_Extraction;
+using namespace Threads;
+using namespace VoiceActivityDetection;
+using namespace Decoder;
+using namespace Utility;
 #define LOGI(...) \
   ((void)__android_log_print(ANDROID_LOG_INFO, APPNAME, __VA_ARGS__))
 #define LOGW(...) \

@@ -65,6 +65,10 @@ public:
         keep_running = false;
         conditionVariable.notify_all();
     }
+
+    int size(){
+        return queue.size();
+    }
 };
 
 

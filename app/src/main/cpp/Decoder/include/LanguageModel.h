@@ -16,10 +16,19 @@ namespace SpeechRecognition::Decoder {
     private:
         void saveWord(char *input);
 
+        std::vector<unsigned long> unigramAlphabetPositions;
+
+        char forBuilding = 'a';
+
+        inline unsigned long getUnigramAlphabetPosition(char ch);
     public:
         std::vector<LMWord> words;
 
         LanguageModel(std::string path);
+
+        float getUnigramScore(std::string word);
+
+        LMWord* getLMWord(std::string word);
     };
 }
 

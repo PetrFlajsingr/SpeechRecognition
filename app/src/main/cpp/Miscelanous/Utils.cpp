@@ -21,7 +21,7 @@ std::string SpeechRecognition::Utility::toString(int &value) {
     return ss.str();
 }
 
-std::vector<std::string> SpeechRecognition::Utility::split(char *str, std::string delimiter) {
+std::vector<std::string> SpeechRecognition::Utility::split(const char *str, std::string delimiter) {
     std::vector<std::string> result;
 
     std::string toSplit(str);

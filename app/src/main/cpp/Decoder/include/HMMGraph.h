@@ -11,9 +11,11 @@
 namespace SpeechRecognition::Decoder {
     class HMMGraph {
     private:
-        const unsigned int MAX_TOKEN_COUNT = 500; //< pruning: max count per "step" (1 level of graph)
+        const unsigned int MAX_TOKEN_COUNT = 200; //< pruning: max count per "step" (1 level of graph)
 
-        const float WORD_INSERTION_PENALTY = -15;
+        const float SCALE_FACTOR_LM = 2;
+
+        const float WORD_INSERTION_PENALTY = -10;
 
         void addSuccessors(GraphNode *node, AcousticModel *model, int wordID, int phonemeIndex);
 
@@ -31,6 +33,8 @@ namespace SpeechRecognition::Decoder {
                           unsigned int level);
 
         void addSILNode(GraphNode *node, int wordID, int phonemeIndex);
+
+        void passTokens(GraphNode* node, float* input);
 
     public:
         GraphNode *rootNode;
@@ -51,6 +55,8 @@ namespace SpeechRecognition::Decoder {
         void eraseTokenRecords();
 
         void addLM();
+
+        void passTokens(float* input);
     };
 }
 

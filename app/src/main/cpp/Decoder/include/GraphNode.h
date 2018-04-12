@@ -10,6 +10,7 @@
 #include <GraphNodeFWD.h>
 #include <TokenFWD.h>
 #include <Phoneme.h>
+#include <list>
 
 namespace SpeechRecognition::Decoder {
 /**

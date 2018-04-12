@@ -16,7 +16,7 @@
 #include <chrono>
 #include <android/log.h>
 #include <constants.h>
-
+#include <list>
 // TODO remove using
 
 /**
@@ -32,6 +32,7 @@ SpeechRecognition::Decoder::ViterbiDecoder::ViterbiDecoder(std::string pathToLex
     graph->rootNode->tokens.push_back(new Token(graph->rootNode, -1));
 
     Token::setAcousticModel(*acousticModel);
+    Token::setLanguageModel(*languageModel);
 
     graph->build(acousticModel);
 }
@@ -41,7 +42,7 @@ SpeechRecognition::Decoder::ViterbiDecoder::~ViterbiDecoder() {
     delete this->languageModel;
     delete this->graph;
 
-    Token::deleteStatic();
+//    Token::deleteStatic();
 }
 
 int test = 0;
@@ -64,38 +65,38 @@ void SpeechRecognition::Decoder::ViterbiDecoder::decode(float *input) {
     graph->clearOutputNode();
     unsigned long timestamp1 = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
     sum1 += timestamp1-startTime;
+    //__android_log_print(ANDROID_LOG_DEBUG, APPNAME, "Clear TOKEN COUNT: %d", Token::tokenCount);
 
-    Token::passAllTokens(input);
+    //Token::passAllTokens(input);
+    graph->passTokens(input);
     unsigned long timestamp2 = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
     sum2 += timestamp2-timestamp1;
+    //__android_log_print(ANDROID_LOG_DEBUG, APPNAME, "Pass TOKEN COUNT: %d", Token::tokenCount);
 
     graph->applyViterbiCriterium();
     unsigned long timestamp3 = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
     sum3 += timestamp3-timestamp2;
+    //__android_log_print(ANDROID_LOG_DEBUG, APPNAME, "Viterbi TOKEN COUNT: %d", Token::tokenCount);
 
-    Token::deleteInvalidTokens();
+    /*Token::deleteInvalidTokens();
     unsigned long timestamp4 = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-    sum4 += timestamp4-timestamp3;
+    sum4 += timestamp4-timestamp3;*/
 
     graph->applyPruning();
-    unsigned long timestamp5 = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-    sum5 += timestamp5-timestamp4;
+    unsigned long timestamp4 = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+    sum4 += timestamp4-timestamp3;
+    //__android_log_print(ANDROID_LOG_DEBUG, APPNAME, "Pruing TOKEN COUNT: %d", Token::tokenCount);
 
-    Token::deleteInvalidTokens();
+    /*Token::deleteInvalidTokens();
     unsigned long timestamp6 = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-    sum6 += timestamp6-timestamp5;
+    sum6 += timestamp6-timestamp5;*/
 
     graph->addLM();
-    unsigned long timestamp7 = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-    sum7 += timestamp7-timestamp6;
+    unsigned long timestamp5 = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+    sum7 += timestamp5-timestamp4;
 
-    if(test % 500 == 0){
-        __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "clear: %d, pass: %d, viterbi: %d, viterbi del: %d, pruning: %d, pruning del: %d, LM: %d",
-        sum1, sum2, sum3, sum4, sum5, sum6, sum7);
-        __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "TOKEN COUNT: %d", Token::tokenVector.size());
-    }
-
-
+    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "clear: %d, pass: %d, viterbi: %d, pruning: %d", sum1, sum2, sum3, sum4);
+    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "LM TOKEN COUNT: %d", Token::tokenCount);
 }
 
 /**
@@ -104,13 +105,12 @@ void SpeechRecognition::Decoder::ViterbiDecoder::decode(float *input) {
 void SpeechRecognition::Decoder::ViterbiDecoder::reset() {
     for(auto iterator = graph->outputNode->tokens.begin();
             iterator != graph->outputNode->tokens.end();){
-        (*iterator)->markToKill();
-        //Token::addIndexToDelete((*iterator)->index_TokenVector);
+        delete *iterator;
         graph->outputNode->tokens.erase(iterator);
     }
 
-    Token::deleteInvalidTokens();
-    Token::deleteStatic();
+    //Token::deleteInvalidTokens();
+    //Token::deleteStatic();
     graph->eraseTokenRecords();
     graph->rootNode->tokens.push_back(new Token(graph->rootNode, -1));
 }
@@ -121,7 +121,7 @@ std::string buildString(SpeechRecognition::Decoder::Token& token){
     for(auto iterator = token.wordHistory.begin();
             iterator != token.wordHistory.end();
             iterator++){
-        result += iterator->writtenForm + " ";
+        result += (*iterator)->writtenForm + " ";
     }
 
     return result;
@@ -143,5 +143,5 @@ std::string SpeechRecognition::Decoder::ViterbiDecoder::getWinner() {
             maxIndex = i;
         }
     }
-    return buildString(*vector.at(maxIndex));
+    return buildString(*(vector.at(maxIndex)));
 }

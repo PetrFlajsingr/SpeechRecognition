@@ -16,7 +16,9 @@ namespace SpeechRecognition::Decoder {
 
         unsigned int id;
 
-        float unigramProbability;
+        float unigramScore;
+
+        float unigramBackoff;
 
         LMWord(const std::string &writtenForm);
 
