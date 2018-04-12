@@ -36,6 +36,8 @@ namespace SpeechRecognition::Decoder {
 
         void passTokens(GraphNode* node, float* input);
 
+        void addTokensToOutputNode();
+
     public:
         GraphNode *rootNode;
         GraphNode *outputNode;

@@ -18,11 +18,15 @@ SpeechRecognition::Decoder::LanguageModel* SpeechRecognition::Decoder::Token::la
  * Saves index in the vector for fast deletion from the vector.
  * @param currentNode node of graph
  */
-SpeechRecognition::Decoder::Token::Token(GraphNode* currentNode, int word) : currentNode(currentNode) {
-    //tokenVector.push_back(this);
+SpeechRecognition::Decoder::Token::Token(GraphNode* currentNode, int word, unsigned int position)
+        : currentNode(currentNode), position(position) {
+    if(currentNode->xPos == 0)
+        this->needWord = true;
+    else
+        this->needWord = false;
 
-    if(word >= 0)
-        this->word = word;
+    if(currentNode->xPos == -1)
+        alive = true;
 
     tokenCount++;
 }
@@ -32,31 +36,27 @@ SpeechRecognition::Decoder::Token::Token(GraphNode* currentNode, int word) : cur
  * @param inputVector vector of NN outputs
  */
 void SpeechRecognition::Decoder::Token::passInGraph(float *inputVector) {
-    if(currentNode->wordID == -1){
-        needWord = true;
+    Token* sourceToken = getBestToken(currentNode->predecessorNodes.at(position));
+
+    if(sourceToken == NULL){
+        alive = false;
+        delete wordHistory;
+        wordHistory = NULL;
         return;
-    } else if(needWord && currentNode->xPos == 0){
-        this->word = this->currentNode->wordID;
+    }
+
+    if(needWord){
+        // TODO check
+        alive = true;
+        if(sourceToken->wordHistory == NULL){
+            wordHistory = new std::list<LMWord*>();
+        } else{
+            wordHistory = sourceToken->wordHistory;
+        }
         addWordToHistory();
-        needWord = false;
     }
-    int i = 0;
-    for(auto iterator = currentNode->successorNodes.begin() + 1;
-            iterator != currentNode->successorNodes.end();
-            iterator++, i++){
-        int wordID = ((*iterator)->wordID >= 0) ? (*iterator)->wordID : currentNode->wordID;
-        Token* newToken = new Token(*iterator, wordID);
-        newToken->wordHistory = this->wordHistory;
-        newToken->likelihood = calculateLikelihood(inputVector, i);
-        (*iterator)->tokens.push_back(newToken);
-    }
-    //removing old record of token
-    this->currentNode->tokens.erase(std::find(currentNode->tokens.begin(), currentNode->tokens.end(), this));
-    //moving to new node
-    this->currentNode = currentNode->successorNodes.at(0);
-    //adding record of token in node
-    this->currentNode->tokens.push_back(this);
-    this->likelihood = calculateLikelihood(inputVector, 0);
+
+    likelihood = calculateLikelihood(inputVector, position, sourceToken);
 }
 
 /**
@@ -65,59 +65,31 @@ void SpeechRecognition::Decoder::Token::passInGraph(float *inputVector) {
  * @param pathNumber connection number
  * @return new likelihood
  */
-float SpeechRecognition::Decoder::Token::calculateLikelihood(float* inputVector, unsigned int pathNumber) {
-    return likelihood
+float SpeechRecognition::Decoder::Token::calculateLikelihood(float* inputVector, unsigned int pathNumber, Token* sourceToken) {
+    return sourceToken->likelihood
+           + inputVector[currentNode->inputVectorIndex]
+           + currentNode->predecessorNodes.at(pathNumber)->pathProbablity.at(pathNumber + 1);
+    /*return likelihood
            + inputVector[currentNode->successorNodes.at(pathNumber)->inputVectorIndex]
-             + currentNode->pathProbablity.at(pathNumber);
+             + currentNode->pathProbablity.at(pathNumber);*/
 }
-
-/**
- * Passes all tokens through the graph (one step)
- * @param inputVector
- */
-/*void SpeechRecognition::Decoder::Token::passAllTokens(float *inputVector) {
-    unsigned int oldTokenCount = tokenVector.size();
-    for(unsigned int i = 0; i < oldTokenCount; i++){
-        tokenVector.at(i)->passInGraph(inputVector);
-    }
-}*/
-
-// TODO speed up, a lot
-/**
- * Deletes all tokens marked for deletion in "indexesToDelete".
- * Updates "index_TokenVector" for all remaining.
- */
-/*void SpeechRecognition::Decoder::Token::deleteInvalidTokens() {
-    for(auto iterator = tokenVector.begin();
-            iterator != tokenVector.end();){
-        if((*iterator)->markedToKill){
-            delete *iterator;
-            tokenVector.erase(iterator);
-        } else
-            iterator++;
-    }
-}*/
 
 SpeechRecognition::Decoder::Token::~Token() {
     tokenCount--;
 }
 
-/**
- * Deletes all tokens recorded in tokenVector.
- */
-/*void SpeechRecognition::Decoder::Token::deleteStatic() {
-    for(auto iterator = tokenVector.begin();
-            iterator != tokenVector.end();){
-        delete *iterator;
-        tokenVector.erase(iterator);
-    }
-    tokenVector.clear();
-}*/
-
 void SpeechRecognition::Decoder::Token::addWordToHistory() {
-    wordHistory.push_back(languageModel->getLMWord(acousticModel->words.at(this->word).writtenForm));
+    wordHistory->push_back(languageModel->getLMWord(acousticModel->words.at(currentNode->wordID).writtenForm));
 }
 
-/*void SpeechRecognition::Decoder::Token::markToKill() {
-    this->markedToKill = true;
-}*/
+SpeechRecognition::Decoder::Token *
+SpeechRecognition::Decoder::Token::getBestToken(SpeechRecognition::Decoder::GraphNode *node) {
+    for(auto iterator = node->tokens.begin();
+            iterator != node->tokens.end();
+            iterator++){
+        if((*iterator)->alive)
+            return *iterator;
+    }
+
+    return NULL;
+}

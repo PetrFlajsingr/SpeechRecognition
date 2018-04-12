@@ -36,7 +36,7 @@ SpeechRecognition::Decoder::ViterbiDecoder::ViterbiDecoder(std::string pathToLex
 
     graph->build(acousticModel);
 
-    graph->rootNode->tokens.push_back(new Token(graph->rootNode, -1));
+    graph->rootNode->tokens.push_back(new Token(graph->rootNode, -1, INT32_MAX));
 }
 
 SpeechRecognition::Decoder::ViterbiDecoder::~ViterbiDecoder() {
@@ -64,12 +64,14 @@ void SpeechRecognition::Decoder::ViterbiDecoder::decode(float *input) {
     unsigned long startTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
     test++;
 
+    //OK
     graph->clearOutputNode();
     unsigned long timestamp1 = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
     sum1 += timestamp1-startTime;
     //__android_log_print(ANDROID_LOG_DEBUG, APPNAME, "Clear TOKEN COUNT: %d", Token::tokenCount);
 
-    //Token::passAllTokens(input);
+    // TODO remake all
+    // SEGFAULT
     graph->passTokens(input);
     unsigned long timestamp2 = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
     sum2 += timestamp2-timestamp1;
@@ -79,10 +81,6 @@ void SpeechRecognition::Decoder::ViterbiDecoder::decode(float *input) {
     unsigned long timestamp3 = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
     sum3 += timestamp3-timestamp2;
     //__android_log_print(ANDROID_LOG_DEBUG, APPNAME, "Viterbi TOKEN COUNT: %d", Token::tokenCount);
-
-    /*Token::deleteInvalidTokens();
-    unsigned long timestamp4 = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-    sum4 += timestamp4-timestamp3;*/
 
     graph->applyPruning();
     unsigned long timestamp4 = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
@@ -105,23 +103,23 @@ void SpeechRecognition::Decoder::ViterbiDecoder::decode(float *input) {
  * Resets the decoder. Removes all tokens.
  */
 void SpeechRecognition::Decoder::ViterbiDecoder::reset() {
+    /*
     for(auto iterator = graph->outputNode->tokens.begin();
             iterator != graph->outputNode->tokens.end();){
         delete *iterator;
         graph->outputNode->tokens.erase(iterator);
-    }
+    }*/
 
     //Token::deleteInvalidTokens();
     //Token::deleteStatic();
-    graph->eraseTokenRecords();
-    graph->rootNode->tokens.push_back(new Token(graph->rootNode, -1));
+    //graph->eraseTokenRecords();
 }
 
 //TODO add to utils
 std::string buildString(SpeechRecognition::Decoder::Token& token){
     std::string result = "";
-    for(auto iterator = token.wordHistory.begin();
-            iterator != token.wordHistory.end();
+    for(auto iterator = token.wordHistory->begin();
+            iterator != token.wordHistory->end();
             iterator++){
         result += (*iterator)->writtenForm + " ";
     }
@@ -133,9 +131,11 @@ std::string buildString(SpeechRecognition::Decoder::Token& token){
  * Returns the word with the highest likelihood from the clearOutputNode node.
  */
 std::string SpeechRecognition::Decoder::ViterbiDecoder::getWinner() {
-    auto vector = this->graph->outputNode->tokens;
+    auto bestToken = this->graph->outputNode->tokens.front();
 
-    float maxLikelihood = -std::numeric_limits<float>::max();
+    return buildString(*bestToken);
+
+    /*float maxLikelihood = -std::numeric_limits<float>::max();
     int maxIndex = -1, i = 0;
     for(auto iterator = vector.begin();
             iterator != vector.end();
@@ -145,5 +145,5 @@ std::string SpeechRecognition::Decoder::ViterbiDecoder::getWinner() {
             maxIndex = i;
         }
     }
-    return buildString(*(vector.at(maxIndex)));
+    return buildString(*(vector.at(maxIndex)));*/
 }

@@ -125,16 +125,29 @@ float SpeechRecognition::Decoder::LanguageModel::getUnigramScore(std::string wor
 }
 
 inline unsigned long SpeechRecognition::Decoder::LanguageModel::getUnigramAlphabetPosition(char ch) {
-    if(ch - 'a' >= unigramAlphabetPositions.size())
-        return unigramAlphabetPositions.size()-1;
+    static char last = CHAR_MAX;
+
+    unsigned long result = 0;
+
     if(ch >= 'a' && ch < words.size()) {
         return unigramAlphabetPositions[ch - 'a'];
     }
-    return 0;
+
+    if(ch > last) {
+        result = unigramAlphabetPositions.size() - 1;
+        last = CHAR_MAX;
+    }else{
+        last = ch;
+    }
+
+
+    return result;
 }
 
 SpeechRecognition::Decoder::LMWord*
 SpeechRecognition::Decoder::LanguageModel::getLMWord(std::string word) {
+    if(word == "!SIL")
+        __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "neco");
     unsigned long startIndex = getUnigramAlphabetPosition(word[0]);
     unsigned long endIndex = getUnigramAlphabetPosition(static_cast<char>(word[0] + 1));
     for(auto iterator = words.begin() + startIndex;

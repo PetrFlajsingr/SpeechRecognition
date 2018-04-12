@@ -20,21 +20,23 @@ namespace SpeechRecognition::Decoder {
  * Represents a token in a HMM graph.
  */
     class Token {
-        float calculateLikelihood(float *inputVector, unsigned int pathNumber);
+        float calculateLikelihood(float *inputVector, unsigned int pathNumber, Token* sourceToken);
 
         static AcousticModel *acousticModel;
 
         static LanguageModel* languageModel;
 
         bool needWord = true;
+
+        unsigned int position;
     public:
         float likelihood = 0.0f;
 
-        int word;
+        bool alive = false;
 
-        std::list<LMWord*> wordHistory; //< word history for ngrams
+        std::list<LMWord*>* wordHistory = NULL; //< word history for ngrams
 
-        Token(GraphNode *currentNode, int word);
+        Token(GraphNode *currentNode, int word, unsigned int position);
 
         virtual ~Token();
 
@@ -53,6 +55,8 @@ namespace SpeechRecognition::Decoder {
         static int tokenCount;
 
         GraphNode *currentNode; //< node in which the token is placed
+
+        static Token* getBestToken(GraphNode* node);
     };
 }
 
