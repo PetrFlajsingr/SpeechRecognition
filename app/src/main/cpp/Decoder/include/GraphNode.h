@@ -20,6 +20,8 @@ namespace SpeechRecognition::Decoder {
     public:
         // indexes of these vectors correlate
         std::vector<float> pathProbablity; //< probability of path to the next node
+
+        std::vector<GraphNode *> predecessorNodes; //< next nodes
         std::vector<GraphNode *> successorNodes; //< next nodes
 
         std::vector<Token *> tokens; //< tokens currently residing in this node

@@ -29,12 +29,14 @@ SpeechRecognition::Decoder::ViterbiDecoder::ViterbiDecoder(std::string pathToLex
     this->languageModel = new LanguageModel(pathToNgram);
 
     this->graph = new HMMGraph(this->acousticModel);
-    graph->rootNode->tokens.push_back(new Token(graph->rootNode, -1));
+    //graph->rootNode->tokens.push_back(new Token(graph->rootNode, -1));
 
     Token::setAcousticModel(*acousticModel);
     Token::setLanguageModel(*languageModel);
 
     graph->build(acousticModel);
+
+    graph->rootNode->tokens.push_back(new Token(graph->rootNode, -1));
 }
 
 SpeechRecognition::Decoder::ViterbiDecoder::~ViterbiDecoder() {

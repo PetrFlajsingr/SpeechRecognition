@@ -17,7 +17,7 @@ namespace SpeechRecognition::Decoder {
 
         const float WORD_INSERTION_PENALTY = -10;
 
-        void addSuccessors(GraphNode *node, AcousticModel *model, int wordID, int phonemeIndex);
+        void addSuccessors(GraphNode *node, AcousticModel *model, int wordID, int phonemeIndex, GraphNode* predecessor);
 
         void destroySuccessors(GraphNode *node);
 
@@ -32,7 +32,7 @@ namespace SpeechRecognition::Decoder {
         void searchTokens(std::vector<std::vector<Token *>> &allTokens, GraphNode *node,
                           unsigned int level);
 
-        void addSILNode(GraphNode *node, int wordID, int phonemeIndex);
+        void addSILNode(GraphNode *node, int wordID, int phonemeIndex, GraphNode* predecessor);
 
         void passTokens(GraphNode* node, float* input);
 

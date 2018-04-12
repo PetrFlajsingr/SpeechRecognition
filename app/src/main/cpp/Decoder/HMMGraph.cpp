@@ -28,19 +28,7 @@ std::vector<float> TEMP_PROB = {
  * @param model Acoustic model
  */
 SpeechRecognition::Decoder::HMMGraph::HMMGraph(AcousticModel* model) {
-    std::vector<float> probabilities;
-    std::vector<GraphNode*> nodes;
 
-    for(int i = 0; i < model->words.size(); i++){
-        probabilities.push_back(0);
-        GraphNode* node = new GraphNode(TEMP_PROB, i, 0,
-                                        model->words.at(i).phonemes.at(0));
-        nodes.push_back(node);
-    }
-    this->rootNode = new GraphNode(probabilities, -2, -1, NONE);
-    this->rootNode->successorNodes = nodes;
-
-    this->outputNode = new GraphNode(TEMP_PROB, -1, -1, NONE);
 }
 
 SpeechRecognition::Decoder::HMMGraph::~HMMGraph() {
@@ -48,20 +36,10 @@ SpeechRecognition::Decoder::HMMGraph::~HMMGraph() {
     delete outputNode;
 }
 
-/**
- * Adds/removes states from the graph.
- * @param model Acoustic model
- */
-void SpeechRecognition::Decoder::HMMGraph::build(AcousticModel *model) {
-    int i = 0;
-    for(auto iterator = rootNode->successorNodes.begin();
-            iterator != rootNode->successorNodes.end();
-            iterator++, i++){
-        addSuccessors(*iterator, model, i, 1);
-    }
-}
 
-void SpeechRecognition::Decoder::HMMGraph::addSILNode(GraphNode *node, int wordID, int phonemeIndex) {
+void SpeechRecognition::Decoder::HMMGraph::addSILNode(GraphNode *node,
+                                                      int wordID, int phonemeIndex,
+                                                      GraphNode* predecessor) {
     std::vector<float> TO_SIL_PROB = {
             static_cast<float>(log(0.80)),
             static_cast<float>(log(0.10)),
@@ -74,8 +52,12 @@ void SpeechRecognition::Decoder::HMMGraph::addSILNode(GraphNode *node, int wordI
     node->successorNodes.push_back(newNode);
     node->successorNodes.push_back(outputNode);
 
+    newNode->predecessorNodes.push_back(predecessor);
     newNode->successorNodes.push_back(newNode);
     newNode->successorNodes.push_back(outputNode);
+
+    outputNode->predecessorNodes.push_back(node);
+    outputNode->predecessorNodes.push_back(newNode);
 }
 
 /**
@@ -83,20 +65,52 @@ void SpeechRecognition::Decoder::HMMGraph::addSILNode(GraphNode *node, int wordI
  * @param wordID id of word in Acoustic model
  * @param phonemeIndex index of a phoneme
  */
-void SpeechRecognition::Decoder::HMMGraph::addSuccessors(GraphNode *node, AcousticModel* model, int wordID, int phonemeIndex) {
-    if(node->successorNodes.empty()) {
-        node->successorNodes.push_back(node);
-        if(phonemeIndex == model->words.at(wordID).phonemes.size()){
-            addSILNode(node, wordID, phonemeIndex + 1);
-            //node->successorNodes.push_back(this->outputNode);
-        }else{
-            GraphNode* newNode = new GraphNode(
-                    TEMP_PROB, wordID,
-                    phonemeIndex, model->words.at(wordID).phonemes.at(phonemeIndex));
-            node->successorNodes.push_back(newNode);
+void SpeechRecognition::Decoder::HMMGraph::addSuccessors(GraphNode *node, AcousticModel* model,
+                                                         int wordID, int phonemeIndex, GraphNode* predecessor) {
+    node->successorNodes.push_back(node);
+    node->predecessorNodes.push_back(predecessor);
+    if(phonemeIndex == model->words.at(wordID).phonemes.size()){
+        addSILNode(node, wordID, phonemeIndex, node);
+    }else {
+        GraphNode *newNode = new GraphNode(
+                TEMP_PROB, wordID,
+                phonemeIndex, model->words.at(wordID).phonemes.at(phonemeIndex));
+        node->successorNodes.push_back(newNode);
 
-            addSuccessors(newNode, model, wordID, phonemeIndex + 1);
-        }
+        addSuccessors(newNode, model, wordID, phonemeIndex + 1, node);
+    }
+}
+
+/**
+ * Adds/removes states from the graph.
+ * @param model Acoustic model
+ */
+void SpeechRecognition::Decoder::HMMGraph::build(AcousticModel *model) {
+    // root
+    std::vector<float> probabilities;
+    for(int i = 0; i < model->words.size(); i++)
+        probabilities.push_back(0);
+
+    std::vector<GraphNode*> nodes;
+
+    this->rootNode = new GraphNode(probabilities, -2, -1, NONE);
+
+    for(int i = 0; i < model->words.size(); i++){
+        GraphNode* node = new GraphNode(TEMP_PROB, i, 0,
+                                        model->words.at(i).phonemes.at(0));
+        nodes.push_back(node);
+    }
+
+    this->rootNode->successorNodes = nodes;
+
+    this->outputNode = new GraphNode(TEMP_PROB, -1, -1, NONE);
+    //\root
+
+    int i = 0;
+    for(auto iterator = rootNode->successorNodes.begin();
+            iterator != rootNode->successorNodes.end();
+            iterator++, i++){
+        addSuccessors(*iterator, model, i, 1, rootNode);
     }
 }
 
