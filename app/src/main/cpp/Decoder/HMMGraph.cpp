@@ -277,6 +277,7 @@ void SpeechRecognition::Decoder::HMMGraph::searchTokens(std::vector<std::vector<
  * Marks tokens with low likelihood for deletion.
  * Viterbi criterium has to be applied before using this function (only one token per node).
  */
+// OPTIMIZE
 void SpeechRecognition::Decoder::HMMGraph::applyPruning() {
     // each inner vector represents tokens in one level
     std::vector<std::vector<Token*>> allTokens;

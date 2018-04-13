@@ -7,7 +7,7 @@
 #include <android/log.h>
 
 SpeechRecognition::Threads::DecoderThread::DecoderThread(JavaCallbacks& callbacks): thread(&DecoderThread::threadDecoder, this)  {
-    this->decoder = new ViterbiDecoder("/sdcard/lexicon.bin", "/sdcard/LM.arpa");
+    this->decoder = new ViterbiDecoder("/sdcard/big/lexicon.bin", "/sdcard/big/lm.arpa");
 
     this->callbacks = &callbacks;
 }

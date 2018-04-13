@@ -53,6 +53,8 @@ void SpeechRecognition::Threads::MelBankThread::threadMelBank() {
         unsigned long sTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
         if(data->type == TERMINATE){
+            if(VADetector->isActive())
+                nnQueue->enqueue(new Q_MelData{SEQUENCE_INACTIVE, NULL});
             nnQueue->enqueue(new Q_MelData{TERMINATE, NULL});
             delete data;
             __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "MEL: TERMINATE");
