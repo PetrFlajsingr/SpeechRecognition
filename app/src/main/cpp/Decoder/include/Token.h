@@ -28,15 +28,17 @@ namespace SpeechRecognition::Decoder {
 
         bool needWord = true;
 
+        bool output = false;
+
         unsigned int position;
     public:
         float likelihood = 0.0f;
 
         bool alive = false;
 
-        std::list<LMWord*>* wordHistory = NULL; //< word history for ngrams
+        std::list<LMWord*> wordHistory; //< word history for ngrams
 
-        Token(GraphNode *currentNode, int word, unsigned int position);
+        Token(GraphNode *currentNode, bool output, unsigned int position);
 
         virtual ~Token();
 
@@ -57,6 +59,8 @@ namespace SpeechRecognition::Decoder {
         GraphNode *currentNode; //< node in which the token is placed
 
         static Token* getBestToken(GraphNode* node);
+
+        static std::vector<Token*> allTokens;
     };
 }
 

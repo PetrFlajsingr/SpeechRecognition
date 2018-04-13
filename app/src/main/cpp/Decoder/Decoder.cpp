@@ -36,7 +36,7 @@ SpeechRecognition::Decoder::ViterbiDecoder::ViterbiDecoder(std::string pathToLex
 
     graph->build(acousticModel);
 
-    graph->rootNode->tokens.push_back(new Token(graph->rootNode, -1, INT32_MAX));
+    graph->rootNode->tokens.push_back(new Token(graph->rootNode, false, INT32_MAX));
 }
 
 SpeechRecognition::Decoder::ViterbiDecoder::~ViterbiDecoder() {
@@ -70,28 +70,22 @@ void SpeechRecognition::Decoder::ViterbiDecoder::decode(float *input) {
     sum1 += timestamp1-startTime;
     //__android_log_print(ANDROID_LOG_DEBUG, APPNAME, "Clear TOKEN COUNT: %d", Token::tokenCount);
 
-    // TODO remake all
-    // SEGFAULT
     graph->passTokens(input);
     unsigned long timestamp2 = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
     sum2 += timestamp2-timestamp1;
     //__android_log_print(ANDROID_LOG_DEBUG, APPNAME, "Pass TOKEN COUNT: %d", Token::tokenCount);
 
-    graph->applyViterbiCriterium();
+    graph->addLM();
     unsigned long timestamp3 = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
     sum3 += timestamp3-timestamp2;
     //__android_log_print(ANDROID_LOG_DEBUG, APPNAME, "Viterbi TOKEN COUNT: %d", Token::tokenCount);
 
-    graph->applyPruning();
+    graph->applyViterbiCriterium();
     unsigned long timestamp4 = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
     sum4 += timestamp4-timestamp3;
-    //__android_log_print(ANDROID_LOG_DEBUG, APPNAME, "Pruing TOKEN COUNT: %d", Token::tokenCount);
+    //__android_log_print(ANDROID_LOG_DEBUG, APPNAME, "Pruning TOKEN COUNT: %d", Token::tokenCount);
 
-    /*Token::deleteInvalidTokens();
-    unsigned long timestamp6 = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-    sum6 += timestamp6-timestamp5;*/
-
-    graph->addLM();
+    graph->applyPruning();
     unsigned long timestamp5 = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
     sum7 += timestamp5-timestamp4;
 
@@ -103,23 +97,22 @@ void SpeechRecognition::Decoder::ViterbiDecoder::decode(float *input) {
  * Resets the decoder. Removes all tokens.
  */
 void SpeechRecognition::Decoder::ViterbiDecoder::reset() {
-    /*
-    for(auto iterator = graph->outputNode->tokens.begin();
-            iterator != graph->outputNode->tokens.end();){
-        delete *iterator;
-        graph->outputNode->tokens.erase(iterator);
-    }*/
+    for(auto iterator = Token::allTokens.begin();
+        iterator != Token::allTokens.end();
+        iterator++){
 
-    //Token::deleteInvalidTokens();
-    //Token::deleteStatic();
-    //graph->eraseTokenRecords();
+        (*iterator)->alive = (*iterator)->currentNode == graph->rootNode;
+
+        (*iterator)->likelihood = 0;
+        (*iterator)->wordHistory.clear();
+    }
 }
 
 //TODO add to utils
 std::string buildString(SpeechRecognition::Decoder::Token& token){
     std::string result = "";
-    for(auto iterator = token.wordHistory->begin();
-            iterator != token.wordHistory->end();
+    for(auto iterator = token.wordHistory.begin();
+            iterator != token.wordHistory.end();
             iterator++){
         result += (*iterator)->writtenForm + " ";
     }
@@ -131,19 +124,7 @@ std::string buildString(SpeechRecognition::Decoder::Token& token){
  * Returns the word with the highest likelihood from the clearOutputNode node.
  */
 std::string SpeechRecognition::Decoder::ViterbiDecoder::getWinner() {
-    auto bestToken = this->graph->outputNode->tokens.front();
+    auto bestToken = Token::getBestToken(graph->outputNode);
 
     return buildString(*bestToken);
-
-    /*float maxLikelihood = -std::numeric_limits<float>::max();
-    int maxIndex = -1, i = 0;
-    for(auto iterator = vector.begin();
-            iterator != vector.end();
-            iterator++, i++){
-        if((*iterator)->likelihood > maxLikelihood){
-            maxLikelihood = (*iterator)->likelihood;
-            maxIndex = i;
-        }
-    }
-    return buildString(*(vector.at(maxIndex)));*/
 }

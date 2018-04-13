@@ -146,8 +146,6 @@ inline unsigned long SpeechRecognition::Decoder::LanguageModel::getUnigramAlphab
 
 SpeechRecognition::Decoder::LMWord*
 SpeechRecognition::Decoder::LanguageModel::getLMWord(std::string word) {
-    if(word == "!SIL")
-        __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "neco");
     unsigned long startIndex = getUnigramAlphabetPosition(word[0]);
     unsigned long endIndex = getUnigramAlphabetPosition(static_cast<char>(word[0] + 1));
     for(auto iterator = words.begin() + startIndex;

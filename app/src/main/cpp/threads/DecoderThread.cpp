@@ -47,9 +47,9 @@ void SpeechRecognition::Threads::DecoderThread::threadDecoder(){
         } else{
             first = true;
             result = decoder->getWinner();
-            decoder->reset();
             __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "RESULT: %s", result.c_str());
             callbacks->notifySequenceRecognized(result);
+            decoder->reset();
         }
         delete data;
 

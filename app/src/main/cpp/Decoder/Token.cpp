@@ -8,19 +8,18 @@
 #include <android/log.h>
 #include <constants.h>
 
-//std::vector<SpeechRecognition::Decoder::Token*> SpeechRecognition::Decoder::Token::tokenVector;
 int SpeechRecognition::Decoder::Token::tokenCount = 0;
 SpeechRecognition::Decoder::AcousticModel* SpeechRecognition::Decoder::Token::acousticModel;
 SpeechRecognition::Decoder::LanguageModel* SpeechRecognition::Decoder::Token::languageModel;
-
+std::vector<SpeechRecognition::Decoder::Token*> SpeechRecognition::Decoder::Token::allTokens;
 /**
  * Registers token in static vector for all tokens.
  * Saves index in the vector for fast deletion from the vector.
  * @param currentNode node of graph
  */
-SpeechRecognition::Decoder::Token::Token(GraphNode* currentNode, int word, unsigned int position)
-        : currentNode(currentNode), position(position) {
-    if(currentNode->xPos == 0)
+SpeechRecognition::Decoder::Token::Token(GraphNode* currentNode, bool output, unsigned int position)
+        : output(output), currentNode(currentNode), position(position) {
+    if(currentNode->xPos == 0 && position == 0)
         this->needWord = true;
     else
         this->needWord = false;
@@ -29,6 +28,8 @@ SpeechRecognition::Decoder::Token::Token(GraphNode* currentNode, int word, unsig
         alive = true;
 
     tokenCount++;
+
+    allTokens.push_back(this);
 }
 
 /**
@@ -40,23 +41,23 @@ void SpeechRecognition::Decoder::Token::passInGraph(float *inputVector) {
 
     if(sourceToken == NULL){
         alive = false;
-        delete wordHistory;
-        wordHistory = NULL;
         return;
     }
+    alive = true;
 
-    if(needWord){
-        // TODO check
-        alive = true;
-        if(sourceToken->wordHistory == NULL){
-            wordHistory = new std::list<LMWord*>();
-        } else{
-            wordHistory = sourceToken->wordHistory;
-        }
-        addWordToHistory();
+    if(sourceToken != this) {
+
+        wordHistory = sourceToken->wordHistory;
+
+        if(needWord)
+            addWordToHistory();
     }
 
-    likelihood = calculateLikelihood(inputVector, position, sourceToken);
+    if(output){
+        likelihood = sourceToken->likelihood;
+    }else {
+        likelihood = calculateLikelihood(inputVector, position, sourceToken);
+    }
 }
 
 /**
@@ -68,10 +69,7 @@ void SpeechRecognition::Decoder::Token::passInGraph(float *inputVector) {
 float SpeechRecognition::Decoder::Token::calculateLikelihood(float* inputVector, unsigned int pathNumber, Token* sourceToken) {
     return sourceToken->likelihood
            + inputVector[currentNode->inputVectorIndex]
-           + currentNode->predecessorNodes.at(pathNumber)->pathProbablity.at(pathNumber + 1);
-    /*return likelihood
-           + inputVector[currentNode->successorNodes.at(pathNumber)->inputVectorIndex]
-             + currentNode->pathProbablity.at(pathNumber);*/
+           + currentNode->predecessorNodes.at(pathNumber)->pathProbablity.at(pathNumber);
 }
 
 SpeechRecognition::Decoder::Token::~Token() {
@@ -79,7 +77,15 @@ SpeechRecognition::Decoder::Token::~Token() {
 }
 
 void SpeechRecognition::Decoder::Token::addWordToHistory() {
-    wordHistory->push_back(languageModel->getLMWord(acousticModel->words.at(currentNode->wordID).writtenForm));
+    if(currentNode->wordID < 0){
+        wordHistory.push_back(languageModel->getLMWord(
+                acousticModel->words.at(currentNode->predecessorNodes.at(this->position)->wordID).writtenForm
+        ));
+    } else {
+        wordHistory.push_back(languageModel->getLMWord(
+                acousticModel->words.at(currentNode->wordID).writtenForm
+        ));
+    }
 }
 
 SpeechRecognition::Decoder::Token *

@@ -25,8 +25,6 @@ namespace SpeechRecognition::Decoder {
 
         void applyViterbiCriterium(GraphNode *node);
 
-        void eraseTokenRecords(GraphNode *node);
-
         void deleteLowLikelihood(std::vector<Token *> &tokens);
 
         void searchTokens(std::vector<std::vector<Token *>> &allTokens, GraphNode *node,
@@ -37,6 +35,8 @@ namespace SpeechRecognition::Decoder {
         void passTokens(GraphNode* node, float* input);
 
         void addTokensToOutputNode();
+
+        void passOutputNode(float* input);
 
     public:
         GraphNode *rootNode;
@@ -53,8 +53,6 @@ namespace SpeechRecognition::Decoder {
         void applyPruning();
 
         void clearOutputNode();
-
-        void eraseTokenRecords();
 
         void addLM();
 
