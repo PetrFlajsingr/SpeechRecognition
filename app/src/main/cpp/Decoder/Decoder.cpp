@@ -37,60 +37,28 @@ SpeechRecognition::Decoder::ViterbiDecoder::ViterbiDecoder(std::string pathToLex
     graph->build(acousticModel);
 
     graph->rootNode->tokens.push_back(new Token(graph->rootNode, false, INT32_MAX));
+
+    graph->rootNode->tokens.front()->wordHistory.push_back(languageModel->getLMWord("<s>"));
 }
 
 SpeechRecognition::Decoder::ViterbiDecoder::~ViterbiDecoder() {
     delete this->acousticModel;
     delete this->languageModel;
     delete this->graph;
-
-//    Token::deleteStatic();
 }
 
 int test = 0;
-
-unsigned long sum1 = 0;
-unsigned long sum2 = 0;
-unsigned long sum3 = 0;
-unsigned long sum4 = 0;
-unsigned long sum5 = 0;
-unsigned long sum6 = 0;
-unsigned long sum7 = 0;
 /**
  * Sends data through the graph.
  * @param input clearOutputNode of NN
  */
 void SpeechRecognition::Decoder::ViterbiDecoder::decode(float *input) {
-    unsigned long startTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
     test++;
 
-    //OK
     graph->clearOutputNode();
-    unsigned long timestamp1 = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-    sum1 += timestamp1-startTime;
-    //__android_log_print(ANDROID_LOG_DEBUG, APPNAME, "Clear TOKEN COUNT: %d", Token::tokenCount);
-
     graph->passTokens(input);
-    unsigned long timestamp2 = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-    sum2 += timestamp2-timestamp1;
-    //__android_log_print(ANDROID_LOG_DEBUG, APPNAME, "Pass TOKEN COUNT: %d", Token::tokenCount);
-
-    graph->addLM();
-    unsigned long timestamp3 = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-    sum3 += timestamp3-timestamp2;
-    //__android_log_print(ANDROID_LOG_DEBUG, APPNAME, "Viterbi TOKEN COUNT: %d", Token::tokenCount);
-
-    graph->applyViterbiCriterium();
-    unsigned long timestamp4 = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-    sum4 += timestamp4-timestamp3;
-    //__android_log_print(ANDROID_LOG_DEBUG, APPNAME, "Pruning TOKEN COUNT: %d", Token::tokenCount);
 
     graph->applyPruning();
-    unsigned long timestamp5 = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-    sum7 += timestamp5-timestamp4;
-
-    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "clear: %d, pass: %d, viterbi: %d, pruning: %d", sum1, sum2, sum3, sum4);
-    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "LM TOKEN COUNT: %d", Token::tokenCount);
 }
 
 /**
@@ -106,18 +74,20 @@ void SpeechRecognition::Decoder::ViterbiDecoder::reset() {
         (*iterator)->likelihood = 0;
         (*iterator)->wordHistory.clear();
     }
+    graph->rootNode->tokens.front()->wordHistory.push_back(languageModel->getLMWord("<s>"));
+
 }
 
 //TODO add to utils
 std::string buildString(SpeechRecognition::Decoder::Token& token){
-    std::string result = "";
+    std::string result = "-";
     for(auto iterator = token.wordHistory.begin();
             iterator != token.wordHistory.end();
             iterator++){
         result += (*iterator)->writtenForm + " ";
     }
 
-    return result;
+    return result+"-";
 }
 
 /**

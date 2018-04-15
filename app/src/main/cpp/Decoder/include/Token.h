@@ -42,7 +42,7 @@ namespace SpeechRecognition::Decoder {
 
         virtual ~Token();
 
-        void passInGraph(float *inputVector);
+        float passInGraph(float *inputVector);
 
         static void setAcousticModel(AcousticModel &model) {
             acousticModel = &model;

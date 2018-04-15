@@ -47,7 +47,6 @@ endforeach()
 # Gradle automatically packages shared libraries with your APK.
 
 add_library( # Sets the name of the library.
-# TODO change library name
               speech_recognition
 
               # Sets the library as a shared library.
@@ -82,6 +81,7 @@ add_library( # Sets the name of the library.
               src/main/cpp/Decoder/LMWord.cpp
               src/main/cpp/Decoder/Phoneme.cpp
               src/main/cpp/Decoder/Token.cpp
+              src/main/cpp/Decoder/Bigram.cpp
 
               # VOICE ACTIVITY DETECTION
               src/main/cpp/Voice_Activity_Detection/VoiceActivityDetector.cpp

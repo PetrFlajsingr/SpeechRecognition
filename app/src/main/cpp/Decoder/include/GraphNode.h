@@ -30,10 +30,10 @@ namespace SpeechRecognition::Decoder {
 
         short xPos; //< position in sequence ("column")
 
-        PHONEME_ENUM inputVectorIndex; //< index for NN clearOutputNode
+        PHONEME inputVectorIndex; //< index for NN clearOutputNode
 
         GraphNode(const std::vector<float> &pathProbablity, int wordID, short xPos,
-                  PHONEME_ENUM inputVectorIndex);
+                  PHONEME inputVectorIndex);
     };
 }
 

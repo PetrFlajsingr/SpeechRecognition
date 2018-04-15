@@ -18,7 +18,7 @@ namespace SpeechRecognition::Decoder {
     public:
         int id;
         std::string writtenForm;
-        std::vector<PHONEME_ENUM> phonemes;
+        std::vector<PHONEME> phonemes;
 
         Word(const std::string &writtenForm);
     };

@@ -13,7 +13,7 @@ namespace SpeechRecognition::Decoder {
  * phonemes coresponding to their clearOutputNode index in neural network
  * TODO change enum name
  */
-    enum PHONEME_ENUM {
+    enum PHONEME {
         AA = 0,
         AE = 1,
         AH = 2,
@@ -68,7 +68,7 @@ namespace SpeechRecognition::Decoder {
  */
     class Phoneme {
     public:
-        static PHONEME_ENUM stringToPhoneme(std::string phoneme);
+        static PHONEME stringToPhoneme(std::string phoneme);
     };
 
 }

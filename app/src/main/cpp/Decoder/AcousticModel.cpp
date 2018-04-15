@@ -39,7 +39,7 @@ SpeechRecognition::Decoder::AcousticModel::AcousticModel(std::string path) {
 
             for(int j = 0; j < phonemeCount;j++) {
                 file.read((char*)(&phoneme), 1);
-                amWord.phonemes.push_back((PHONEME_ENUM)phoneme);
+                amWord.phonemes.push_back((PHONEME)phoneme);
             }
             this->words.push_back(amWord);
         }

@@ -11,7 +11,7 @@
 namespace SpeechRecognition::Decoder {
     class HMMGraph {
     private:
-        const unsigned int MAX_TOKEN_COUNT = 200; //< pruning: max count per "step" (1 level of graph)
+        const unsigned int MAX_TOKEN_COUNT = 400; //< pruning: max count per "step" (1 level of graph)
 
         const float SCALE_FACTOR_LM = 2;
 
@@ -22,8 +22,6 @@ namespace SpeechRecognition::Decoder {
         void destroySuccessors(GraphNode *node);
 
         void destroyGraph(GraphNode *node);
-
-        void applyViterbiCriterium(GraphNode *node);
 
         void deleteLowLikelihood(std::vector<Token *> &tokens);
 
@@ -38,6 +36,10 @@ namespace SpeechRecognition::Decoder {
 
         void passOutputNode(float* input);
 
+        std::vector<std::vector<Token*>> tokensForPruning;
+
+        float getBigramValue(Token* token);
+
     public:
         GraphNode *rootNode;
         GraphNode *outputNode;
@@ -47,8 +49,6 @@ namespace SpeechRecognition::Decoder {
         virtual ~HMMGraph();
 
         void build(AcousticModel *model);
-
-        void applyViterbiCriterium();
 
         void applyPruning();
 

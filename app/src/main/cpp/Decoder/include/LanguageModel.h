@@ -16,6 +16,8 @@ namespace SpeechRecognition::Decoder {
     private:
         void saveWord(char *input);
 
+        void saveBigram(char* input);
+
         std::vector<unsigned long> unigramAlphabetPositions;
 
         char forBuilding = 'a';
@@ -25,8 +27,6 @@ namespace SpeechRecognition::Decoder {
         std::vector<LMWord> words;
 
         LanguageModel(std::string path);
-
-        float getUnigramScore(std::string word);
 
         LMWord* getLMWord(std::string word);
     };

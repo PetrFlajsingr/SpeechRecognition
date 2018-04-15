@@ -6,6 +6,8 @@
 #define VOICERECOGNITION_LMWORD_H
 
 #include <string>
+#include <vector>
+#include <BigramFWD.h>
 
 namespace SpeechRecognition::Decoder {
     class LMWord {
@@ -21,6 +23,8 @@ namespace SpeechRecognition::Decoder {
         float unigramBackoff;
 
         LMWord(const std::string &writtenForm);
+
+        std::vector<Bigram*> bigrams;
 
     };
 }
