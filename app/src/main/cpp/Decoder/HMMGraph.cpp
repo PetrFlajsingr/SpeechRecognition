@@ -16,8 +16,6 @@
 #include <chrono>
 #include <Bigram.h>
 
-// TODO remove using
-using namespace SpeechRecognition::Decoder;
 //TODO temp variable, remove
 std::vector<float> TEMP_PROB = {
         static_cast<float>(log(0.87)),
@@ -257,7 +255,7 @@ void SpeechRecognition::Decoder::HMMGraph::addLM() {
     }
 }
 
-float HMMGraph::getBigramValue(Token *token) {
+float SpeechRecognition::Decoder::HMMGraph::getBigramValue(SpeechRecognition::Decoder::Token *token) {
     std::list<LMWord*>::iterator iter = token->wordHistory.end();
     std::list<LMWord*>::iterator lastWord = --iter;
     --iter;
@@ -274,7 +272,7 @@ float HMMGraph::getBigramValue(Token *token) {
     return (*lastWord)->unigramScore + (*iter)->unigramBackoff;
 }
 
-void HMMGraph::passTokens(GraphNode *node, float* input) {
+void SpeechRecognition::Decoder::HMMGraph::passTokens(SpeechRecognition::Decoder::GraphNode *node, float* input) {
     if(node != outputNode) {
         int offset = 1;
         if(node == rootNode)
@@ -313,18 +311,18 @@ void HMMGraph::passTokens(GraphNode *node, float* input) {
     }
 }
 
-void HMMGraph::passTokens(float *input) {
+void SpeechRecognition::Decoder::HMMGraph::passTokens(float *input) {
     passOutputNode(input);
     passTokens(rootNode, input);
 }
 
-void HMMGraph::addTokensToOutputNode() {
+void SpeechRecognition::Decoder::HMMGraph::addTokensToOutputNode() {
     for(int i = 0; i < outputNode->predecessorNodes.size(); i++){
         outputNode->tokens.push_back(new Token(outputNode, true, i));
     }
 }
 
-void HMMGraph::passOutputNode(float* input) {
+void SpeechRecognition::Decoder::HMMGraph::passOutputNode(float* input) {
     float maxLikelihood = -std::numeric_limits<float>::max();
     float likelihood;
     unsigned int maxIndex = 0, i = 0;

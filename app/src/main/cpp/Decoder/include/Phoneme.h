@@ -10,8 +10,7 @@
 
 namespace SpeechRecognition::Decoder {
 /**
- * phonemes coresponding to their clearOutputNode index in neural network
- * TODO change enum name
+ * phonemes corresponding to their clearOutputNode index in neural network
  */
     enum PHONEME {
         AA = 0,

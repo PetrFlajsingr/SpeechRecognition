@@ -17,7 +17,6 @@
 #include <android/log.h>
 #include <constants.h>
 #include <list>
-// TODO remove using
 
 /**
  * Prepares language and acoustic models and lays foundation for a graph.
@@ -78,8 +77,7 @@ void SpeechRecognition::Decoder::ViterbiDecoder::reset() {
 
 }
 
-//TODO add to utils
-std::string buildString(SpeechRecognition::Decoder::Token& token){
+std::string SpeechRecognition::Decoder::ViterbiDecoder::buildString(SpeechRecognition::Decoder::Token& token){
     std::string result = "-";
     for(auto iterator = token.wordHistory.begin();
             iterator != token.wordHistory.end();
