@@ -1,6 +1,6 @@
 //
 // Created by Petr Flajsingr on 31/03/2018.
-//
+// Forward declaration of GraphNode class
 
 #ifndef VOICERECOGNITION_GRAPHNODEFWD_H
 #define VOICERECOGNITION_GRAPHNODEFWD_H

@@ -16,7 +16,7 @@
 #include <fstream>
 #include <thread>
 #include <AudioSubsampler.h>
-#include <Decoder.h>
+#include <ViterbiDecoder.h>
 #include <Utils.h>
 #include <VoiceActivityDetector.h>
 #include <unistd.h>
@@ -42,8 +42,6 @@ std::vector<T_registeredObject> callbackObjects;
 using namespace android::RSC;
 
 RawAudioRecorder* recorder;
-
-short* readAudioFromFile(std::string filepath, int* recordingSize);
 
 const char* cacheDir;
 
@@ -89,26 +87,6 @@ void startRecording()
 }
 
 //\ threads
-
-/**
- * Reads raw audio file from storage. Expects little endian 16 bit signed audio
- * @param filepath
- * @param recordingSize
- * @return
- */
-short* readAudioFromFile(std::string filepath, int* recordingSize){
-    std::ifstream in(filepath.c_str(), std::ifstream::binary);
-
-    in.seekg(0, std::ios::end);
-    long fileSize = in.tellg();
-    in.seekg(0, std::ios::beg);
-
-    short* data = new short[fileSize];
-    in.read((char*) data, fileSize);
-    *recordingSize = (int) (fileSize / 2);
-    return data;
-}
-
 
 // shut down the native audio system
 void shutdown()

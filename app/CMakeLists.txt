@@ -74,7 +74,7 @@ add_library( # Sets the name of the library.
               # DECODER
               src/main/cpp/Decoder/HMMGraph.cpp
               src/main/cpp/Decoder/GraphNode.cpp
-              src/main/cpp/Decoder/Decoder.cpp
+              src/main/cpp/Decoder/ViterbiDecoder.cpp
               src/main/cpp/Decoder/AcousticModel.cpp
               src/main/cpp/Decoder/LanguageModel.cpp
               src/main/cpp/Decoder/Word.cpp

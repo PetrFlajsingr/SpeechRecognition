@@ -32,6 +32,13 @@ namespace SpeechRecognition::Decoder {
 
         PHONEME inputVectorIndex; //< index for NN clearOutputNode
 
+        /**
+         * Creates a node for a graph
+         * @param pathProbablity probability of transition
+         * @param wordID id of a word represented by this node
+         * @param xPos position in a word
+         * @param inputVectorIndex index of neural network output
+         */
         GraphNode(const std::vector<float> &pathProbablity, int wordID, short xPos,
                   PHONEME inputVectorIndex);
     };

@@ -8,8 +8,16 @@
 #include <LMWordFWD.h>
 
 namespace SpeechRecognition::Decoder {
+    /**
+     * Represents bigram of a specified word
+     */
     class Bigram {
     public:
+        /**
+         * Create bigram
+         * @param secondWord second word in a bigram
+         * @param bigramProbability bigram probability
+         */
         Bigram(LMWord *secondWord, float bigramProbablity);
 
         LMWord *secondWord;

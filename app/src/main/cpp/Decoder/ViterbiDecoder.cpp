@@ -7,7 +7,7 @@
 #include <LanguageModel.h>
 #include <AcousticModel.h>
 #include <HMMGraph.h>
-#include <Decoder.h>
+#include <ViterbiDecoder.h>
 #include <vector>
 #include <GraphNode.h>
 #include <Token.h>

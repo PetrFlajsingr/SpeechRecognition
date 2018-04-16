@@ -27,19 +27,27 @@ std::vector<float> TEMP_PROB = {
 
 
 /**
- * Prepares root node of a graph and creates first token;
  * @param model Acoustic model
  */
 SpeechRecognition::Decoder::HMMGraph::HMMGraph(AcousticModel* model) {
 
 }
 
+/**
+ * Free graph memory
+ */
 SpeechRecognition::Decoder::HMMGraph::~HMMGraph() {
     destroyGraph(rootNode);
     delete outputNode;
 }
 
-
+/**
+ * Adds SIL node to the end of the word and links it
+ * @param node predecessor node
+ * @param wordID id of a word
+ * @param phonemeIndex index in a word
+ * @param predecessor
+ */
 void SpeechRecognition::Decoder::HMMGraph::addSILNode(GraphNode *node,
                                                       int wordID, int phonemeIndex,
                                                       GraphNode* predecessor) {

@@ -7,7 +7,7 @@
 
 
 #include <thread>
-#include <Decoder.h>
+#include <ViterbiDecoder.h>
 #include <QueueData.h>
 #include <SafeQueue.h>
 #include "JavaCallbacks.h"

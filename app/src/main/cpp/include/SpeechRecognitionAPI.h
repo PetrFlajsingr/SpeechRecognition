@@ -5,10 +5,11 @@
 #ifndef VOICERECOGNITION_SPEECHRECOGNITIONAPI_H
 #define VOICERECOGNITION_SPEECHRECOGNITIONAPI_H
 
+namespace SpeechRecognition {
+    class SpeechRecognitionAPI {
 
-class SpeechRecognitionAPI {
-
-};
+    };
+}
 
 
 #endif //VOICERECOGNITION_SPEECHRECOGNITIONAPI_H
