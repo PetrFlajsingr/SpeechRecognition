@@ -44,7 +44,7 @@ float SpeechRecognition::Decoder::Token::passInGraph(float *inputVector) {
 
     if(sourceToken == NULL){
         alive = false;
-        wordHistory.clear();
+        //wordHistory.clear();
         return -std::numeric_limits<float>::max();
     }
 

@@ -92,8 +92,9 @@ SpeechRecognition::Decoder::LanguageModel::LanguageModel(std::string path) {
             }
 
         }
+        file.close();
     }
-    file.close();
+
     __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "LM loaded");
 }
 

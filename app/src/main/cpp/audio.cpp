@@ -24,6 +24,7 @@
 #include <NNThread.h>
 #include <DecoderThread.h>
 #include <JavaCallbacks.h>
+#include <WavReader.h>
 
 using namespace SpeechRecognition;
 using namespace Feature_Extraction;
@@ -374,6 +375,27 @@ void notifyRecognitionDone(){
         DetachJava();
 }
 
+void vawtest(){
+    WavReader reader;
+
+    std::ifstream file;
+
+    file.open("/sdcard/Audio/test.wav", std::ios::in|std::ios::binary);
+    if(file.is_open()){
+
+        short* audioData = reader.wavToPcm(file);
+        if(audioData == NULL){
+            __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "error audio read: %s", reader.getErrorMessage().c_str());
+            return;
+        }
+
+
+
+        file.close();
+    }
+
+}
+
 extern "C"{
     // CALLBACKS
     JNIEXPORT void JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_SpeechRecognitionAPI_registerCallbacksNative
@@ -430,6 +452,6 @@ extern "C"{
     //test
     JNIEXPORT void JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_SpeechRecognitionAPI_testNative
             (JNIEnv* env, jobject obj){
-        VADtest();
+        vawtest();
     }
 }

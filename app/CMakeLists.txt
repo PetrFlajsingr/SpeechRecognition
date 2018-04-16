@@ -57,6 +57,7 @@ add_library( # Sets the name of the library.
               src/main/cpp/Miscelanous/AudioSubsampler.cpp
               src/main/cpp/Miscelanous/FeatureMatrix.cpp
               src/main/cpp/Miscelanous/Utils.cpp
+              src/main/cpp/Miscelanous/WavReader.cpp
 
               # FEATURE EXTRACTION
               src/main/cpp/Feature_Extraction/AudioFrame.cpp
@@ -68,7 +69,6 @@ add_library( # Sets the name of the library.
               # THIRD PARTY
               src/main/cpp/kissfft/kiss_fft.c
               src/main/cpp/kissfft/kiss_fftr.c
-
               src/main/cpp/firfilter/filt.cpp
 
               # DECODER
