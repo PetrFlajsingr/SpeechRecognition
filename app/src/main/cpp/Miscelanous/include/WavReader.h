@@ -18,7 +18,11 @@ private:
         bool isStereo;
     }WavInfo;
 
+    unsigned int dataSize = 0;
+
     const unsigned int HEADER_SIZE = 44;
+
+    const unsigned int FORMAT_OFFSET = 20;
 
     WavInfo wavInfo;
 
@@ -28,6 +32,8 @@ private:
 public:
 
     std::string getErrorMessage();
+
+    unsigned int getDataSize();
 
     short* wavToPcm(std::ifstream& stream);
 };
