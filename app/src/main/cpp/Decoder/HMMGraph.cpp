@@ -15,6 +15,9 @@
 #include <algorithm>
 #include <chrono>
 #include <Bigram.h>
+#include <thread>
+#include <constants.h>
+#include <android/log.h>
 
 //TODO temp variable, remove
 std::vector<float> TEMP_PROB = {
@@ -129,7 +132,7 @@ void SpeechRecognition::Decoder::HMMGraph::build(AcousticModel *model) {
     addTokensToOutputNode();
 
     // for filling the vectors
-    searchTokens(tokensForPruning, rootNode, 0);
+    searchTokens(tokensForBeamPruning, rootNode, 0);
 }
 
 /**
@@ -181,11 +184,11 @@ void SpeechRecognition::Decoder::HMMGraph::destroyGraph(GraphNode* node) {
 }
 
 
-void SpeechRecognition::Decoder::HMMGraph::deleteLowLikelihood(std::vector<Token*>& tokens){
-    if(tokens.size() <= MAX_TOKEN_COUNT)
+void SpeechRecognition::Decoder::HMMGraph::applyBeamPruning(std::vector<Token *> &tokens){
+    if(tokens.size() <= BEAM_PRUNING_LIMIT)
         return;
 
-    for(auto iterator = tokens.begin() + MAX_TOKEN_COUNT;
+    for(auto iterator = tokens.begin() + BEAM_PRUNING_LIMIT;
         iterator != tokens.end();
         iterator++){
         (*iterator)->alive = false;
@@ -225,34 +228,34 @@ void SpeechRecognition::Decoder::HMMGraph::searchTokens(std::vector<std::vector<
  * Viterbi criterium has to be applied before using this function (only one token per node).
  */
 void SpeechRecognition::Decoder::HMMGraph::applyPruning() {
-    // sorting by likelihood - descending
-    for(auto iterator = tokensForPruning.begin();
-            iterator != tokensForPruning.end();
+    // BEAM PRUNING
+    for(auto iterator = tokensForBeamPruning.begin();
+            iterator != tokensForBeamPruning.end();
             iterator++){
         std::sort((*iterator).begin(), (*iterator).end(),
                   [](const Token* ls, const Token* rs){
                       return ls->alive && ls->likelihood > rs->likelihood;
                   });
-        deleteLowLikelihood(*iterator);
+        applyBeamPruning(*iterator);
     }
-}
 
-void SpeechRecognition::Decoder::HMMGraph::addLM() {
-    for(auto iterator = outputNode->tokens.begin();
-            iterator != outputNode->tokens.end();
-            iterator++){
-        if((*iterator)->alive) {
-            //UNIGRAM
-            //(*iterator)->likelihood += WORD_INSERTION_PENALTY
-            //                           + (*iterator)->wordHistory.back()->unigramScore *
-            //                             SCALE_FACTOR_LM;
-            //BIGRAM
-            (*iterator)->likelihood += WORD_INSERTION_PENALTY
-                                       + getBigramValue(*iterator) *
-                                         SCALE_FACTOR_LM;
+    return;
 
-        }
+    if(Token::allTokens.size() < LIVE_STATES_PRUNING_LIMIT)
+        return;
+
+    // LIVE STATES PRUNING
+    std::sort(Token::allTokens.begin(), Token::allTokens.end(),
+              [](const Token* ls, const Token* rs){
+                  return ls->alive && ls->likelihood > rs->likelihood;
+              });
+
+    for(auto iterator = Token::allTokens.begin() + LIVE_STATES_PRUNING_LIMIT;
+        iterator != Token::allTokens.end();
+        iterator++){
+        (*iterator)->alive = false;
     }
+
 }
 
 float SpeechRecognition::Decoder::HMMGraph::getBigramValue(SpeechRecognition::Decoder::Token *token) {
@@ -264,7 +267,7 @@ float SpeechRecognition::Decoder::HMMGraph::getBigramValue(SpeechRecognition::De
     for(auto iterator = (*iter)->bigrams.begin();
             iterator != (*iter)->bigrams.end();
             iterator++){
-        if((*iterator)->secondWord->writtenForm == (*lastWord)->writtenForm){
+        if((*iterator)->secondWord->id == (*lastWord)->id){
             return (*iterator)->bigramProbability;
         }
     }
@@ -311,6 +314,7 @@ void SpeechRecognition::Decoder::HMMGraph::passTokens(SpeechRecognition::Decoder
     }
 }
 
+
 void SpeechRecognition::Decoder::HMMGraph::passTokens(float *input) {
     passOutputNode(input);
     passTokens(rootNode, input);
@@ -344,5 +348,4 @@ void SpeechRecognition::Decoder::HMMGraph::passOutputNode(float* input) {
             (*iterator)->alive = (i == maxIndex);
         }
     }
-    addLM();
 }

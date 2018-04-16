@@ -172,10 +172,10 @@ SpeechRecognition::Decoder::LanguageModel::getLMWord(std::string word) {
             return &(*iterator);
         }
     }
-    LMWord* lmWord = new LMWord(word+"--unknwn--");
-    lmWord->unigramScore = -1;
-    lmWord->unigramBackoff = -1;
-    return lmWord;
+}
+
+SpeechRecognition::Decoder::LanguageModel::~LanguageModel() {
+
 }
 
 

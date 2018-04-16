@@ -129,7 +129,7 @@ public class SpeechRecognitionAPI {
 
 
     // LISTENERS
-    private List<ISpeechRecognitionAPICallback> listeners = new ArrayList<>();
+    final private List<ISpeechRecognitionAPICallback> listeners = new ArrayList<>();
 
     private void notifyVADChanged(final VAD_ACTIVITY activity){
         new Thread(new Runnable() {
@@ -185,7 +185,7 @@ public class SpeechRecognitionAPI {
     }
     //\ LISTENERS
 
-    private List<ISpeechRecognitionAPIDebugCallbacks> debugListeners = new ArrayList<>();
+    final private List<ISpeechRecognitionAPIDebugCallbacks> debugListeners = new ArrayList<>();
 
     public void addDebugListener(ISpeechRecognitionAPIDebugCallbacks listener){
         debugListeners.add(listener);

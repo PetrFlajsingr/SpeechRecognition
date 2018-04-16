@@ -7,23 +7,18 @@
 
 #include <GraphNode.h>
 #include <AcousticModel.h>
+#include <mutex>
 
 namespace SpeechRecognition::Decoder {
     class HMMGraph {
     private:
-        const unsigned int MAX_TOKEN_COUNT = 400; //< pruning: max count per "step" (1 level of graph)
-
-        const float SCALE_FACTOR_LM = 2;
-
-        const float WORD_INSERTION_PENALTY = -10;
-
         void addSuccessors(GraphNode *node, AcousticModel *model, int wordID, int phonemeIndex, GraphNode* predecessor);
 
         void destroySuccessors(GraphNode *node);
 
         void destroyGraph(GraphNode *node);
 
-        void deleteLowLikelihood(std::vector<Token *> &tokens);
+        void applyBeamPruning(std::vector<Token *> &tokens);
 
         void searchTokens(std::vector<std::vector<Token *>> &allTokens, GraphNode *node,
                           unsigned int level);
@@ -36,10 +31,7 @@ namespace SpeechRecognition::Decoder {
 
         void passOutputNode(float* input);
 
-        std::vector<std::vector<Token*>> tokensForPruning;
-
-        float getBigramValue(Token* token);
-
+        std::vector<std::vector<Token*>> tokensForBeamPruning;
     public:
         GraphNode *rootNode;
         GraphNode *outputNode;
@@ -54,9 +46,9 @@ namespace SpeechRecognition::Decoder {
 
         void clearOutputNode();
 
-        void addLM();
-
         void passTokens(float* input);
+
+        static float getBigramValue(Token* token);
     };
 }
 

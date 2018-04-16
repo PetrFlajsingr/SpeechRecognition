@@ -24,8 +24,8 @@
  * @param pathToNgram
  */
 SpeechRecognition::Decoder::ViterbiDecoder::ViterbiDecoder(std::string pathToLexicon, std::string pathToNgram) {
-    this->acousticModel = new AcousticModel(pathToLexicon);
     this->languageModel = new LanguageModel(pathToNgram);
+    this->acousticModel = new AcousticModel(pathToLexicon, languageModel);
 
     this->graph = new HMMGraph(this->acousticModel);
     //graph->rootNode->tokens.push_back(new Token(graph->rootNode, -1));
@@ -44,19 +44,20 @@ SpeechRecognition::Decoder::ViterbiDecoder::~ViterbiDecoder() {
     delete this->acousticModel;
     delete this->languageModel;
     delete this->graph;
+
+    LMWord::resetIdCounter();
+    Word::resetIdCounter();
+
+    Token::deleteAllTokens();
 }
 
-int test = 0;
 /**
  * Sends data through the graph.
  * @param input clearOutputNode of NN
  */
 void SpeechRecognition::Decoder::ViterbiDecoder::decode(float *input) {
-    test++;
-
     graph->clearOutputNode();
     graph->passTokens(input);
-
     graph->applyPruning();
 }
 
@@ -78,14 +79,14 @@ void SpeechRecognition::Decoder::ViterbiDecoder::reset() {
 }
 
 std::string SpeechRecognition::Decoder::ViterbiDecoder::buildString(SpeechRecognition::Decoder::Token& token){
-    std::string result = "-";
+    std::string result = "";
     for(auto iterator = token.wordHistory.begin();
             iterator != token.wordHistory.end();
             iterator++){
         result += (*iterator)->writtenForm + " ";
     }
 
-    return result+"-";
+    return result;
 }
 
 /**
@@ -94,5 +95,9 @@ std::string SpeechRecognition::Decoder::ViterbiDecoder::buildString(SpeechRecogn
 std::string SpeechRecognition::Decoder::ViterbiDecoder::getWinner() {
     auto bestToken = Token::getBestToken(graph->outputNode);
 
+    if(bestToken == NULL)
+        return "ERR";
+
+    bestToken->wordHistory.push_back(languageModel->getLMWord("</s>"));
     return buildString(*bestToken);
 }

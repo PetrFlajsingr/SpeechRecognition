@@ -17,7 +17,6 @@ import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity implements SpeechRecognitionAPI.ISpeechRecognitionAPICallback, SpeechRecognitionAPI.ISpeechRecognitionAPIDebugCallbacks{
     private boolean recording = false;
-    private boolean created = false;
 
     private SpeechRecognitionAPI speechAPI;
 
@@ -32,7 +31,7 @@ public class MainActivity extends AppCompatActivity implements SpeechRecognition
     private TextView decoderThreadTextView;
     private TextView memoryUsageTextView;
 
-    private Timer timer = new Timer();
+    final private Timer timer = new Timer();
 
     /**
      * Requests permissions on start.

@@ -28,8 +28,6 @@ namespace SpeechRecognition::Decoder {
 
         bool needWord = true;
 
-        bool output = false;
-
         unsigned int position;
     public:
         float likelihood = 0.0f;
@@ -61,6 +59,10 @@ namespace SpeechRecognition::Decoder {
         static Token* getBestToken(GraphNode* node);
 
         static std::vector<Token*> allTokens;
+
+        static void deleteAllTokens();
+
+        bool output = false;
     };
 }
 

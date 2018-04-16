@@ -7,6 +7,7 @@
 #include <GraphNode.h>
 #include <android/log.h>
 #include <constants.h>
+#include <HMMGraph.h>
 
 int SpeechRecognition::Decoder::Token::tokenCount = 0;
 SpeechRecognition::Decoder::AcousticModel* SpeechRecognition::Decoder::Token::acousticModel;
@@ -46,19 +47,20 @@ float SpeechRecognition::Decoder::Token::passInGraph(float *inputVector) {
         wordHistory.clear();
         return -std::numeric_limits<float>::max();
     }
-    alive = true;
 
     if(sourceToken != this) {
+        alive = true;
 
-        //if(wordHistory.size() != sourceToken->wordHistory.size())
-            wordHistory = sourceToken->wordHistory;
+        wordHistory = sourceToken->wordHistory;
 
         if(needWord)
             addWordToHistory();
     }
 
     if(output){
-        likelihood = sourceToken->likelihood;
+        likelihood = sourceToken->likelihood + WORD_INSERTION_PENALTY
+                                   + HMMGraph::getBigramValue(this) *
+                                     SCALE_FACTOR_LM;
     }else {
         likelihood = calculateLikelihood(inputVector, position, sourceToken);
     }
@@ -83,15 +85,7 @@ SpeechRecognition::Decoder::Token::~Token() {
 }
 
 void SpeechRecognition::Decoder::Token::addWordToHistory() {
-    if(currentNode->wordID < 0){
-        wordHistory.push_back(languageModel->getLMWord(
-                acousticModel->words[currentNode->predecessorNodes[this->position]->wordID].writtenForm
-        ));
-    } else {
-        wordHistory.push_back(languageModel->getLMWord(
-                acousticModel->words[currentNode->wordID].writtenForm
-        ));
-    }
+    wordHistory.push_back(acousticModel->words[currentNode->wordID].lmword);
 }
 
 SpeechRecognition::Decoder::Token *
@@ -104,4 +98,12 @@ SpeechRecognition::Decoder::Token::getBestToken(SpeechRecognition::Decoder::Grap
     }
 
     return NULL;
+}
+
+void SpeechRecognition::Decoder::Token::deleteAllTokens() {
+    for(auto iterator = allTokens.begin();
+            iterator != allTokens.end();){
+        delete *iterator;
+        allTokens.erase(iterator);
+    }
 }

@@ -28,6 +28,8 @@ namespace SpeechRecognition::Decoder {
 
         LanguageModel(std::string path);
 
+        virtual ~LanguageModel();
+
         LMWord* getLMWord(std::string word);
     };
 }

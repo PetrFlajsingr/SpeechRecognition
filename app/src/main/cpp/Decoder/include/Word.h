@@ -7,20 +7,22 @@
 
 #include <vector>
 #include <Phoneme.h>
+#include "LMWord.h"
 
 namespace SpeechRecognition::Decoder {
     class Word {
     private:
         static int idCounter;
-
-        static void resetIdCounter();
-
     public:
         int id;
         std::string writtenForm;
         std::vector<PHONEME> phonemes;
 
+        LMWord* lmword;
+
         Word(const std::string &writtenForm);
+
+        static void resetIdCounter();
     };
 }
 

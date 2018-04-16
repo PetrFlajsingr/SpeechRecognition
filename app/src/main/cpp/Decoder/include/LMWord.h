@@ -26,6 +26,7 @@ namespace SpeechRecognition::Decoder {
 
         std::vector<Bigram*> bigrams;
 
+        static void resetIdCounter();
     };
 }
 

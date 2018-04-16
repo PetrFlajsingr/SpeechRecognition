@@ -7,6 +7,7 @@
 
 
 #include <Word.h>
+#include "LanguageModel.h"
 
 namespace SpeechRecognition::Decoder {
 /**
@@ -16,6 +17,7 @@ namespace SpeechRecognition::Decoder {
     public:
         std::vector<Word> words; //< vector of all words in the model
         AcousticModel(std::string path);
+        AcousticModel(std::string path, LanguageModel* languageModel);
     };
 }
 
