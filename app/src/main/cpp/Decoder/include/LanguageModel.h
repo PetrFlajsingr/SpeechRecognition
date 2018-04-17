@@ -22,7 +22,7 @@ namespace SpeechRecognition::Decoder {
 
         char forBuilding = 'a';
 
-        inline unsigned long getUnigramAlphabetPosition(char ch);
+        inline unsigned long getUnigramAlphabetPosition(int ch);
     public:
         std::vector<LMWord> words;
 

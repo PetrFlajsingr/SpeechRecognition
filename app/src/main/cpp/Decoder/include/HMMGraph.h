@@ -48,7 +48,7 @@ namespace SpeechRecognition::Decoder {
 
         void passTokens(float* input);
 
-        static float getBigramValue(Token* token);
+        static float getBigramMapValue(Token* token);
     };
 }
 

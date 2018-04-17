@@ -266,18 +266,16 @@ void SpeechRecognition::Decoder::HMMGraph::applyPruning() {
 
 }
 
-float SpeechRecognition::Decoder::HMMGraph::getBigramValue(SpeechRecognition::Decoder::Token *token) {
+float
+SpeechRecognition::Decoder::HMMGraph::getBigramMapValue(SpeechRecognition::Decoder::Token *token) {
     std::list<LMWord*>::iterator iter = token->wordHistory.end();
     std::list<LMWord*>::iterator lastWord = --iter;
     --iter;
 
+    auto bigram = (*iter)->bigramsMap.find((*lastWord)->id);
 
-    for(auto iterator = (*iter)->bigrams.begin();
-            iterator != (*iter)->bigrams.end();
-            iterator++){
-        if((*iterator)->secondWord->id == (*lastWord)->id){
-            return (*iterator)->bigramProbability;
-        }
+    if(bigram != (*iter)->bigramsMap.end()){
+        return bigram->second->bigramProbability;
     }
 
     return (*lastWord)->unigramScore + (*iter)->unigramBackoff;

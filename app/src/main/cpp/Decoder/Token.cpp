@@ -44,7 +44,6 @@ float SpeechRecognition::Decoder::Token::passInGraph(float *inputVector) {
 
     if(sourceToken == NULL){
         alive = false;
-        //wordHistory.clear();
         return -std::numeric_limits<float>::max();
     }
 
@@ -59,8 +58,9 @@ float SpeechRecognition::Decoder::Token::passInGraph(float *inputVector) {
 
     if(output){
         likelihood = sourceToken->likelihood + WORD_INSERTION_PENALTY
-                                   + HMMGraph::getBigramValue(this) *
+                                    + HMMGraph::getBigramMapValue(this)*
                                      SCALE_FACTOR_LM;
+
     }else {
         likelihood = calculateLikelihood(inputVector, position, sourceToken);
     }

@@ -103,13 +103,18 @@ void SpeechRecognition::Decoder::LanguageModel::saveBigram(char *input) {
 
     std::vector<std::string> words = split(record[1].c_str(), " ");
 
+    LMWord* bigramWord = getLMWord(words[1]);
+
+    Bigram* newBigram = new Bigram(
+            bigramWord,
+            static_cast<float>(atof(record[0].c_str())));
     LMWord* word = getLMWord(words[0]);
+
     word->bigrams.push_back(
-            new Bigram(
-                    getLMWord(words[1]),
-                    static_cast<float>(atof(record[0].c_str()))
-            )
+            newBigram
     );
+
+    word->bigramsMap.insert({newBigram->secondWord->id, newBigram});
 }
 
 /**
@@ -142,8 +147,8 @@ void SpeechRecognition::Decoder::LanguageModel::saveWord(char *input) {
     words.push_back(word);
 }
 
-inline unsigned long SpeechRecognition::Decoder::LanguageModel::getUnigramAlphabetPosition(char ch) {
-    static char last = CHAR_MAX;
+inline unsigned long SpeechRecognition::Decoder::LanguageModel::getUnigramAlphabetPosition(int ch) {
+    static int last = CHAR_MAX;
 
     unsigned long result = 0;
 
@@ -164,8 +169,8 @@ inline unsigned long SpeechRecognition::Decoder::LanguageModel::getUnigramAlphab
 
 SpeechRecognition::Decoder::LMWord*
 SpeechRecognition::Decoder::LanguageModel::getLMWord(std::string word) {
-    unsigned long startIndex = getUnigramAlphabetPosition(word[0]);
-    unsigned long endIndex = getUnigramAlphabetPosition(static_cast<char>(word[0] + 1));
+    unsigned long startIndex = getUnigramAlphabetPosition(word.c_str()[0]);
+    unsigned long endIndex = getUnigramAlphabetPosition((word.c_str()[0] + 1));
     for(auto iterator = words.begin() + startIndex;
         iterator != words.begin() + endIndex;
         iterator++){
