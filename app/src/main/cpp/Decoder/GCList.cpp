@@ -20,7 +20,8 @@ void SpeechRecognition::Decoder::GCList::unasign() {
 }
 
 SpeechRecognition::Decoder::GCList *SpeechRecognition::Decoder::GCList::copy() {
-    return new GCList(this);
+    GCList* newList = new GCList(this);
+    newList->referenceCount = 1;
 }
 
 SpeechRecognition::Decoder::GCList::GCList() {

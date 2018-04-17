@@ -58,7 +58,7 @@ float SpeechRecognition::Decoder::Token::passInGraph(float *inputVector) {
         if(needWord) {
             if(wordHistory != NULL)
                 wordHistory->unasign();
-            wordHistory = sourceToken->wordHistory->copy();
+            wordHistory = new GCList();
             addWordToHistory();
         }else{
             if(wordHistory != NULL)

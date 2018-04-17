@@ -21,7 +21,7 @@ android {
         renderscriptNdkModeEnabled true
         externalNativeBuild {
             cmake {
-                cppFlags "-std=c++14 -fno-rtti -fexceptions -O3 -ffast-math -DANDROID_ARM_NEON=TRUE"
+                cppFlags "-std=c++14 -fno-rtti -fexceptions -ffast-math -DANDROID_ARM_NEON=TRUE"
             }
         }
     }

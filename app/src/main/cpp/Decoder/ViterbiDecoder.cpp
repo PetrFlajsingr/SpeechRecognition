@@ -17,6 +17,7 @@
 #include <android/log.h>
 #include <constants.h>
 #include <list>
+#include <algorithm>
 
 /**
  * Prepares language and acoustic models and lays foundation for a graph.
@@ -84,7 +85,8 @@ std::string SpeechRecognition::Decoder::ViterbiDecoder::buildString(SpeechRecogn
     for(auto iterator = token.wordHistory->words.begin();
             iterator != token.wordHistory->words.end();
             iterator++){
-        result += (*iterator)->writtenForm + " ";
+        result.append((*iterator)->writtenForm);
+        result.append(" ");
     }
 
     return result;
@@ -100,5 +102,6 @@ std::string SpeechRecognition::Decoder::ViterbiDecoder::getWinner() {
         return "ERR";
 
     bestToken->wordHistory->words.push_back(languageModel->getLMWord("</s>"));
-    return buildString(*bestToken);
+    std::string result =  buildString(*bestToken);
+    return result;
 }

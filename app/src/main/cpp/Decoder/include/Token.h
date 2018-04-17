@@ -35,7 +35,7 @@ namespace SpeechRecognition::Decoder {
 
         bool alive = false;
 
-        GCList* wordHistory; //< word history for ngrams
+        GCList* wordHistory = NULL; //< word history for ngrams
 
         Token(GraphNode *currentNode, bool output, unsigned int position);
 
