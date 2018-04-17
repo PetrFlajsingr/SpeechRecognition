@@ -27,8 +27,10 @@ SpeechRecognition::Decoder::Token::Token(GraphNode* currentNode, bool output, un
     else
         this->needWord = false;
 
-    if(currentNode->xPos == -1)
+    if(currentNode->xPos == -1) {
         alive = true;
+        wordHistory = new GCList();
+    }
 
     tokenCount++;
 
@@ -44,16 +46,25 @@ float SpeechRecognition::Decoder::Token::passInGraph(float *inputVector) {
 
     if(sourceToken == NULL){
         alive = false;
+        if(wordHistory != NULL)
+            wordHistory->unasign();
+        wordHistory = NULL;
         return -std::numeric_limits<float>::max();
     }
 
     if(sourceToken != this) {
         alive = true;
 
-        wordHistory = sourceToken->wordHistory;
-
-        if(needWord)
+        if(needWord) {
+            if(wordHistory != NULL)
+                wordHistory->unasign();
+            wordHistory = sourceToken->wordHistory->copy();
             addWordToHistory();
+        }else{
+            if(wordHistory != NULL)
+                wordHistory->unasign();
+            wordHistory = sourceToken->wordHistory->assign();
+        }
     }
 
     if(output){
@@ -85,7 +96,7 @@ SpeechRecognition::Decoder::Token::~Token() {
 }
 
 void SpeechRecognition::Decoder::Token::addWordToHistory() {
-    wordHistory.push_back(acousticModel->words[currentNode->wordID].lmword);
+    wordHistory->words.push_back(acousticModel->words[currentNode->wordID].lmword);
 }
 
 SpeechRecognition::Decoder::Token *

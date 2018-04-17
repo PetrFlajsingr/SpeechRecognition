@@ -167,7 +167,8 @@ void SpeechRecognition::Decoder::HMMGraph::destroySuccessors(GraphNode *node) {
 void SpeechRecognition::Decoder::HMMGraph::clearOutputNode() {
     Token* bestToken = Token::getBestToken(outputNode);
     if(bestToken != NULL) {
-        rootNode->tokens.front()->wordHistory = bestToken->wordHistory;
+        rootNode->tokens.front()->wordHistory->unasign();
+        rootNode->tokens.front()->wordHistory = bestToken->wordHistory->assign();
         rootNode->tokens.front()->likelihood = bestToken->likelihood;
     }
 }
@@ -261,14 +262,15 @@ void SpeechRecognition::Decoder::HMMGraph::applyPruning() {
     for(auto iterator = Token::allTokens.begin() + LIVE_STATES_PRUNING_LIMIT;
         iterator != Token::allTokens.end();
         iterator++){
-        (*iterator)->alive = false;
+        if(!(*iterator)->output)
+            (*iterator)->alive = false;
     }
 
 }
 
 float
 SpeechRecognition::Decoder::HMMGraph::getBigramMapValue(SpeechRecognition::Decoder::Token *token) {
-    std::list<LMWord*>::iterator iter = token->wordHistory.end();
+    std::list<LMWord*>::iterator iter = token->wordHistory->words.end();
     std::list<LMWord*>::iterator lastWord = --iter;
     --iter;
 

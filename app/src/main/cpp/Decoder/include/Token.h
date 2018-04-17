@@ -13,6 +13,7 @@
 #include <Word.h>
 #include "AcousticModel.h"
 #include "LanguageModel.h"
+#include "GCList.h"
 #include <list>
 
 namespace SpeechRecognition::Decoder {
@@ -34,7 +35,7 @@ namespace SpeechRecognition::Decoder {
 
         bool alive = false;
 
-        std::list<LMWord*> wordHistory; //< word history for ngrams
+        GCList* wordHistory; //< word history for ngrams
 
         Token(GraphNode *currentNode, bool output, unsigned int position);
 

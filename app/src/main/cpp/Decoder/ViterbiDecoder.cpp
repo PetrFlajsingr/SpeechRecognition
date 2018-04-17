@@ -37,7 +37,7 @@ SpeechRecognition::Decoder::ViterbiDecoder::ViterbiDecoder(std::string pathToLex
 
     graph->rootNode->tokens.push_back(new Token(graph->rootNode, false, INT32_MAX));
 
-    graph->rootNode->tokens.front()->wordHistory.push_back(languageModel->getLMWord("<s>"));
+    graph->rootNode->tokens.front()->wordHistory->words.push_back(languageModel->getLMWord("<s>"));
 }
 
 SpeechRecognition::Decoder::ViterbiDecoder::~ViterbiDecoder() {
@@ -72,16 +72,17 @@ void SpeechRecognition::Decoder::ViterbiDecoder::reset() {
         (*iterator)->alive = (*iterator)->currentNode == graph->rootNode;
 
         (*iterator)->likelihood = 0;
-        (*iterator)->wordHistory.clear();
+        if((*iterator)->alive)
+            (*iterator)->wordHistory->words.clear();
     }
-    graph->rootNode->tokens.front()->wordHistory.push_back(languageModel->getLMWord("<s>"));
+    graph->rootNode->tokens.front()->wordHistory->words.push_back(languageModel->getLMWord("<s>"));
 
 }
 
 std::string SpeechRecognition::Decoder::ViterbiDecoder::buildString(SpeechRecognition::Decoder::Token& token){
     std::string result = "";
-    for(auto iterator = token.wordHistory.begin();
-            iterator != token.wordHistory.end();
+    for(auto iterator = token.wordHistory->words.begin();
+            iterator != token.wordHistory->words.end();
             iterator++){
         result += (*iterator)->writtenForm + " ";
     }
@@ -98,6 +99,6 @@ std::string SpeechRecognition::Decoder::ViterbiDecoder::getWinner() {
     if(bestToken == NULL)
         return "ERR";
 
-    bestToken->wordHistory.push_back(languageModel->getLMWord("</s>"));
+    bestToken->wordHistory->words.push_back(languageModel->getLMWord("</s>"));
     return buildString(*bestToken);
 }
