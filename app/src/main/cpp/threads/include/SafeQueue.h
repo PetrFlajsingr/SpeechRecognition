@@ -10,6 +10,8 @@
 #include <condition_variable>
 #include <queue>
 #include <atomic>
+#include <constants.h>
+#include <android/log.h>
 
 /**
  * Queue for passing data between worker threads.
@@ -20,6 +22,8 @@ private:
     std::condition_variable conditionVariable;
     std::queue<T> queue;
     std::atomic<bool> keep_running;
+
+
 public:
     SafeQueue():keep_running(true){};
 
@@ -39,7 +43,7 @@ public:
     }
 
     /**
-     * Get a first item from the queue and delete it from the queue
+     * Get a first item from the queue and remove it
      * @param item returned item
      * @return true if queue is still active, else false
      */
@@ -53,7 +57,6 @@ public:
             item = std::move(queue.front());
             queue.pop();
         }
-
         return keep_running;
     }
 

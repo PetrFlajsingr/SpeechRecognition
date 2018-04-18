@@ -57,8 +57,8 @@ void SpeechRecognition::Threads::DecoderThread::threadDecoder(){
         totalTime = nTime - startTime;
         runTime += nTime - sTime;
         counter++;
-        if(counter % 10 == 0)
-            callbacks->notifyDecoderDone(runTime/(double)totalTime*100);
+        //if(counter % 100 == 0)
+        //    callbacks->notifyDecoderDone(runTime/(double)totalTime*100);
     }
     callbacks->notifyRecognitionDone();
 

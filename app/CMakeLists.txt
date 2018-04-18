@@ -82,7 +82,7 @@ add_library( # Sets the name of the library.
               src/main/cpp/Decoder/Phoneme.cpp
               src/main/cpp/Decoder/Token.cpp
               src/main/cpp/Decoder/Bigram.cpp
-              src/main/cpp/Decoder/GCList.cpp
+              src/main/cpp/Decoder/WordHistoryList.cpp
 
               # VOICE ACTIVITY DETECTION
               src/main/cpp/Voice_Activity_Detection/VoiceActivityDetector.cpp
@@ -91,6 +91,7 @@ add_library( # Sets the name of the library.
               src/main/cpp/threads/MelBankThread.cpp
               src/main/cpp/threads/NNThread.cpp
               src/main/cpp/threads/DecoderThread.cpp
+              src/main/cpp/threads/FileStreamThread.cpp
               src/main/cpp/threads/JavaCallbacks.cpp
 
               ${RS_OBJ_FILES}

@@ -25,6 +25,7 @@
 #include <DecoderThread.h>
 #include <JavaCallbacks.h>
 #include <WavReader.h>
+#include <FileStreamThread.h>
 
 using namespace SpeechRecognition;
 using namespace Feature_Extraction;
@@ -61,8 +62,28 @@ void stopRecording(){
     recorder->stopRecording();
 }
 
+void threadsFromWav(std::ifstream& filestream){
+    FileStreamThread fileStreamThread(filestream);
+    MelBankThread melBankThread(cacheDir, callbacks, false);
+    NNThread nnThread(cacheDir);
+    DecoderThread decoderThread(callbacks);
+
+    nnThread.callbacks = &callbacks;
+
+    fileStreamThread.melQueue = &melBankThread.inputQueue;
+    melBankThread.nnQueue = &nnThread.inputQueue;
+    nnThread.decoderQueue = &decoderThread.inputQueue;
+
+    fileStreamThread.start();
+
+    fileStreamThread.thread.join();
+    melBankThread.thread.join();
+    nnThread.thread.join();
+    decoderThread.thread.join();
+}
+
 void threads(){
-    MelBankThread melBankThread(cacheDir, callbacks);
+    MelBankThread melBankThread(cacheDir, callbacks, true);
     NNThread nnThread(cacheDir);
     DecoderThread decoderThread(callbacks);
 
@@ -185,7 +206,13 @@ extern "C"{
 
     //test
     JNIEXPORT void JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_SpeechRecognitionAPI_testNative
-            (JNIEnv* env, jobject obj){
-        vawtest();
+            (JNIEnv* env, jobject obj, jstring path){
+        const char* nativeStringPath = env->GetStringUTFChars(path, 0);
+        std::ifstream file;
+        file.open(nativeStringPath, std::ios::in|std::ios::binary);
+        if(file.is_open()) {
+            threadsFromWav(file);
+            file.close();
+        }
     }
 }

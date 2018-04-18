@@ -26,11 +26,7 @@ import java.util.List;
  */
 public class SpeechRecognitionAPI {
     // TEST
-    private native void testNative();
-
-    public void test(){
-        testNative();
-    }
+    private native void testNative(String path);
     //\ TEST
     // NATIVE METHODS
     private native void setCacheDirNative(String cacheDir);
@@ -100,9 +96,8 @@ public class SpeechRecognitionAPI {
      * Recognizes speech from a given audio file.
      * @param file WAV audio file
      */
-    public void recognizeWAV(File file){
-        // TODO implement
-        throw new UnsupportedOperationException("The method has not been implemented");
+    public void recognizeWAV(String filePath){
+        testNative(filePath);
     }
 
     // CALLBACKS FROM NDK

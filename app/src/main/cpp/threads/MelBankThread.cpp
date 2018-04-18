@@ -11,11 +11,13 @@
 #include <JavaCallbacks.h>
 #include <android/log.h>
 
-SpeechRecognition::Threads::MelBankThread::MelBankThread(const char* cacheDir, JavaCallbacks& callbacks): thread(&MelBankThread::threadMelBank, this){
+SpeechRecognition::Threads::MelBankThread::MelBankThread(const char* cacheDir, JavaCallbacks& callbacks, bool subsample): thread(&MelBankThread::threadMelBank, this){
     this->melFilterBank = new RSMelFilterBank(cacheDir);
 
     this->VADetector = new VoiceActivityDetector();
     this->callbacks = &callbacks;
+
+    this->subsample = subsample;
 }
 
 SpeechRecognition::Threads::MelBankThread::~MelBankThread() {
@@ -49,6 +51,7 @@ void SpeechRecognition::Threads::MelBankThread::threadMelBank() {
     unsigned long counter = 0;
 
     bool notified = false;
+    short* subsampledAudio;
     while(inputQueue.dequeue(data)){
         unsigned long sTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
@@ -60,20 +63,25 @@ void SpeechRecognition::Threads::MelBankThread::threadMelBank() {
             __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "MEL: TERMINATE");
             break;
         }
-        short* subsampledAudio = subsampler.sample(data->data, SMALL_RECORDER_FRAMES);
+        if(subsample)
+            subsampledAudio = subsampler.sample(data->data, SMALL_RECORDER_FRAMES);
+        else
+            subsampledAudio = data->data;
 
         if(dataCount < 3){
             std::copy(subsampledAudio, subsampledAudio + SUBSAMPLED_OVERLAP_LENGTH,
                       newAudioData + dataCount * SUBSAMPLED_OVERLAP_LENGTH);
             dataCount++;
-            delete[] subsampledAudio;
+            if(subsample)
+                delete[] subsampledAudio;
             delete[] data->data;
             delete data;
             continue;
         }
 
         prepareAudioData(newAudioData, subsampledAudio);
-        delete[] subsampledAudio;
+        if(subsample)
+            delete[] subsampledAudio;
 
         frame.applyHammingWindow(newAudioData);
         delete[] data->data;
@@ -102,7 +110,7 @@ void SpeechRecognition::Threads::MelBankThread::threadMelBank() {
                 notified = true;
             }
         } else {
-            if(notified) {
+            if(notified && !subsample) {
                 notified = false;
                 nnQueue->enqueue(new Q_MelData{SEQUENCE_INACTIVE, NULL});
                 callbacks->notifyVADChanged(false);
@@ -115,8 +123,8 @@ void SpeechRecognition::Threads::MelBankThread::threadMelBank() {
         totalTime = nTime - startTime;
         runTime += nTime - sTime;
         counter++;
-        if(counter % 100 == 0)
-            callbacks->notifyMelDone(runTime/(double)totalTime*100);
+        //if(counter % 200 == 0)
+        //    callbacks->notifyMelDone(runTime/(double)totalTime*100);
     }
     delete[] newAudioData;
     callbacks->DetachJava();

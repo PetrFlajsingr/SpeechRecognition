@@ -29,7 +29,7 @@ SpeechRecognition::Decoder::Token::Token(GraphNode* currentNode, bool output, un
 
     if(currentNode->xPos == -1) {
         alive = true;
-        wordHistory = new GCList();
+        wordHistory = new WordHistoryList();
     }
 
     tokenCount++;
@@ -58,7 +58,7 @@ float SpeechRecognition::Decoder::Token::passInGraph(float *inputVector) {
         if(needWord) {
             if(wordHistory != NULL)
                 wordHistory->unasign();
-            wordHistory = new GCList();
+            wordHistory = sourceToken->wordHistory->copy();
             addWordToHistory();
         }else{
             if(wordHistory != NULL)

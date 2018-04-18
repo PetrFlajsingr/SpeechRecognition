@@ -28,8 +28,9 @@ namespace SpeechRecognition::Threads {
 
         void prepareAudioData(short *data, short *newData);
 
+        bool subsample;
     public:
-        MelBankThread(const char *cacheDir, JavaCallbacks &callbacks);
+        MelBankThread(const char *cacheDir, JavaCallbacks &callbacks, bool subsample);
 
         virtual ~MelBankThread();
 

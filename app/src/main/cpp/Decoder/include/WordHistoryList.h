@@ -10,21 +10,19 @@
 #include <LMWord.h>
 
 namespace SpeechRecognition::Decoder {
-    class GCList {
+    class WordHistoryList {
     private:
 
     public:
         unsigned int referenceCount = 1;
 
-        bool deleted = false;
+        WordHistoryList();
 
-        GCList();
+        WordHistoryList(WordHistoryList* list);
 
-        GCList(GCList* list);
+        WordHistoryList *assign();
 
-        GCList *assign();
-
-        GCList *copy();
+        WordHistoryList *copy();
 
         void unasign();
 

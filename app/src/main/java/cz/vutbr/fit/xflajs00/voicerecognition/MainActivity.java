@@ -111,7 +111,7 @@ public class MainActivity extends AppCompatActivity implements SpeechRecognition
         Thread thread = new Thread() {
             @Override
             public void run() {
-                speechAPI.test();
+                speechAPI.recognizeWAV("/sdcard/Audio/test.wav");
             }
         };
         thread.start();
