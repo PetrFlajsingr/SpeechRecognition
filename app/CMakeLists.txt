@@ -14,10 +14,10 @@ execute_process(COMMAND mkdir -p "${PROJECT_SOURCE_DIR}/src/main/rs_libs/${ANDRO
 
 include_directories(src/main/cpp/include)
 include_directories(src/main/cpp/Decoder/include)
-include_directories(src/main/cpp/Miscelanous/include)
+include_directories(src/main/cpp/Utility/include)
 include_directories(src/main/cpp/Feature_Extraction/include)
 include_directories(src/main/cpp/Voice_Activity_Detection/include)
-include_directories(src/main/cpp/threads/include)
+include_directories(src/main/cpp/Threads/include)
 include_directories(src/main/cpp/kissfft)
 include_directories(src/main/cpp/firfilter)
 include_directories(${RENDER_SCRIPT_HEADERS_PATH}/cpp
@@ -52,12 +52,12 @@ add_library( # Sets the name of the library.
               # Sets the library as a shared library.
               SHARED
 
-              # MISCELANOUS
-              src/main/cpp/Miscelanous/RawAudioRecorder.cpp
-              src/main/cpp/Miscelanous/AudioSubsampler.cpp
-              src/main/cpp/Miscelanous/FeatureMatrix.cpp
-              src/main/cpp/Miscelanous/Utils.cpp
-              src/main/cpp/Miscelanous/WavReader.cpp
+              # UTILITY
+              src/main/cpp/Utility/RawAudioRecorder.cpp
+              src/main/cpp/Utility/AudioSubsampler.cpp
+              src/main/cpp/Utility/FeatureMatrix.cpp
+              src/main/cpp/Utility/Utils.cpp
+              src/main/cpp/Utility/WavReader.cpp
 
               # FEATURE EXTRACTION
               src/main/cpp/Feature_Extraction/AudioFrame.cpp
@@ -88,14 +88,15 @@ add_library( # Sets the name of the library.
               src/main/cpp/Voice_Activity_Detection/VoiceActivityDetector.cpp
 
               # THREADS
-              src/main/cpp/threads/MelBankThread.cpp
-              src/main/cpp/threads/NNThread.cpp
-              src/main/cpp/threads/DecoderThread.cpp
-              src/main/cpp/threads/FileStreamThread.cpp
-              src/main/cpp/threads/JavaCallbacks.cpp
+              src/main/cpp/Threads/MelBankThread.cpp
+              src/main/cpp/Threads/NNThread.cpp
+              src/main/cpp/Threads/DecoderThread.cpp
+              src/main/cpp/Threads/FileStreamThread.cpp
+              src/main/cpp/Threads/JavaCallbacks.cpp
 
               ${RS_OBJ_FILES}
               ${RS_FILES}
+              src/main/cpp/SpeechRecognitionAPI.cpp
               src/main/cpp/audio.cpp
 
 

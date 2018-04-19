@@ -26,28 +26,33 @@ import java.util.List;
  */
 public class SpeechRecognitionAPI {
     // TEST
-    private native void testNative(String path);
-    //\ TEST
+
+    private String cacheDir;
+    public void test(){
+        testNative(cacheDir);
+    }
+
+    private native void testNative(String str);
     // NATIVE METHODS
     private native void setCacheDirNative(String cacheDir);
-    private native void createEngineNative();
-    private native boolean createAudioRecorderNative();
-    private native void startRecordingNative();
+    private native boolean startRecordingNative();
     private native void stopRecordingNative();
     private native void shutdownNative();
 
+    private native boolean isRecordingNative();
+
     private native void registerCallbacksNative();
+
+    private native String recognizeWAVNative(String path);
 
     static{
         System.loadLibrary("speech_recognition");
     }
     //\ NATIVE METHODS
 
-    private boolean recorderCreated = false;
 
-    private boolean recording = false;
     public boolean isRecording() {
-        return recording;
+        return isRecordingNative();
     }
 
     /**
@@ -55,8 +60,8 @@ public class SpeechRecognitionAPI {
      * @param cacheDir cache dir path
      */
     public SpeechRecognitionAPI(String cacheDir) {
+        this.cacheDir = cacheDir;
         setCacheDirNative(cacheDir);
-        createEngineNative();
 
         registerCallbacksNative();
     }
@@ -66,15 +71,8 @@ public class SpeechRecognitionAPI {
      * @throws Exception Thrown when audio recorder can not be created
      */
     public void startRecording() throws Exception {
-        if(!recorderCreated){
-            if(!createAudioRecorderNative()){
-                throw new Exception("Failed to create audio recorder");
-            }
-            recorderCreated = true;
-        }
-
-        startRecordingNative();
-        recording = true;
+        if(!startRecordingNative())
+            throw new Exception("Failed to create audio recorder");
     }
 
     /**
@@ -82,7 +80,6 @@ public class SpeechRecognitionAPI {
      */
     public void stopRecording(){
         stopRecordingNative();
-        recording = false;
     }
 
     /**
@@ -94,10 +91,10 @@ public class SpeechRecognitionAPI {
 
     /**
      * Recognizes speech from a given audio file.
-     * @param file WAV audio file
+     * @param filePath path to WAV audio file
      */
-    public void recognizeWAV(String filePath){
-        testNative(filePath);
+    public String recognizeWAV(String filePath){
+        return recognizeWAVNative(filePath);
     }
 
     // CALLBACKS FROM NDK

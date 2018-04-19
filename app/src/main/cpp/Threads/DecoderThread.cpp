@@ -6,23 +6,24 @@
 #include <constants.h>
 #include <android/log.h>
 
-SpeechRecognition::Threads::DecoderThread::DecoderThread(JavaCallbacks& callbacks): thread(&DecoderThread::threadDecoder, this)  {
-    this->decoder = new ViterbiDecoder("/sdcard/big/lexicon.bin", "/sdcard/big/lm.arpa");
+SpeechRecognition::Threads::DecoderThread::DecoderThread(JavaCallbacks& callbacks, ViterbiDecoder* decoder): thread(&DecoderThread::threadDecoder, this),
+decoder(decoder){
+    //this->decoder = new ViterbiDecoder("/sdcard/big/lexicon.bin", "/sdcard/big/lm.arpa");
 
     this->callbacks = &callbacks;
 }
 
 SpeechRecognition::Threads::DecoderThread::~DecoderThread() {
-    delete decoder;
 }
 
 /**
  * Method to be run in thread. Decodes data given by neural network thread and notifies listeners.
  */
 void SpeechRecognition::Threads::DecoderThread::threadDecoder(){
+    recognitionResult.clear();
     __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "DECODER: START");
     Q_NNData* data;
-    std::string result;
+    std::string result = "";
     bool first = true;
 
     unsigned long startTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
@@ -33,7 +34,6 @@ void SpeechRecognition::Threads::DecoderThread::threadDecoder(){
 
     while(inputQueue.dequeue(data)){
         unsigned long sTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-        //__android_log_print(ANDROID_LOG_DEBUG, APPNAME, "DECODER: counter %lu, Q size: %d", counter, inputQueue.size());
         if(data->type == TERMINATE){
             delete data;
             __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "DECODER: TERMINATE");
@@ -47,6 +47,7 @@ void SpeechRecognition::Threads::DecoderThread::threadDecoder(){
         } else{
             first = true;
             result = decoder->getWinner();
+            recognitionResult.append(result);
             __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "RESULT: %s", result.c_str());
             callbacks->notifySequenceRecognized(result);
             decoder->reset();
@@ -60,8 +61,13 @@ void SpeechRecognition::Threads::DecoderThread::threadDecoder(){
         if(counter % 100 == 0)
             callbacks->notifyDecoderDone(runTime/(double)totalTime*100);
     }
+
     callbacks->notifyRecognitionDone();
 
     callbacks->DetachJava();
     __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "DECODER: END");
+}
+
+std::string SpeechRecognition::Threads::DecoderThread::getResult() {
+    return recognitionResult;
 }

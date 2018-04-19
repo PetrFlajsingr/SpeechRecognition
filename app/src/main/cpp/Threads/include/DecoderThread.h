@@ -21,14 +21,17 @@ namespace SpeechRecognition::Threads {
 
         void threadDecoder();
 
+        std::string recognitionResult = "";
     public:
         std::thread thread;
 
-        DecoderThread(JavaCallbacks &callbacks);
+        DecoderThread(JavaCallbacks &callbacks, ViterbiDecoder* decoder);
 
         virtual ~DecoderThread();
 
         SafeQueue<Q_NNData *> inputQueue;
+
+        std::string getResult();
     };
 
 }

@@ -13,6 +13,10 @@ JavaVM* SpeechRecognition::Threads::JavaCallbacks::g_VM = NULL;
  * @return
  */
 JNIEnv* SpeechRecognition::Threads::JavaCallbacks::AttachJava(bool* attached) {
+    if(g_VM == NULL) {
+        *attached = false;
+        return NULL;
+    }
     JavaVMAttachArgs args = {JNI_VERSION_1_2, 0, 0};
     JNIEnv* java;
     if(g_VM->AttachCurrentThread(&java, &args) == JNI_FALSE)
@@ -23,6 +27,8 @@ JNIEnv* SpeechRecognition::Threads::JavaCallbacks::AttachJava(bool* attached) {
 }
 
 void SpeechRecognition::Threads::JavaCallbacks::DetachJava(){
+    if(g_VM == NULL)
+        return;
     g_VM->DetachCurrentThread();
 }
 
@@ -32,6 +38,8 @@ void SpeechRecognition::Threads::JavaCallbacks::DetachJava(){
 void SpeechRecognition::Threads::JavaCallbacks::notifyVADChanged(bool activity){
     bool attached;
     JNIEnv* env = AttachJava(&attached);
+    if(env == NULL)
+        return;
     for(auto iterator = callbackObjects.begin();
         iterator != callbackObjects.end();
         iterator++){
@@ -50,6 +58,8 @@ void SpeechRecognition::Threads::JavaCallbacks::notifyVADChanged(bool activity){
 void SpeechRecognition::Threads::JavaCallbacks::notifySequenceRecognized(std::string sequence){
     bool attached;
     JNIEnv* env = AttachJava(&attached);
+    if(env == NULL)
+        return;
     for(auto iterator = callbackObjects.begin();
         iterator != callbackObjects.end();
         iterator++){
@@ -66,6 +76,8 @@ void SpeechRecognition::Threads::JavaCallbacks::notifySequenceRecognized(std::st
 void SpeechRecognition::Threads::JavaCallbacks::notifyRecognitionDone(){
     bool attached;
     JNIEnv* env = AttachJava(&attached);
+    if(env == NULL)
+        return;
     for(auto iterator = callbackObjects.begin();
         iterator != callbackObjects.end();
         iterator++){
@@ -81,13 +93,14 @@ void SpeechRecognition::Threads::JavaCallbacks::addListener(T_registeredObject o
 }
 
 void SpeechRecognition::Threads::JavaCallbacks::setJavaVM(JavaVM* vm) {
-    if(g_VM == NULL)
-        g_VM = vm;
+    g_VM = vm;
 }
 
 void SpeechRecognition::Threads::JavaCallbacks::notifyMelDone(int percentage) {
     bool attached;
     JNIEnv* env = AttachJava(&attached);
+    if(env == NULL)
+        return;
     for(auto iterator = callbackObjects.begin();
         iterator != callbackObjects.end();
         iterator++){
@@ -101,6 +114,8 @@ void SpeechRecognition::Threads::JavaCallbacks::notifyMelDone(int percentage) {
 void SpeechRecognition::Threads::JavaCallbacks::notifyNNDone(int percentage) {
     bool attached;
     JNIEnv* env = AttachJava(&attached);
+    if(env == NULL)
+        return;
     for(auto iterator = callbackObjects.begin();
         iterator != callbackObjects.end();
         iterator++){
@@ -114,6 +129,8 @@ void SpeechRecognition::Threads::JavaCallbacks::notifyNNDone(int percentage) {
 void SpeechRecognition::Threads::JavaCallbacks::notifyDecoderDone(int percentage) {
     bool attached;
     JNIEnv* env = AttachJava(&attached);
+    if(env == NULL)
+        return;
     for(auto iterator = callbackObjects.begin();
         iterator != callbackObjects.end();
         iterator++){

@@ -45,7 +45,6 @@ void SpeechRecognition::Feature_Extraction::AudioFrame::calcHammingCoef() {
 SpeechRecognition::Feature_Extraction::AudioFrame::~AudioFrame() {
     delete[] hammingData;
     delete[] fftData;
-    //free(fftData);
 }
 
 /**
@@ -55,7 +54,6 @@ SpeechRecognition::Feature_Extraction::AudioFrame::~AudioFrame() {
  */
 void SpeechRecognition::Feature_Extraction::AudioFrame::applyFFT(kiss_fftr_cfg *cfg) {
     this->fftData = new kiss_fft_cpx[FFT_FRAME_LENGTH/2+1];
-    //this->fftData = (kiss_fft_cpx*)malloc((FFT_FRAME_LENGTH/2+1) * sizeof(kiss_fft_cpx));
 
     // adding padding to the fft input
     float fftInput[FFT_FRAME_LENGTH];

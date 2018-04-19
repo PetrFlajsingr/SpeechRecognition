@@ -86,8 +86,8 @@ public class MainActivity extends AppCompatActivity implements SpeechRecognition
     }
     // UI control with a button
     public void recordingControl(View view){
-        recording = !recording;
-        if(recording){
+        if(!recording){
+            recording = true;
             VADTextView.setVisibility(View.VISIBLE);
             resultTextView.setText("");
             new Thread(new Runnable() {
@@ -102,6 +102,7 @@ public class MainActivity extends AppCompatActivity implements SpeechRecognition
                 }
             }).run();
         }else{
+            recording = false;
             speechAPI.stopRecording();
         }
     }
@@ -111,7 +112,14 @@ public class MainActivity extends AppCompatActivity implements SpeechRecognition
         Thread thread = new Thread() {
             @Override
             public void run() {
-                speechAPI.recognizeWAV("/sdcard/Audio/test.wav");
+                speechAPI.test();
+                /*final String recongized = speechAPI.recognizeWAV("/sdcard/Audio/test.wav");
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        resultTextView.setText(recongized);
+                    }
+                });*/
             }
         };
         thread.start();

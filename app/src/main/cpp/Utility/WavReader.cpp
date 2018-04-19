@@ -2,7 +2,7 @@
 // Created by Petr Flajsingr on 16/04/2018.
 //
 
-#include "WavReader.h"
+#include <WavReader.h>
 
 bool WavReader::readHeader(std::ifstream& stream) {
     unsigned int dataRead = FORMAT_OFFSET;

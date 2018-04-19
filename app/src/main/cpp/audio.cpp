@@ -26,6 +26,7 @@
 #include <JavaCallbacks.h>
 #include <WavReader.h>
 #include <FileStreamThread.h>
+#include <SpeechRecognitionAPI.h>
 
 using namespace SpeechRecognition;
 using namespace Feature_Extraction;
@@ -34,136 +35,98 @@ using namespace VoiceActivityDetection;
 using namespace Decoder;
 using namespace Utility;
 
-static JavaVM *g_VM;
+SpeechRecognitionAPI* speechRecognitionAPI = NULL;
 
-JavaCallbacks callbacks;
-
-std::vector<T_registeredObject> callbackObjects;
-
-using namespace android::RSC;
-
-RawAudioRecorder* recorder;
-
-const char* cacheDir;
-
-// create the engine and clearOutputNode mix objects
-void createEngine()
-{
-    recorder = new RawAudioRecorder();
-}
-
-// create audio recorder
-jboolean createAudioRecorder()
-{
-    return (jboolean) (recorder->createAudioRecorder() ? JNI_TRUE : JNI_FALSE);
-}
-
-void stopRecording(){
-    recorder->stopRecording();
-}
-
-void threadsFromWav(std::ifstream& filestream){
-    FileStreamThread fileStreamThread(filestream);
-    MelBankThread melBankThread(cacheDir, callbacks, false);
-    NNThread nnThread(cacheDir);
-    DecoderThread decoderThread(callbacks);
-
-    nnThread.callbacks = &callbacks;
-
-    fileStreamThread.melQueue = &melBankThread.inputQueue;
-    melBankThread.nnQueue = &nnThread.inputQueue;
-    nnThread.decoderQueue = &decoderThread.inputQueue;
-
-    fileStreamThread.start();
-
-    fileStreamThread.thread.join();
-    melBankThread.thread.join();
-    nnThread.thread.join();
-    decoderThread.thread.join();
-}
-
-void threads(){
-    MelBankThread melBankThread(cacheDir, callbacks, true);
-    NNThread nnThread(cacheDir);
-    DecoderThread decoderThread(callbacks);
-
-    nnThread.callbacks = &callbacks;
-
-    recorder->melQueue = &melBankThread.inputQueue;
-    melBankThread.nnQueue = &nnThread.inputQueue;
-    nnThread.decoderQueue = &decoderThread.inputQueue;
-
-    recorder->startRecording();
-
-    melBankThread.thread.join();
-    nnThread.thread.join();
-    decoderThread.thread.join();
-}
-
-// set the recording state for the audio recorder
-void startRecording()
-{
-   std::thread thread(threads);
-    thread.detach();
-}
-
-//\ threads
-
-// shut down the native audio system
-void shutdown()
-{
-    delete recorder;
-}
-
-void setCacheDir(const char* cDir){
-    cacheDir = cDir;
-}
-
-void vawtest(){
+void test(char* cachedir){
     WavReader reader;
 
-    std::ifstream file;
 
-    file.open("/sdcard/Audio/test.wav", std::ios::in|std::ios::binary);
-    if(file.is_open()){
+    std::ifstream ifstream;
+    ifstream.open("/sdcard/Audio/test.wav");
 
-        short* audioData = reader.wavToPcm(file);
-        if(audioData == NULL){
-            __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "error audio read: %s", reader.getErrorMessage().c_str());
-            return;
+    AudioFrame frame;
+
+    kiss_fft_cpx *fftFrame;
+
+    AudioFrame::calcHammingCoef();
+    kiss_fftr_cfg cfg = kiss_fftr_alloc(FFT_FRAME_LENGTH, 0, NULL, NULL);
+
+    RSMelFilterBank melFilterBank(cachedir);
+
+    if(ifstream.is_open()) {
+        std::vector<float*> results;
+        short *audioData = reader.wavToPcm(ifstream);
+        // MEL TEST
+        __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "start mel");
+        unsigned long melStartTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+
+        for(unsigned int i = 0; i < reader.getDataSize(); i += SUBSAMPLED_OVERLAP_LENGTH) {
+            short data[AUDIO_FRAME_LENGTH];
+
+            std::copy(audioData + i, audioData + AUDIO_FRAME_LENGTH + i, data);
+
+            frame.applyHammingWindow(data);
+
+            frame.applyFFT(&cfg);
+
+            fftFrame = frame.getFftData();
+
+            float *result = melFilterBank.calculateMelBank(fftFrame);
+
+            melFilterBank.normalise(result);
+
+            results.push_back(result);
+
+            delete[] fftFrame;
+        }
+        unsigned long melEndTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+
+
+        FeatureMatrix matrix;
+
+        matrix.init(results.size(), 24);
+
+        for(int i = 0; i < results.size(); i++) {
+            matrix.setFeatureMatrixFrame(i, results[i]);
         }
 
+        //NN TEST
+        RSNeuralNetwork neuralNetwork("/sdcard/NNnew.bin", cachedir);
+        __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "start nn");
+        unsigned long nnStartTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
-        std::ofstream out;
-        out.open("/sdcard/Audio/test.pcm", std::ios::out|std::ios::binary);
+        FeatureMatrix* nnresult = neuralNetwork.forwardAll(&matrix);
 
-        if(out.is_open()) {
-            out.write((char*)audioData, reader.getDataSize() * 2);
-
-            out.close();
-        }
-
-        delete[] audioData;
+        unsigned long nnEndTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
 
-        file.close();
+        ViterbiDecoder decoder("/sdcard/big/lexicon.bin", "/sdcard/big/lm.arpa");
+        __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "start decoder");
+        unsigned long decoderStartTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+        for(int i = 0; i < nnresult->getFramesNum(); i++)
+            decoder.decode(nnresult->getFeaturesMatrix()[i]);
+        unsigned long decoderEndTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+
+        __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "MEL: %lu, NN: %lu, DECODER: %lu",
+                melEndTime - melStartTime, nnEndTime - nnStartTime, decoderEndTime - decoderStartTime);
     }
-
 }
+
 
 extern "C"{
     // CALLBACKS
     JNIEXPORT void JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_SpeechRecognitionAPI_registerCallbacksNative
             ( JNIEnv* env, jobject obj){
+        JavaVM *g_VM;
+
         T_registeredObject object;
         object.obj = env->NewGlobalRef(obj);
         object.clazz = env->FindClass("cz/vutbr/fit/xflajs00/voicerecognition/SpeechRecognitionAPI");
         object.clazz = (jclass)env->NewGlobalRef(object.clazz);
         env->GetJavaVM(&g_VM);
-        callbacks.setJavaVM(g_VM);
-        callbacks.addListener(object);
 
-        callbackObjects.push_back(object);
+        speechRecognitionAPI->callbacks.setJavaVM(g_VM);
+        speechRecognitionAPI->callbacks.addListener(object);
     }
     //\ CALLBACKS
 
@@ -171,48 +134,46 @@ extern "C"{
     //setCacheDir
     JNIEXPORT void JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_SpeechRecognitionAPI_setCacheDirNative
             (JNIEnv* env, jobject obj, jstring pathObj){
-        setCacheDir(env->GetStringUTFChars(pathObj, NULL));
-    }
-
-    //createEngine
-    JNIEXPORT void JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_SpeechRecognitionAPI_createEngineNative
-            (JNIEnv* env, jobject obj){
-        createEngine();
-    }
-
-    //createAudioRecorder
-    JNIEXPORT jboolean JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_SpeechRecognitionAPI_createAudioRecorderNative
-            (JNIEnv* env, jobject obj){
-        return createAudioRecorder();
+        const char* cacheDir = env->GetStringUTFChars(pathObj, NULL);
+        if(speechRecognitionAPI != NULL){
+            delete speechRecognitionAPI;
+        }
+        speechRecognitionAPI = new SpeechRecognitionAPI(cacheDir);
     }
 
     //startRecording
-    JNIEXPORT void JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_SpeechRecognitionAPI_startRecordingNative
+    JNIEXPORT jboolean JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_SpeechRecognitionAPI_startRecordingNative
             (JNIEnv* env, jobject obj){
-        startRecording();
+       // startRecording();
+        return (speechRecognitionAPI->startRecording() ? JNI_TRUE : JNI_FALSE);
     }
 
     //stopRecording
     JNIEXPORT void JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_SpeechRecognitionAPI_stopRecordingNative
             (JNIEnv* env, jobject obj){
-        stopRecording();
+        speechRecognitionAPI->stopRecording();
     }
 
     //shutdown
     JNIEXPORT void JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_SpeechRecognitionAPI_shutdownNative
             (JNIEnv* env, jobject obj){
-        shutdown();
+        //shutdown();
+        if(speechRecognitionAPI != NULL)
+            delete speechRecognitionAPI;
     }
 
-    //test
-    JNIEXPORT void JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_SpeechRecognitionAPI_testNative
+    JNIEXPORT jboolean JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_SpeechRecognitionAPI_isRecordingNative
+            (JNIEnv* env, jobject obj){
+        return (speechRecognitionAPI->isRecording() ? JNI_TRUE : JNI_FALSE);
+    }
+
+    JNIEXPORT jstring JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_SpeechRecognitionAPI_recognizeWAVNative
             (JNIEnv* env, jobject obj, jstring path){
-        const char* nativeStringPath = env->GetStringUTFChars(path, 0);
-        std::ifstream file;
-        file.open(nativeStringPath, std::ios::in|std::ios::binary);
-        if(file.is_open()) {
-            threadsFromWav(file);
-            file.close();
-        }
+        return env->NewStringUTF(speechRecognitionAPI->recognizeWav(env->GetStringUTFChars(path, NULL)).c_str());
+     }
+
+    JNIEXPORT void JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_SpeechRecognitionAPI_testNative
+            (JNIEnv* env, jobject obj, jstring str){
+        test(const_cast<char *>(env->GetStringUTFChars(str, NULL)));
     }
 }
