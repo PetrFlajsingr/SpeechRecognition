@@ -106,14 +106,16 @@ void SpeechRecognition::Threads::MelBankThread::threadMelBank() {
                 VADetector->getBuffer().erase(iterator);
             }
             if(!notified) {
-                callbacks->notifyVADChanged(true);
+                if(subsample)
+                    callbacks->notifyVADChanged(true);
                 notified = true;
             }
         } else {
-            if(notified && !subsample) {
+            if(notified) {
                 notified = false;
                 nnQueue->enqueue(new Q_MelData{SEQUENCE_INACTIVE, NULL});
-                callbacks->notifyVADChanged(false);
+                if(subsample)
+                    callbacks->notifyVADChanged(false);
             }
 
             dataCount = 0;
@@ -123,8 +125,8 @@ void SpeechRecognition::Threads::MelBankThread::threadMelBank() {
         totalTime = nTime - startTime;
         runTime += nTime - sTime;
         counter++;
-        //if(counter % 200 == 0)
-        //    callbacks->notifyMelDone(runTime/(double)totalTime*100);
+        if(counter % 500 == 0)
+            callbacks->notifyMelDone(runTime/(double)totalTime*100);
     }
     delete[] newAudioData;
     callbacks->DetachJava();

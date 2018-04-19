@@ -65,8 +65,8 @@ void SpeechRecognition::Threads::NNThread::threadNN() {
         totalTime = nTime - startTime;
         runTime += nTime - sTime;
         counter++;
-        //if(counter % 100 == 0)
-        //    callbacks->notifyNNDone(runTime/(double)totalTime*100);
+        if(counter % 100 == 0)
+            callbacks->notifyNNDone(runTime/(double)totalTime*100);
     }
 
     JavaCallbacks::DetachJava();
