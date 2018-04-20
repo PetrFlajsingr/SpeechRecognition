@@ -33,7 +33,7 @@ void SpeechRecognition::Threads::DecoderThread::threadDecoder(){
     unsigned long counter = 0;
 
     while(inputQueue.dequeue(data)){
-        unsigned long sTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+        //unsigned long sTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
         if(data->type == TERMINATE){
             delete data;
             __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "DECODER: TERMINATE");
@@ -54,18 +54,20 @@ void SpeechRecognition::Threads::DecoderThread::threadDecoder(){
         }
         delete data;
 
-        unsigned long nTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-        totalTime = nTime - startTime;
-        runTime += nTime - sTime;
-        counter++;
-        if(counter % 100 == 0)
-            callbacks->notifyDecoderDone(runTime/(double)totalTime*100);
+        //unsigned long nTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+        //totalTime = nTime - startTime;
+        //runTime += nTime - sTime;
+        //counter++;
+        //if(counter % 100 == 0)
+        //    callbacks->notifyDecoderDone(runTime/(double)totalTime*100);
     }
 
     callbacks->notifyRecognitionDone();
 
     callbacks->DetachJava();
-    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "DECODER: END");
+    unsigned long endTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+
+    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "DECODER: END, TIME: %lu",  endTime - startTime);
 }
 
 std::string SpeechRecognition::Threads::DecoderThread::getResult() {

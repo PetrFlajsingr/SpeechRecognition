@@ -172,7 +172,7 @@ SpeechRecognition::Decoder::LanguageModel::getLMWord(std::string word) {
     unsigned long startIndex = getUnigramAlphabetPosition(word.c_str()[0]);
     unsigned long endIndex = getUnigramAlphabetPosition((word.c_str()[0] + 1));
     for(auto iterator = words.begin() + startIndex;
-        iterator != words.begin() + endIndex;
+        iterator != words.begin() + endIndex + 1;
         iterator++){
         if(word == iterator->writtenForm){
             return &(*iterator);

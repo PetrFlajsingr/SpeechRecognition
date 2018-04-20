@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity implements SpeechRecognition
         decoderThreadTextView = (TextView) findViewById(R.id.decoderThreadTextView);
         memoryUsageTextView = (TextView) findViewById(R.id.memoryUsageTextView);
 
-        timer.schedule(new memoryTask(), 0, 2000);
+        //timer.schedule(new memoryTask(), 0, 2000);
     }
 
     @Override
