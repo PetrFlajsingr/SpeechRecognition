@@ -13,7 +13,7 @@
 #include <Word.h>
 #include "AcousticModel.h"
 #include "LanguageModel.h"
-#include "WordHistoryList.h"
+#include "WordLinkRecord.h"
 #include <list>
 
 namespace SpeechRecognition::Decoder {
@@ -26,16 +26,14 @@ namespace SpeechRecognition::Decoder {
         static AcousticModel *acousticModel;
 
         static LanguageModel* languageModel;
-
-        bool needWord = true;
+    public:
+        float likelihood = -std::numeric_limits<float>::max();
 
         unsigned int position;
-    public:
-        float likelihood = 0.0f;
 
         bool alive = false;
 
-        WordHistoryList* wordHistory = NULL; //< word history for ngrams
+        WordLinkRecord* wordLinkRecord = NULL;
 
         Token(GraphNode *currentNode, bool output, unsigned int position);
 
@@ -51,8 +49,6 @@ namespace SpeechRecognition::Decoder {
             languageModel = &model;
         }
 
-        void addWordToHistory();
-
         static int tokenCount;
 
         GraphNode *currentNode; //< node in which the token is placed
@@ -64,6 +60,8 @@ namespace SpeechRecognition::Decoder {
         static void deleteAllTokens();
 
         bool output = false;
+
+        static std::vector<Token*> livingTokens;
     };
 }
 

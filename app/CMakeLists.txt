@@ -82,7 +82,7 @@ add_library( # Sets the name of the library.
               src/main/cpp/Decoder/Phoneme.cpp
               src/main/cpp/Decoder/Token.cpp
               src/main/cpp/Decoder/Bigram.cpp
-              src/main/cpp/Decoder/WordHistoryList.cpp
+              src/main/cpp/Decoder/WordLinkRecord.cpp
 
               # VOICE ACTIVITY DETECTION
               src/main/cpp/Voice_Activity_Detection/VoiceActivityDetector.cpp

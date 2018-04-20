@@ -13,6 +13,7 @@ int SpeechRecognition::Decoder::Token::tokenCount = 0;
 SpeechRecognition::Decoder::AcousticModel* SpeechRecognition::Decoder::Token::acousticModel;
 SpeechRecognition::Decoder::LanguageModel* SpeechRecognition::Decoder::Token::languageModel;
 std::vector<SpeechRecognition::Decoder::Token*> SpeechRecognition::Decoder::Token::allTokens;
+std::vector<SpeechRecognition::Decoder::Token*> SpeechRecognition::Decoder::Token::livingTokens;
 /**
  * Registers token in static vector for all tokens.
  * Saves index in the vector for fast deletion from the vector.
@@ -20,16 +21,9 @@ std::vector<SpeechRecognition::Decoder::Token*> SpeechRecognition::Decoder::Toke
  */
 SpeechRecognition::Decoder::Token::Token(GraphNode* currentNode, bool output, unsigned int position)
         : output(output), currentNode(currentNode), position(position) {
-
-    // first node and not loopback token
-    if(currentNode->xPos == 0 && position == 1)
-        this->needWord = true;
-    else
-        this->needWord = false;
-
-    if(currentNode->xPos == -1) {
+    if(currentNode->xPos == -1){
         alive = true;
-        wordHistory = new WordHistoryList();
+        likelihood = 0.0f;
     }
 
     tokenCount++;
@@ -46,33 +40,29 @@ float SpeechRecognition::Decoder::Token::passInGraph(float *inputVector) {
 
     if(sourceToken == NULL){
         alive = false;
-        if(wordHistory != NULL)
-            wordHistory->unasign();
-        wordHistory = NULL;
+        if(wordLinkRecord != NULL)
+            wordLinkRecord->unasign();
+        wordLinkRecord = NULL;
+        likelihood = -std::numeric_limits<float>::max();
         return -std::numeric_limits<float>::max();
     }
 
     if(sourceToken != this) {
         alive = true;
-
-        if(needWord) {
-            if(wordHistory != NULL)
-                wordHistory->unasign();
-            wordHistory = sourceToken->wordHistory->copy();
-            addWordToHistory();
-        }else{
-            if(wordHistory != NULL)
-                wordHistory->unasign();
-            wordHistory = sourceToken->wordHistory->assign();
-        }
+        if(wordLinkRecord != NULL)
+            wordLinkRecord->unasign();
+        wordLinkRecord = sourceToken->wordLinkRecord->assign();
     }
 
     if(output){
+        LMWord* toAdd = acousticModel->words[currentNode->predecessorNodes[position]->wordID].lmword;
+        wordLinkRecord = wordLinkRecord->addRecord(toAdd);
         likelihood = sourceToken->likelihood + WORD_INSERTION_PENALTY
                                     + HMMGraph::getBigramMapValue(this)*
                                      SCALE_FACTOR_LM;
 
     }else {
+        Token::livingTokens.push_back(this);
         likelihood = calculateLikelihood(inputVector, position, sourceToken);
     }
 
@@ -95,12 +85,14 @@ SpeechRecognition::Decoder::Token::~Token() {
     tokenCount--;
 }
 
-void SpeechRecognition::Decoder::Token::addWordToHistory() {
-    wordHistory->words.push_back(acousticModel->words[currentNode->wordID].lmword);
-}
-
 SpeechRecognition::Decoder::Token *
 SpeechRecognition::Decoder::Token::getBestToken(SpeechRecognition::Decoder::GraphNode *node) {
+
+    if(node->bestToken != NULL && node->bestToken->alive)
+        return node->bestToken;
+
+    return NULL;
+    /*
     for(auto iterator = node->tokens.begin();
             iterator != node->tokens.end();
             iterator++){
@@ -108,7 +100,7 @@ SpeechRecognition::Decoder::Token::getBestToken(SpeechRecognition::Decoder::Grap
             return *iterator;
     }
 
-    return NULL;
+    return NULL;*/
 }
 
 void SpeechRecognition::Decoder::Token::deleteAllTokens() {

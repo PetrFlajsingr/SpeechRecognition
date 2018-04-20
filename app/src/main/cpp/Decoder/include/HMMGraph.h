@@ -18,11 +18,6 @@ namespace SpeechRecognition::Decoder {
 
         void destroyGraph(GraphNode *node);
 
-        void applyBeamPruning(std::vector<Token *> &tokens);
-
-        void searchTokens(std::vector<std::vector<Token *>> &allTokens, GraphNode *node,
-                          unsigned int level);
-
         void addSILNode(GraphNode *node, int wordID, int phonemeIndex, GraphNode* predecessor);
 
         void passTokens(GraphNode* node, float* input);
@@ -31,7 +26,7 @@ namespace SpeechRecognition::Decoder {
 
         void passOutputNode(float* input);
 
-        std::vector<std::vector<Token*>> tokensForBeamPruning;
+        AcousticModel* acousticModel;
     public:
         GraphNode *rootNode;
         GraphNode *outputNode;

@@ -9,7 +9,7 @@
 
 
 SpeechRecognition::Threads::NNThread::NNThread(const char* cacheDir): thread(&NNThread::threadNN, this) {
-    neuralNetwork = new RSNeuralNetwork("/sdcard/NNnew.bin", cacheDir);
+    neuralNetwork = new RSNeuralNetwork("/sdcard/devel/NNnew.bin", cacheDir);
 }
 
 SpeechRecognition::Threads::NNThread::~NNThread() {

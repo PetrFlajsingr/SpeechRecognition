@@ -26,7 +26,7 @@ const float HIGH_FREQ = 3800.0;
 const unsigned int NN_INPUT_SIZE = 360;
 
 const unsigned int BEAM_PRUNING_LIMIT = 190; //< pruning: max count per "step" (1 level of graph)
-const unsigned int LIVE_STATES_PRUNING_LIMIT = 2000; //< pruning: max count per "step" (1 level of graph)
+const unsigned int LIVE_STATES_PRUNING_LIMIT = 4000; //< pruning: max count per "step" (1 level of graph)
 
 const float SCALE_FACTOR_LM = 2;
 

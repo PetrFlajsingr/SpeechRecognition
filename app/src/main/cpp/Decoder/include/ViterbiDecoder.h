@@ -22,6 +22,8 @@ namespace SpeechRecognition::Decoder {
         HMMGraph *graph;
 
         std::string buildString(Token& token);
+
+        bool firstPass = true;
     public:
         ViterbiDecoder(std::string pathToLexicon, std::string pathToNgram);
 

@@ -26,6 +26,8 @@ namespace SpeechRecognition::Decoder {
 
         std::vector<Token *> tokens; //< tokens currently residing in this node
 
+        Token* bestToken = NULL;
+
         int wordID; //< id of acoustic model ("row")
 
         short xPos; //< position in sequence ("column")

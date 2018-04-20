@@ -18,6 +18,7 @@
 #include <constants.h>
 #include <list>
 #include <algorithm>
+#include <deque>
 
 /**
  * Prepares language and acoustic models and lays foundation for a graph.
@@ -38,7 +39,7 @@ SpeechRecognition::Decoder::ViterbiDecoder::ViterbiDecoder(std::string pathToLex
 
     graph->rootNode->tokens.push_back(new Token(graph->rootNode, false, INT32_MAX));
 
-    graph->rootNode->tokens.front()->wordHistory->words.push_back(languageModel->getLMWord("<s>"));
+    graph->rootNode->tokens.front()->wordLinkRecord = new WordLinkRecord(NULL, languageModel->getLMWord("<s>"));
 }
 
 SpeechRecognition::Decoder::ViterbiDecoder::~ViterbiDecoder() {
@@ -52,20 +53,37 @@ SpeechRecognition::Decoder::ViterbiDecoder::~ViterbiDecoder() {
     Token::deleteAllTokens();
 }
 
+unsigned long sum1 = 0, sum2 = 0, sum3 = 0, cnt = 0;
 /**
  * Sends data through the graph.
  * @param input clearOutputNode of NN
  */
 void SpeechRecognition::Decoder::ViterbiDecoder::decode(float *input) {
+    unsigned long timeStamp1 = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
     graph->clearOutputNode();
+    unsigned long timeStamp2 = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
     graph->passTokens(input);
+    unsigned long timeStamp3 = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
     graph->applyPruning();
+    unsigned long timeStamp4 = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+
+    if(firstPass){
+        graph->rootNode->tokens.front()->alive = false;
+        firstPass = false;
+    }
+    sum1 += timeStamp2 - timeStamp1;
+    sum2 += timeStamp3 - timeStamp2;
+    sum3 += timeStamp4 - timeStamp3;
+    cnt++;
+    if(cnt % 100 == 0)
+    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "clear: %lu, pass: %lu, pruning: %lu", sum1, sum2, sum3);
 }
 
 /**
  * Resets the decoder. Removes all tokens.
  */
 void SpeechRecognition::Decoder::ViterbiDecoder::reset() {
+    firstPass = true;
     for(auto iterator = Token::allTokens.begin();
         iterator != Token::allTokens.end();
         iterator++){
@@ -73,17 +91,31 @@ void SpeechRecognition::Decoder::ViterbiDecoder::reset() {
         (*iterator)->alive = (*iterator)->currentNode == graph->rootNode;
 
         (*iterator)->likelihood = 0;
-        if((*iterator)->alive)
-            (*iterator)->wordHistory->words.clear();
+        if((*iterator)->alive) {
+            if((*iterator)->wordLinkRecord != NULL) {
+                (*iterator)->wordLinkRecord->unasign();
+                (*iterator)->wordLinkRecord = NULL;
+            }
+        }
     }
-    graph->rootNode->tokens.front()->wordHistory->words.push_back(languageModel->getLMWord("<s>"));
+    graph->rootNode->tokens.front()->wordLinkRecord = new WordLinkRecord(NULL, languageModel->getLMWord("<s>"));
 
 }
 
 std::string SpeechRecognition::Decoder::ViterbiDecoder::buildString(SpeechRecognition::Decoder::Token& token){
+    std::deque<LMWord*> words;
+
+    for(auto recordIterator = token.wordLinkRecord;
+        recordIterator != NULL;
+        recordIterator = recordIterator->previous){
+        words.push_front(recordIterator->word);
+    }
+
+
     std::string result = "";
-    for(auto iterator = token.wordHistory->words.begin();
-            iterator != token.wordHistory->words.end();
+
+    for(auto iterator = words.begin();
+            iterator != words.end();
             iterator++){
         result.append((*iterator)->writtenForm);
         result.append(" ");
@@ -101,7 +133,7 @@ std::string SpeechRecognition::Decoder::ViterbiDecoder::getWinner() {
     if(bestToken == NULL)
         return "ERR";
 
-    bestToken->wordHistory->words.push_back(languageModel->getLMWord("</s>"));
+    bestToken->wordLinkRecord = bestToken->wordLinkRecord->addRecord(languageModel->getLMWord("</s>"));
     std::string result =  buildString(*bestToken);
     return result;
 }

@@ -30,7 +30,7 @@ std::vector<float> TEMP_PROB = {
  * @param model Acoustic model
  */
 SpeechRecognition::Decoder::HMMGraph::HMMGraph(AcousticModel* model) {
-
+    acousticModel = model;
 }
 
 /**
@@ -126,6 +126,7 @@ void SpeechRecognition::Decoder::HMMGraph::build(AcousticModel *model) {
     this->rootNode->successorNodes = nodes;
 
     this->rootNode->tokens.push_back(new Token(rootNode, false, 0));
+    this->rootNode->bestToken = this->rootNode->tokens.front();
 
     this->outputNode = new GraphNode(TEMP_PROB, -1, -2, NONE);
     //\root
@@ -138,9 +139,6 @@ void SpeechRecognition::Decoder::HMMGraph::build(AcousticModel *model) {
     }
 
     addTokensToOutputNode();
-
-    // for filling the vectors
-    searchTokens(tokensForBeamPruning, rootNode, 0);
 }
 
 /**
@@ -167,9 +165,10 @@ void SpeechRecognition::Decoder::HMMGraph::destroySuccessors(GraphNode *node) {
 void SpeechRecognition::Decoder::HMMGraph::clearOutputNode() {
     Token* bestToken = Token::getBestToken(outputNode);
     if(bestToken != NULL) {
-        rootNode->tokens.front()->wordHistory->unasign();
-        rootNode->tokens.front()->wordHistory = bestToken->wordHistory->assign();
+        rootNode->tokens.front()->wordLinkRecord->unasign();
+        rootNode->tokens.front()->wordLinkRecord = bestToken->wordLinkRecord->assign();
         rootNode->tokens.front()->likelihood = bestToken->likelihood;
+        rootNode->tokens.front()->alive = true;
     }
 }
 
@@ -192,95 +191,50 @@ void SpeechRecognition::Decoder::HMMGraph::destroyGraph(GraphNode* node) {
     delete node;
 }
 
-
-void SpeechRecognition::Decoder::HMMGraph::applyBeamPruning(std::vector<Token *> &tokens){
-    if(tokens.size() <= BEAM_PRUNING_LIMIT)
-        return;
-
-    for(auto iterator = tokens.begin() + BEAM_PRUNING_LIMIT;
-        iterator != tokens.end();
-        iterator++){
-        (*iterator)->alive = false;
-    }
-}
-
-void SpeechRecognition::Decoder::HMMGraph::searchTokens(std::vector<std::vector<Token *>> &allTokens, GraphNode* node, unsigned int level) {
-    if(node == outputNode)
-        return;
-
-    if(allTokens.size() < level + 1){
-        std::vector<Token*> vector;
-        allTokens.push_back(vector);
-    }
-    // root node doesn't matter - it starts of the recursion
-    if(node == rootNode) {
-        for(auto iterator = node->successorNodes.begin();
-                iterator != node->successorNodes.end();
-                iterator++){
-            searchTokens(allTokens, *iterator, level);
-        }
-        return;
-    }else {
-        for(auto iterator = node->tokens.begin();
-                iterator != node->tokens.end();
-                iterator++){
-            if((*iterator)->alive)
-                allTokens[level].push_back(*iterator);
-        }
-    }
-
-    searchTokens(allTokens, node->successorNodes[1], level + 1);
-}
-
 /**
  * Marks tokens with low likelihood for deletion.
  * Viterbi criterium has to be applied before using this function (only one token per node).
  */
 void SpeechRecognition::Decoder::HMMGraph::applyPruning() {
-    // BEAM PRUNING
-    for(auto iterator = tokensForBeamPruning.begin();
-            iterator != tokensForBeamPruning.end();
-            iterator++){
-        std::sort((*iterator).begin(), (*iterator).end(),
-                  [](const Token* ls, const Token* rs){
-                      return ls->alive && ls->likelihood > rs->likelihood;
-                  });
-        applyBeamPruning(*iterator);
-    }
-
-    return;
-
-    if(Token::allTokens.size() < LIVE_STATES_PRUNING_LIMIT)
+    if(Token::livingTokens.size() < LIVE_STATES_PRUNING_LIMIT)
         return;
 
-    // LIVE STATES PRUNING
-    std::sort(Token::allTokens.begin(), Token::allTokens.end(),
+    std::sort(Token::livingTokens.begin(), Token::livingTokens.end(),
               [](const Token* ls, const Token* rs){
-                  return ls->alive && ls->likelihood > rs->likelihood;
+                  return ls->likelihood > rs->likelihood;
               });
 
-    for(auto iterator = Token::allTokens.begin() + LIVE_STATES_PRUNING_LIMIT;
-        iterator != Token::allTokens.end();
-        iterator++){
-        if(!(*iterator)->output)
-            (*iterator)->alive = false;
+    float threshold = Token::livingTokens[0]->likelihood - BEAM_PRUNING_LIMIT;
+
+    if(threshold > Token::livingTokens[LIVE_STATES_PRUNING_LIMIT]->likelihood){
+        unsigned long vecLength = Token::livingTokens.size();
+        __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "TOKENS ALIVE: %lu", Token::livingTokens.size());
+        for(int i = 1; i < vecLength; i++){
+            if(Token::livingTokens[i]->likelihood < threshold)
+                Token::livingTokens[i]->alive = false;
+        }
     }
+    unsigned long vecLength = Token::livingTokens.size();
+    for(int i = LIVE_STATES_PRUNING_LIMIT; i < vecLength; i++){
+        Token::livingTokens[i]->alive = false;
+    }
+
+    Token::livingTokens.clear();
 
 }
 
 float
 SpeechRecognition::Decoder::HMMGraph::getBigramMapValue(SpeechRecognition::Decoder::Token *token) {
-    std::list<LMWord*>::iterator iter = token->wordHistory->words.end();
-    std::list<LMWord*>::iterator lastWord = --iter;
-    --iter;
+    LMWord* lastWord = token->wordLinkRecord->word;
+    LMWord* nextToLastWord = token->wordLinkRecord->previous->word;
 
-    auto bigram = (*iter)->bigramsMap.find((*lastWord)->id);
+    auto bigram = nextToLastWord->bigramsMap.find(lastWord->id);
 
-    if(bigram != (*iter)->bigramsMap.end()){
+    if(bigram != nextToLastWord->bigramsMap.end()){
         return bigram->second->bigramProbability;
     }
 
-    return (*lastWord)->unigramScore + (*iter)->unigramBackoff;
+    return lastWord->unigramScore + nextToLastWord->unigramBackoff;
 }
 
 void SpeechRecognition::Decoder::HMMGraph::passTokens(SpeechRecognition::Decoder::GraphNode *node, float* input) {
@@ -316,6 +270,8 @@ void SpeechRecognition::Decoder::HMMGraph::passTokens(SpeechRecognition::Decoder
                 iterator++, i++){
                 if((*iterator)->alive) {
                     (*iterator)->alive = (i == maxIndex);
+                    if((*iterator)->alive)
+                        (*iterator)->currentNode->bestToken = (*iterator);
                 }
             }
         }
@@ -354,6 +310,8 @@ void SpeechRecognition::Decoder::HMMGraph::passOutputNode(float* input) {
         iterator++, i++){
         if((*iterator)->alive) {
             (*iterator)->alive = (i == maxIndex);
+            if((*iterator)->alive)
+                outputNode->bestToken = (*iterator);
         }
     }
 }
