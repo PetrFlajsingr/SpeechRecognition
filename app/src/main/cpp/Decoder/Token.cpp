@@ -41,7 +41,7 @@ float SpeechRecognition::Decoder::Token::passInGraph(float *inputVector) {
     if(sourceToken == NULL){
         alive = false;
         if(wordLinkRecord != NULL)
-            wordLinkRecord->unasign();
+            wordLinkRecord->unassign();
         wordLinkRecord = NULL;
         likelihood = -std::numeric_limits<float>::max();
         return -std::numeric_limits<float>::max();
@@ -50,7 +50,7 @@ float SpeechRecognition::Decoder::Token::passInGraph(float *inputVector) {
     if(sourceToken != this) {
         alive = true;
         if(wordLinkRecord != NULL)
-            wordLinkRecord->unasign();
+            wordLinkRecord->unassign();
         wordLinkRecord = sourceToken->wordLinkRecord->assign();
     }
 
@@ -58,7 +58,7 @@ float SpeechRecognition::Decoder::Token::passInGraph(float *inputVector) {
         LMWord* toAdd = acousticModel->words[currentNode->predecessorNodes[position]->wordID].lmword;
         wordLinkRecord = wordLinkRecord->addRecord(toAdd);
         likelihood = sourceToken->likelihood + WORD_INSERTION_PENALTY
-                                    + HMMGraph::getBigramMapValue(this)*
+                                    + wordLinkRecord->getBigramProbability()
                                      SCALE_FACTOR_LM;
 
     }else {

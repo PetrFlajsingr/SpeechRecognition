@@ -49,7 +49,7 @@ void SpeechRecognition::Threads::DecoderThread::threadDecoder(){
             result = decoder->getWinner();
             recognitionResult.append(result);
             __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "RESULT: %s", result.c_str());
-            callbacks->notifySequenceRecognized(result);
+            //callbacks->notifySequenceRecognized(result);
             decoder->reset();
         }
         delete data;
@@ -62,9 +62,9 @@ void SpeechRecognition::Threads::DecoderThread::threadDecoder(){
         //    callbacks->notifyDecoderDone(runTime/(double)totalTime*100);
     }
 
-    callbacks->notifyRecognitionDone();
+    //callbacks->notifyRecognitionDone();
 
-    callbacks->DetachJava();
+    //callbacks->DetachJava();
     unsigned long endTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
     __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "DECODER: END, TIME: %lu",  endTime - startTime);

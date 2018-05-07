@@ -38,6 +38,31 @@ using namespace Utility;
 SpeechRecognitionAPI* speechRecognitionAPI = NULL;
 
 void test(char* cachedir, std::string filePath){
+    /*std::ifstream filestream;
+    filestream.open(filePath);
+    JavaCallbacks callbacks;
+
+    FileStreamThread fileStreamThread(filestream);
+    MelBankThread melBankThread(cachedir, callbacks, false);
+    NNThread nnThread(cachedir);
+
+    std::thread thread(&saveshit, filePath + ".result");
+
+    nnThread.callbacks = &callbacks;
+
+    fileStreamThread.melQueue = &melBankThread.inputQueue;
+    melBankThread.nnQueue = &nnThread.inputQueue;
+    nnThread.decoderQueue = &queue;
+
+    fileStreamThread.start();
+
+    fileStreamThread.thread.join();
+    melBankThread.thread.join();
+    nnThread.thread.join();
+    thread.join();
+
+    return;
+    */
     WavReader reader;
 
     std::ifstream ifstream;
@@ -47,12 +72,19 @@ void test(char* cachedir, std::string filePath){
 
     kiss_fft_cpx *fftFrame;
 
-    AudioFrame::calcHammingCoef();
+    AudioFrame::calculateHammingCoefficients();
     kiss_fftr_cfg cfg = kiss_fftr_alloc(FFT_FRAME_LENGTH, 0, NULL, NULL);
 
     RSMelFilterBank melFilterBank(cachedir);
 
     if(ifstream.is_open()) {
+
+        std::ofstream out;
+        out.open("/sdcard/Audio/testresults2K.txt");
+
+
+        out << "start";out.flush();
+
         std::vector<std::vector<float*>> results;
 
         std::vector<float*> tmp;
@@ -67,6 +99,7 @@ void test(char* cachedir, std::string filePath){
         unsigned int segments = 0;
         unsigned long melStartTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
+        out << "melstart";out.flush();
         for(unsigned int i = 0; i < reader.getDataSize(); i += SUBSAMPLED_OVERLAP_LENGTH) {
             short data[AUDIO_FRAME_LENGTH];
 
@@ -105,14 +138,14 @@ void test(char* cachedir, std::string filePath){
             }
         }
         unsigned long melEndTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-
+        out << "melnd";out.flush();
 
         FeatureMatrix matrix[segments];
 
         for(int i = 0; i < results.size(); i++){
-            matrix[i].init(results[i].size(), 24);
+            matrix[i].initialize(results[i].size(), 24);
             for(int j = 0; j < results[i].size(); j++) {
-                matrix[i].setFeatureMatrixFrame(j, results[i][j]);
+                matrix[i].setFeaturesMatrixFrame(j, results[i][j]);
             }
         }
 
@@ -129,13 +162,13 @@ void test(char* cachedir, std::string filePath){
 
         unsigned long nnEndTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
-
-        ViterbiDecoder decoder("/sdcard/devel/lexicon.bin", "/sdcard/devel/lm.arpa");
+        out << "nnend";out.flush();
+       ViterbiDecoder decoder("/sdcard/devel/2K/lexicon.bin", "/sdcard/devel/2K/lm.arpa");
         __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "start decoder");
         unsigned long decoderStartTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
         for(int i = 0; i < segments; i++){
-            for(int j = 0; j < nnResults[i]->getFramesNum(); j++)
+            for(int j = 0; j < nnResults[i]->getHeight(); j++)
                 decoder.decode(nnResults[i]->getFeaturesMatrix()[j]);
             __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "%s", decoder.getWinner().c_str());
             decoder.reset();
@@ -144,6 +177,11 @@ void test(char* cachedir, std::string filePath){
 
         __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "MEL: %lu, NN: %lu, DECODER: %lu",
                 melEndTime - melStartTime, nnEndTime - nnStartTime, decoderEndTime - decoderStartTime);
+
+
+
+        out << "MEL:" << melEndTime - melStartTime << "NN:" << nnEndTime - nnStartTime << "DEC:" <<decoderEndTime - decoderStartTime;
+        out.close();
     }
 }
 
@@ -210,9 +248,19 @@ extern "C"{
     JNIEXPORT void JNICALL Java_cz_vutbr_fit_xflajs00_voicerecognition_SpeechRecognitionAPI_testNative
             (JNIEnv* env, jobject obj, jstring str){
 
+        test(const_cast<char *>(env->GetStringUTFChars(str, NULL)), "/sdcard/Audio/test1.wav");
+        //test(const_cast<char *>(env->GetStringUTFChars(str, NULL)), "/sdcard/Audio/test2.wav");
+       // test(const_cast<char *>(env->GetStringUTFChars(str, NULL)), "/sdcard/Audio/test3.wav");
+        //test(const_cast<char *>(env->GetStringUTFChars(str, NULL)), "/sdcard/Audio/test4.wav");
+        //test(const_cast<char *>(env->GetStringUTFChars(str, NULL)), "/sdcard/Audio/test5.wav");
+        //test(const_cast<char *>(env->GetStringUTFChars(str, NULL)), "/sdcard/Audio/test6.wav");
+        //test(const_cast<char *>(env->GetStringUTFChars(str, NULL)), "/sdcard/Audio/test7.wav");
+        //test(const_cast<char *>(env->GetStringUTFChars(str, NULL)), "/sdcard/Audio/test8.wav");
+        //test(const_cast<char *>(env->GetStringUTFChars(str, NULL)), "/sdcard/Audio/test9.wav");
+        //test(const_cast<char *>(env->GetStringUTFChars(str, NULL)), "/sdcard/Audio/test10.wav");
         //speechRecognitionAPI->recognizeWav("/sdcard/Audio/test1.wav");
         //speechRecognitionAPI->recognizeWav("/sdcard/Audio/test2.wav");
-        speechRecognitionAPI->recognizeWav("/sdcard/Audio/test3.wav");
+        //speechRecognitionAPI->recognizeWav("/sdcard/Audio/test3.wav");
         //speechRecognitionAPI->recognizeWav("/sdcard/Audio/test4.wav");
         //speechRecognitionAPI->recognizeWav("/sdcard/Audio/test5.wav");
         /*test(const_cast<char *>(env->GetStringUTFChars(str, NULL)), "/sdcard/Audio/test1.wav");

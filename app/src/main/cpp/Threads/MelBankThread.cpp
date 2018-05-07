@@ -30,7 +30,7 @@ SpeechRecognition::Threads::MelBankThread::~MelBankThread() {
  */
 void SpeechRecognition::Threads::MelBankThread::threadMelBank() {
     __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "MEL: START");
-    AudioFrame::calcHammingCoef();
+    AudioFrame::calculateHammingCoefficients();
     Q_AudioData* data;
     AudioFrame frame;
     kiss_fft_cpx *fftFrame;
@@ -56,7 +56,7 @@ void SpeechRecognition::Threads::MelBankThread::threadMelBank() {
         //unsigned long sTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
         if(data->type == TERMINATE){
-            if(VADetector->isActive())
+            //if(VADetector->isActive())
                 nnQueue->enqueue(new Q_MelData{SEQUENCE_INACTIVE, NULL});
             nnQueue->enqueue(new Q_MelData{TERMINATE, NULL});
             delete data;
@@ -64,7 +64,7 @@ void SpeechRecognition::Threads::MelBankThread::threadMelBank() {
             break;
         }
         if(subsample)
-            subsampledAudio = subsampler.sample(data->data, SMALL_RECORDER_FRAMES);
+            subsampledAudio = subsampler.subSample(data->data, SMALL_RECORDER_FRAMES);
         else
             subsampledAudio = data->data;
 
@@ -95,7 +95,10 @@ void SpeechRecognition::Threads::MelBankThread::threadMelBank() {
 
         delete[] fftFrame;
 
-        VADetector->checkData(result);
+
+        melFilterBank->normalise(result);
+        nnQueue->enqueue(new Q_MelData{SEQUENCE_DATA, result});
+        /*VADetector->checkData(result);
 
         if(VADetector->isActive()){
             for(auto iterator = VADetector->getBuffer().begin();
@@ -119,7 +122,7 @@ void SpeechRecognition::Threads::MelBankThread::threadMelBank() {
             }
 
             dataCount = 0;
-        }
+        }*/
 
         //unsigned long nTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
         //totalTime = nTime - startTime;

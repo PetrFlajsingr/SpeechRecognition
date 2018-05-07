@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 namespace SpeechRecognition::Threads {
-    typedef struct registeredObject {
+    typedef struct RegisteredObject {
         jobject obj;
         jclass clazz;
     } T_registeredObject;

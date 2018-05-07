@@ -7,6 +7,7 @@ import android.os.Debug;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -109,11 +110,27 @@ public class MainActivity extends AppCompatActivity implements SpeechRecognition
 
 
     public void createFrames(View view){
+        Toast.makeText(getApplicationContext(), "running test", Toast.LENGTH_LONG).show();
         Thread thread = new Thread() {
             @Override
             public void run() {
-                speechAPI.test();
-                /*final String recongized = speechAPI.recognizeWAV("/sdcard/Audio/test.wav");
+
+                 final long start = System.currentTimeMillis();
+                speechAPI.recognizeWAV("/sdcard/Audio/test1.wav");
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        resultTextView.setText(resultTextView.getText() + Long.toString(System.currentTimeMillis() - start));
+                    }
+                });
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getApplicationContext(), "RECOGNITION DONE", Toast.LENGTH_LONG).show();
+                    }
+                });
+                /*final String recongized = speechAPI.recognizeWAV("/sdcard/Audio/test1.wav");
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {

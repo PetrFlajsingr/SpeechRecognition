@@ -110,10 +110,6 @@ void SpeechRecognition::Decoder::LanguageModel::saveBigram(char *input) {
             static_cast<float>(atof(record[0].c_str())));
     LMWord* word = getLMWord(words[0]);
 
-    word->bigrams.push_back(
-            newBigram
-    );
-
     word->bigramsMap.insert({newBigram->secondWord->id, newBigram});
 }
 

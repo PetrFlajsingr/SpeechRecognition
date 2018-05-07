@@ -93,7 +93,7 @@ void SpeechRecognition::Decoder::ViterbiDecoder::reset() {
         (*iterator)->likelihood = 0;
         if((*iterator)->alive) {
             if((*iterator)->wordLinkRecord != NULL) {
-                (*iterator)->wordLinkRecord->unasign();
+                (*iterator)->wordLinkRecord->unassign();
                 (*iterator)->wordLinkRecord = NULL;
             }
         }

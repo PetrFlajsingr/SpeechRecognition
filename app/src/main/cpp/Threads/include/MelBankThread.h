@@ -16,6 +16,7 @@
 namespace SpeechRecognition::Threads {
     using namespace Feature_Extraction;
     using namespace VoiceActivityDetection;
+    
     class MelBankThread {
     private:
         RSMelFilterBank *melFilterBank;

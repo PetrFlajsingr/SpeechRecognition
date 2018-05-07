@@ -3,8 +3,10 @@ apply plugin: 'com.android.application'
 android {
     signingConfigs {
         config {
-            keyAlias 'test'
+            keyAlias 'key0'
             keyPassword '555555'
+            storeFile file('/Users/petr/KEY')
+            storePassword '555555'
         }
     }
     compileSdkVersion 26
@@ -27,13 +29,14 @@ android {
     }
     buildTypes {
         release {
-            lintOptions{
+            lintOptions {
                 disable 'MissingTranslation'
                 checkReleaseBuilds false
                 abortOnError false
             }
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.config
         }
         debug_native {
             jniDebuggable true

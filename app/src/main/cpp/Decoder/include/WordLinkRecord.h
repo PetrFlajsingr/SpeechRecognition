@@ -15,15 +15,19 @@ namespace SpeechRecognition::Decoder {
     public:
         WordLinkRecord(WordLinkRecord *previous, LMWord* word);
 
+        virtual ~WordLinkRecord();
+
         LMWord* word;
 
         WordLinkRecord* previous;
 
         WordLinkRecord* assign();
 
-        void unasign();
+        void unassign();
 
         WordLinkRecord* addRecord(LMWord* word);
+
+        float getBigramProbability();
     };
 }
 

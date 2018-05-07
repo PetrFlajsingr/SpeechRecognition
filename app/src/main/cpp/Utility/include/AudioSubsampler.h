@@ -9,7 +9,7 @@
 
 namespace SpeechRecognition::Utility {
 /**
- * Wrapper for static classes handling subsamoling to 8kHz sample rate for recognition.
+ * Wrapper for static classes handling subsampling to 8kHz sample rate for recognition.
  */
     class AudioSubsampler {
     private:
@@ -19,10 +19,7 @@ namespace SpeechRecognition::Utility {
 
         virtual ~AudioSubsampler();
 
-        short *sample(short *data, int dataLength);
-
-        static short *subsample48kHzto8kHz(short *data, int dataLength);
-
+        short *subSample(short *data, int dataLength);
     };
 }
 

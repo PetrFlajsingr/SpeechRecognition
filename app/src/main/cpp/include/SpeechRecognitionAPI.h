@@ -35,7 +35,7 @@ namespace SpeechRecognition {
         ViterbiDecoder* decoder;
     public:
         SpeechRecognitionAPI(const char* cacheDir) : cacheDir(cacheDir) {
-            decoder = new ViterbiDecoder("/sdcard/devel/lexicon.bin", "/sdcard/devel/lm.arpa");
+            decoder = new ViterbiDecoder("/sdcard/devel/1.5Kbig/lexicon.bin", "/sdcard/devel/1.5Kbig/lm.arpa");
         }
 
         virtual ~SpeechRecognitionAPI();

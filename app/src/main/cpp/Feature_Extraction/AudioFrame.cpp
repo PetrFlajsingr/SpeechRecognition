@@ -7,7 +7,7 @@
 #include <AudioFrame.h>
 
 
-float SpeechRecognition::Feature_Extraction::AudioFrame::hammingCoef[AUDIO_FRAME_LENGTH];
+float SpeechRecognition::Feature_Extraction::AudioFrame::hammingCoefficients[AUDIO_FRAME_LENGTH];
 const double SpeechRecognition::Feature_Extraction::AudioFrame::ALPHA = 0.54;
 const double SpeechRecognition::Feature_Extraction::AudioFrame::BETA = (1 - ALPHA);
 
@@ -18,7 +18,7 @@ const double SpeechRecognition::Feature_Extraction::AudioFrame::BETA = (1 - ALPH
  */
 void SpeechRecognition::Feature_Extraction::AudioFrame::applyHammingWindow(short* data) {
     for(int i = 0; i < AUDIO_FRAME_LENGTH; ++i){
-        hammingData[i] = hammingCoef[i] * (data[i]);
+        hammingData[i] = hammingCoefficients[i] * (data[i]);
     }
 }
 
@@ -34,11 +34,11 @@ SpeechRecognition::Feature_Extraction::AudioFrame::AudioFrame() {
  * Calculates hamming window coefficients.
  * coef(n) = alpha - beta * cos((2*pi*n)/(N - 1))
  */
-void SpeechRecognition::Feature_Extraction::AudioFrame::calcHammingCoef() {
+void SpeechRecognition::Feature_Extraction::AudioFrame::calculateHammingCoefficients() {
     const double PI_MUL_2 = M_PI*2;
 
     for(int i = 0; i < AUDIO_FRAME_LENGTH; ++i){
-        hammingCoef[i] = (float) ( ALPHA - (BETA * cos(PI_MUL_2 * (double)i / (double)(AUDIO_FRAME_LENGTH - 1))));
+        hammingCoefficients[i] = (float) ( ALPHA - (BETA * cos(PI_MUL_2 * (double)i / (double)(AUDIO_FRAME_LENGTH - 1))));
     }
 }
 

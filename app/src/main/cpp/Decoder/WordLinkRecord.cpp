@@ -11,18 +11,12 @@ SpeechRecognition::Decoder::WordLinkRecord::WordLinkRecord(
         previous->assign();
 }
 
-/*SpeechRecognition::Decoder::WordLinkRecord *SpeechRecognition::Decoder::WordLinkRecord::copy() {
-    WordLinkRecord* copiedRecord = new WordLinkRecord(this->previous, this->word);
-
-    return copiedRecord;
-}*/
-
 SpeechRecognition::Decoder::WordLinkRecord *SpeechRecognition::Decoder::WordLinkRecord::assign() {
     referenceCount++;
     return this;
 }
 
-void SpeechRecognition::Decoder::WordLinkRecord::unasign() {
+void SpeechRecognition::Decoder::WordLinkRecord::unassign() {
     referenceCount--;
     if(referenceCount == 0)
         delete this;
@@ -31,7 +25,25 @@ void SpeechRecognition::Decoder::WordLinkRecord::unasign() {
 SpeechRecognition::Decoder::WordLinkRecord *
 SpeechRecognition::Decoder::WordLinkRecord::addRecord(LMWord* word) {
     WordLinkRecord* newRecord = new WordLinkRecord(this, word);
-    this->unasign();
+    this->unassign();
 
     return newRecord;
+}
+
+SpeechRecognition::Decoder::WordLinkRecord::~WordLinkRecord() {
+    if(previous != NULL)
+        previous->unassign();
+}
+
+float SpeechRecognition::Decoder::WordLinkRecord::getBigramProbability() {
+    LMWord* lastWord = this->word;
+    LMWord* nextToLastWord = this->previous->word;
+
+    auto bigram = nextToLastWord->bigramsMap.find(lastWord->id);
+
+    if(bigram != nextToLastWord->bigramsMap.end()){
+        return bigram->second->bigramProbability;
+    }
+
+    return lastWord->unigramScore + nextToLastWord->unigramBackoff;
 }

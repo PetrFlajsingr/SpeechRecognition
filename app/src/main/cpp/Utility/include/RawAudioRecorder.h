@@ -28,7 +28,7 @@ namespace SpeechRecognition::Utility {
         SLEngineItf engineEngine;
 
         //stops the recording when user requests it
-        static bool recordingStopBool;
+        static bool recordingStopFlag;
 
         // recorder interfaces
         SLObjectItf recorderObject = NULL;

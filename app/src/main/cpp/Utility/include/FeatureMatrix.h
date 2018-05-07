@@ -12,30 +12,20 @@ namespace SpeechRecognition::Utility {
     private:
         float **featuresMatrix = NULL; //< matrix data
 
-        int framesNum = 0;
+        int height = 0; //< height
+        int width = 0; //< width
     public:
-        void setFramesNum(int framesNum);
+        int getWidth() const;
 
-    private:
-        //< height
-        int frameSize = 0; //< width
-    public:
-        int getFrameSize() const;
+        int getHeight() const;
 
-
-        int getFramesNum() const;
-
-        void init(int framesNum, int frameSize);
+        void initialize(int height, int width);
 
         float **getFeaturesMatrix();
 
-        void setFeatureMatrix(float **featureMatrix);
-
-        void setFeatureMatrixFrame(int frameNum, float *data);
+        void setFeaturesMatrixFrame(int frameNum, float *data);
 
         virtual ~FeatureMatrix();
-
-        void dumpResultToFile(std::string path);
     };
 }
 

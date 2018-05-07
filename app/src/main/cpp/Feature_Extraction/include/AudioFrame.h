@@ -16,7 +16,7 @@ namespace SpeechRecognition::Feature_Extraction {
         // hamming window coeficients
         static const double ALPHA;
         static const double BETA;
-        static float hammingCoef[AUDIO_FRAME_LENGTH];
+        static float hammingCoefficients[AUDIO_FRAME_LENGTH];
 
         float *hammingData; //< data after using hamming window
 
@@ -34,7 +34,7 @@ namespace SpeechRecognition::Feature_Extraction {
 
         void applyFFT(kiss_fftr_cfg *cfg);
 
-        static void calcHammingCoef();
+        static void calculateHammingCoefficients();
     };
 
 }

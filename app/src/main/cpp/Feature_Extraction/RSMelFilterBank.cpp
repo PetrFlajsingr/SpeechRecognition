@@ -64,35 +64,6 @@ float *SpeechRecognition::Feature_Extraction::RSMelFilterBank::calculateMelBank(
     return returnMelValues;
 }
 
-/**
- * Mean normalization
- */
-void SpeechRecognition::Feature_Extraction::RSMelFilterBank::substractMean(FeatureMatrix *featuresMatrix) {
-    this->melRSinstance->set_frameCount(featuresMatrix->getFramesNum());
-
-    sp<Allocation> melCalcFramesAllocation = Allocation::createSized(renderScriptObject,
-                                                                     Element::F32(renderScriptObject),
-                                                                     featuresMatrix->getFramesNum() * MEL_BANK_FRAME_LENGTH);
-
-    for(int i = 0; i < featuresMatrix->getFramesNum(); i++)
-        melCalcFramesAllocation->copy1DRangeFrom(i * featuresMatrix->getFrameSize(),
-                                                 featuresMatrix->getFrameSize(),
-                                                 featuresMatrix->getFeaturesMatrix()[i]);
-
-    this->melRSinstance->set_melCalculatedFrames(melCalcFramesAllocation);
-
-
-    this->melRSinstance->forEach_substractMean(melIterationAllocation);
-
-    renderScriptObject->finish();
-
-    for(int i = 0; i < featuresMatrix->getFramesNum(); i++)
-        melCalcFramesAllocation->copy1DRangeTo(i * featuresMatrix->getFrameSize(),
-                                               featuresMatrix->getFrameSize(),
-                                               featuresMatrix->getFeaturesMatrix()[i]);
-
-}
-
 void SpeechRecognition::Feature_Extraction::RSMelFilterBank::normalise(float *data) {
     for(int i = 0; i < MEL_BANK_FRAME_LENGTH; i++){
         meanForNormalisation[i] = (meanForNormalisation[i] * elementCount + data[i]) / (elementCount + 1);

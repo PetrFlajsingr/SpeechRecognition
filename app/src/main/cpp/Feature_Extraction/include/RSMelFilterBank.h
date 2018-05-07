@@ -10,15 +10,14 @@
 #include <kiss_fft.h>
 #include <constants.h>
 #include "ScriptC_RSmelfilterbank.h"
+#include "RSBase.h"
 
 using namespace android::RSC;
 
 namespace SpeechRecognition::Feature_Extraction {
     using namespace Utility;
-    class RSMelFilterBank {
+    class RSMelFilterBank : public RSBase {
     private:
-        sp<RS> renderScriptObject;
-
         ScriptC_RSmelfilterbank *melRSinstance;
 
         void prepareAllocations();
@@ -35,8 +34,6 @@ namespace SpeechRecognition::Feature_Extraction {
         RSMelFilterBank(const char *cacheDir);
 
         float *calculateMelBank(kiss_fft_cpx *fftData);
-
-        void substractMean(FeatureMatrix *featuresMatrix);
 
         void normalise(float *data);
     };

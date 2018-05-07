@@ -165,7 +165,7 @@ void SpeechRecognition::Decoder::HMMGraph::destroySuccessors(GraphNode *node) {
 void SpeechRecognition::Decoder::HMMGraph::clearOutputNode() {
     Token* bestToken = Token::getBestToken(outputNode);
     if(bestToken != NULL) {
-        rootNode->tokens.front()->wordLinkRecord->unasign();
+        rootNode->tokens.front()->wordLinkRecord->unassign();
         rootNode->tokens.front()->wordLinkRecord = bestToken->wordLinkRecord->assign();
         rootNode->tokens.front()->likelihood = bestToken->likelihood;
         rootNode->tokens.front()->alive = true;
@@ -196,6 +196,8 @@ void SpeechRecognition::Decoder::HMMGraph::destroyGraph(GraphNode* node) {
  * Viterbi criterium has to be applied before using this function (only one token per node).
  */
 void SpeechRecognition::Decoder::HMMGraph::applyPruning() {
+    Token::livingTokens.clear();
+    return;
     if(Token::livingTokens.size() < LIVE_STATES_PRUNING_LIMIT)
         return;
 
@@ -221,20 +223,6 @@ void SpeechRecognition::Decoder::HMMGraph::applyPruning() {
 
     Token::livingTokens.clear();
 
-}
-
-float
-SpeechRecognition::Decoder::HMMGraph::getBigramMapValue(SpeechRecognition::Decoder::Token *token) {
-    LMWord* lastWord = token->wordLinkRecord->word;
-    LMWord* nextToLastWord = token->wordLinkRecord->previous->word;
-
-    auto bigram = nextToLastWord->bigramsMap.find(lastWord->id);
-
-    if(bigram != nextToLastWord->bigramsMap.end()){
-        return bigram->second->bigramProbability;
-    }
-
-    return lastWord->unigramScore + nextToLastWord->unigramBackoff;
 }
 
 void SpeechRecognition::Decoder::HMMGraph::passTokens(SpeechRecognition::Decoder::GraphNode *node, float* input) {
@@ -277,7 +265,6 @@ void SpeechRecognition::Decoder::HMMGraph::passTokens(SpeechRecognition::Decoder
         }
     }
 }
-
 
 void SpeechRecognition::Decoder::HMMGraph::passTokens(float *input) {
     passOutputNode(input);

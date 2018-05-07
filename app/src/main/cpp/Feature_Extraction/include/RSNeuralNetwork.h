@@ -10,30 +10,30 @@
 #include <NNInitInfo.h>
 #include <ScriptC_RSneuralnetwork.h>
 #include <RenderScript.h>
+#include "RSBase.h"
+
 namespace SpeechRecognition::Feature_Extraction {
     using namespace Utility;
-    class RSNeuralNetwork {
+    class RSNeuralNetwork : public RSBase {
         enum ACTIVATION_FUNCTIONS {
             NOTHING = 0,
             SIGMOID = 1,
             SOFTMAX = 2
         };
     private:
-        sp<RS> renderScriptObject;
-
         ScriptC_RSneuralnetwork *neuralNetworkRSInstance; //< Renderscript neural network implementation
 
         // NN data
         NNInitInfo info;
 
-        float **layerBiases;
-        float **layerVars;
-        float **layerMeans;
-        float ***layerWeights;
+        float **biases;
+        float **variances;
+        float **means;
+        float ***weights;
 
         sp<Allocation> dataAllocation;
 
-        sp<Allocation> iterAlloc;
+        sp<Allocation> iterationAllocation;
 
         int neuronIterator[500];
 
@@ -47,6 +47,9 @@ namespace SpeechRecognition::Feature_Extraction {
 
         void prepareAllocations();
 
+        unsigned int getTotalNeuronCount();
+
+        unsigned int getTotalWeightsCount();
     public:
         RSNeuralNetwork(std::string filepath, const char *cacheDir);
 
@@ -55,10 +58,6 @@ namespace SpeechRecognition::Feature_Extraction {
         float *forward(float *data);
 
         FeatureMatrix *forwardAll(FeatureMatrix *data);
-
-        unsigned int getTotalNeuronCount();
-
-        unsigned int getTotalWeightsCount();
     };
 }
 

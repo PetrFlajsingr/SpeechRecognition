@@ -25,8 +25,6 @@ namespace SpeechRecognition::Decoder {
 
         LMWord(const std::string &writtenForm);
 
-        std::vector<Bigram*> bigrams;
-
         std::unordered_map<unsigned int, Bigram*> bigramsMap;
 
         static void resetIdCounter();

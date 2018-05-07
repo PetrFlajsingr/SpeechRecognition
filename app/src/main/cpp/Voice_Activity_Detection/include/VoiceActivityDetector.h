@@ -22,9 +22,9 @@ namespace SpeechRecognition::VoiceActivityDetection {
 
         STATE currentState = INACTIVE;
 
-        unsigned int counterForTransition[2] = {0, 0};
+        unsigned int transitionCounter[2] = {0, 0};
 
-        float meanForNormalisation[MEL_BANK_FRAME_LENGTH] = {0};
+        float channelMeans[MEL_BANK_FRAME_LENGTH] = {0};
 
         unsigned int elementCount = 0;
 
@@ -32,7 +32,6 @@ namespace SpeechRecognition::VoiceActivityDetection {
     public:
         std::vector<float *> &getBuffer();
 
-    public:
         VoiceActivityDetector();
 
         virtual ~VoiceActivityDetector();

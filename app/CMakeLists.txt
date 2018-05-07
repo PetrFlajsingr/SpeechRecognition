@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.4.1)
 
 
 # variables for files
-set(DEBUG_MODEL 1)
+set(DEBUG_MODEL 0)
 set(RS_FILES "")
 set(RS_OBJ_FILES "")
 set(RENDER_SCRIPT_HEADERS_PATH ${ANDROID_NDK}/toolchains/renderscript/prebuilt/${ANDROID_HOST_TAG}/platform/rs)
@@ -61,8 +61,6 @@ add_library( # Sets the name of the library.
 
               # FEATURE EXTRACTION
               src/main/cpp/Feature_Extraction/AudioFrame.cpp
-              src/main/cpp/Feature_Extraction/MelFilterBank.cpp
-              src/main/cpp/Feature_Extraction/NeuralNetwork.cpp
               src/main/cpp/Feature_Extraction/RSMelFilterBank.cpp
               src/main/cpp/Feature_Extraction/RSNeuralNetwork.cpp
 

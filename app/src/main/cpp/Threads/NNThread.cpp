@@ -69,7 +69,7 @@ void SpeechRecognition::Threads::NNThread::threadNN() {
         //    callbacks->notifyNNDone(runTime/(double)totalTime*100);
     }
 
-    JavaCallbacks::DetachJava();
+    //JavaCallbacks::DetachJava();
     unsigned long endTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
     __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "NN: END, TIME: %lu", endTime - startTime);
 }

@@ -16,4 +16,5 @@ Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus
     <string name="inactive">Neaktivní</string>
     <string name="threadActivity">Aktivita vláken</string>
     <string name="memoryUsage">Využitá paměť</string>
+    <string name="audioRecording">WAV</string>
 </resources>

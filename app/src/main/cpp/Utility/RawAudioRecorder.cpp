@@ -7,7 +7,7 @@
 #include <algorithm>
 #include <android/log.h>
 
-bool SpeechRecognition::Utility::RawAudioRecorder::recordingStopBool = false;
+bool SpeechRecognition::Utility::RawAudioRecorder::recordingStopFlag = false;
 pthread_mutex_t SpeechRecognition::Utility::RawAudioRecorder::audioEngineLock = PTHREAD_MUTEX_INITIALIZER;
 SLAndroidSimpleBufferQueueItf SpeechRecognition::Utility::RawAudioRecorder::recorderBufferQueue;
 short* SpeechRecognition::Utility::RawAudioRecorder::recorderBuffer;
@@ -53,7 +53,7 @@ void SpeechRecognition::Utility::RawAudioRecorder::bqRecorderCallback(SLAndroidS
     assert(NULL == context);
     SLresult result;
     // recording stopped by user
-    if(recordingStopBool) {
+    if(recordingStopFlag) {
         // stopping the recording engine
         result = (*recorderRecord)->SetRecordState(recorderRecord, SL_RECORDSTATE_STOPPED);
         __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "RECORDER: stopbool set");
@@ -136,7 +136,7 @@ bool SpeechRecognition::Utility::RawAudioRecorder::createAudioRecorder() {
  * Stops current recording
  */
 void SpeechRecognition::Utility::RawAudioRecorder::stopRecording() {
-    recordingStopBool = true;
+    recordingStopFlag = true;
 }
 
 /**
@@ -154,7 +154,7 @@ void SpeechRecognition::Utility::RawAudioRecorder::startRecording() {
     if (pthread_mutex_trylock(&audioEngineLock)) {
         return;
     }
-    recordingStopBool = false;
+    recordingStopFlag = false;
     // in case already recording, stop recording and clear buffer queue
     result = (*recorderRecord)->SetRecordState(recorderRecord, SL_RECORDSTATE_STOPPED);
     assert(SL_RESULT_SUCCESS == result);

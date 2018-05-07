@@ -16,21 +16,21 @@ void SpeechRecognition::VoiceActivityDetection::VoiceActivityDetector::checkData
     }
     float sum = 0;
     for(int i = 0; i < MEL_BANK_FRAME_LENGTH; i++){
-        meanForNormalisation[i] = (meanForNormalisation[i] * elementCount + melBankData[i]) / (elementCount + 1);
-        sum += melBankData[i] - meanForNormalisation[i];
+        channelMeans[i] = (channelMeans[i] * elementCount + melBankData[i]) / (elementCount + 1);
+        sum += melBankData[i] - channelMeans[i];
     }
     elementCount++;
 
     if(currentState == ACTIVE && sum <= POWER_LIMIT) {
-        counterForTransition[ACTIVE] = 0;
-        counterForTransition[INACTIVE]++;
-        if(counterForTransition[INACTIVE] == FRAMES_FOR_TRANSITION_INACTIVE){
+        transitionCounter[ACTIVE] = 0;
+        transitionCounter[INACTIVE]++;
+        if(transitionCounter[INACTIVE] == FRAMES_FOR_TRANSITION_INACTIVE){
             currentState = INACTIVE;
         }
     } else if(sum > POWER_LIMIT) {
-        counterForTransition[INACTIVE] = 0;
-        counterForTransition[ACTIVE]++;
-        if(counterForTransition[ACTIVE] == FRAMES_FOR_TRANSITION_ACTIVE){
+        transitionCounter[INACTIVE] = 0;
+        transitionCounter[ACTIVE]++;
+        if(transitionCounter[ACTIVE] == FRAMES_FOR_TRANSITION_ACTIVE){
             currentState = ACTIVE;
         }
     }
