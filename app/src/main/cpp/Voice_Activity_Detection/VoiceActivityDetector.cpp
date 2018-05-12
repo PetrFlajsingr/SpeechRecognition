@@ -10,10 +10,14 @@ SpeechRecognition::VoiceActivityDetection::VoiceActivityDetector::~VoiceActivity
 
 void SpeechRecognition::VoiceActivityDetection::VoiceActivityDetector::checkData(float* melBankData) {
     buffer.push_back(melBankData);
+
+    // delete old invalid data
     if(buffer.size() > FRAMES_FOR_TRANSITION_ACTIVE) {
         delete[] buffer.at(0);
         buffer.erase(buffer.begin());
     }
+
+    // update means
     float sum = 0;
     for(int i = 0; i < MEL_BANK_FRAME_LENGTH; i++){
         channelMeans[i] = (channelMeans[i] * elementCount + melBankData[i]) / (elementCount + 1);
@@ -21,6 +25,7 @@ void SpeechRecognition::VoiceActivityDetection::VoiceActivityDetector::checkData
     }
     elementCount++;
 
+    // detect state
     if(currentState == ACTIVE && sum <= POWER_LIMIT) {
         transitionCounter[ACTIVE] = 0;
         transitionCounter[INACTIVE]++;

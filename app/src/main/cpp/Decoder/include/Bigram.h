@@ -9,7 +9,9 @@
 
 namespace SpeechRecognition::Decoder {
     /**
-     * Represents bigram of a specified word
+     * @brief Represents bigram of a specified word
+     *
+     * @author Petr Flajšingr, xflajs00@stud.fit.vutbr.cz
      */
     class Bigram {
     public:

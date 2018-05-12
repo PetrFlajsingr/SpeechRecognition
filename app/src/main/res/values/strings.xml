@@ -17,4 +17,6 @@ Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus
     <string name="threadActivity">Aktivita vláken</string>
     <string name="memoryUsage">Využitá paměť</string>
     <string name="audioRecording">WAV</string>
+    <string name="criticalError">Critical error</string>
+    <string name="will_terminate">The application will terminate</string>
 </resources>

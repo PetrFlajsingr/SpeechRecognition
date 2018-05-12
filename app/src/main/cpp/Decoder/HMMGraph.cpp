@@ -19,35 +19,16 @@
 #include <constants.h>
 #include <android/log.h>
 
-//TODO temp variable, remove
-std::vector<float> TEMP_PROB = {
-        static_cast<float>(log(0.87)),
-        static_cast<float>(log(0.13))
-};
 
-
-/**
- * @param model Acoustic model
- */
 SpeechRecognition::Decoder::HMMGraph::HMMGraph(AcousticModel* model) {
     acousticModel = model;
 }
 
-/**
- * Free graph memory
- */
 SpeechRecognition::Decoder::HMMGraph::~HMMGraph() {
     destroyGraph(rootNode);
     delete outputNode;
 }
 
-/**
- * Adds SIL node to the end of the word and links it
- * @param node predecessor node
- * @param wordID id of a word
- * @param phonemeIndex index in a word
- * @param predecessor
- */
 void SpeechRecognition::Decoder::HMMGraph::addSILNode(GraphNode *node,
                                                       int wordID, int phonemeIndex,
                                                       GraphNode* predecessor) {
@@ -77,11 +58,6 @@ void SpeechRecognition::Decoder::HMMGraph::addSILNode(GraphNode *node,
     outputNode->predecessorNodes.push_back(newNode);
 }
 
-/**
- * Recursively adds nodes where it is needed.
- * @param wordID id of word in Acoustic model
- * @param phonemeIndex index of a phoneme
- */
 void SpeechRecognition::Decoder::HMMGraph::addSuccessors(GraphNode *node, AcousticModel* model,
                                                          int wordID, int phonemeIndex, GraphNode* predecessor) {
     node->successorNodes.push_back(node);
@@ -103,10 +79,6 @@ void SpeechRecognition::Decoder::HMMGraph::addSuccessors(GraphNode *node, Acoust
     }
 }
 
-/**
- * Adds/removes states from the graph.
- * @param model Acoustic model
- */
 void SpeechRecognition::Decoder::HMMGraph::build(AcousticModel *model) {
     // root
     std::vector<float> probabilities;
@@ -141,10 +113,6 @@ void SpeechRecognition::Decoder::HMMGraph::build(AcousticModel *model) {
     addTokensToOutputNode();
 }
 
-/**
- * Deletes all nodes behind the given one.
- * @param node
- */
 void SpeechRecognition::Decoder::HMMGraph::destroySuccessors(GraphNode *node) {
     for(auto iterator = node->successorNodes.begin();
             iterator != node->successorNodes.end();
@@ -157,11 +125,6 @@ void SpeechRecognition::Decoder::HMMGraph::destroySuccessors(GraphNode *node) {
     node->successorNodes.clear();
 }
 
-/**
- * Debug clearOutputNode
- * @param model
- * @return
- */
 void SpeechRecognition::Decoder::HMMGraph::clearOutputNode() {
     Token* bestToken = Token::getBestToken(outputNode);
     if(bestToken != NULL) {
@@ -172,9 +135,6 @@ void SpeechRecognition::Decoder::HMMGraph::clearOutputNode() {
     }
 }
 
-/**
- * Recursive deletion of GraphNodes
- */
 void SpeechRecognition::Decoder::HMMGraph::destroyGraph(GraphNode* node) {
     // exit condition
     if(node == outputNode)
@@ -191,10 +151,6 @@ void SpeechRecognition::Decoder::HMMGraph::destroyGraph(GraphNode* node) {
     delete node;
 }
 
-/**
- * Marks tokens with low likelihood for deletion.
- * Viterbi criterium has to be applied before using this function (only one token per node).
- */
 void SpeechRecognition::Decoder::HMMGraph::applyPruning() {
     Token::livingTokens.clear();
     return;

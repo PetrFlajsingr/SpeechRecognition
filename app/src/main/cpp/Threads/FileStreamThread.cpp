@@ -16,7 +16,6 @@ void SpeechRecognition::Threads::FileStreamThread::threadFileStream() {
     std::unique_lock<std::mutex> lock(startMutex);
     conditionVariable.wait(lock);
 
-    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "FILESTREAM: START");
     short* data = wavReader.wavToPcm(*fileStream);
 
     Q_AudioData* audioData;
@@ -24,8 +23,6 @@ void SpeechRecognition::Threads::FileStreamThread::threadFileStream() {
     if(data == NULL) {
         audioData = new Q_AudioData{TERMINATE, NULL};
         melQueue->enqueue(audioData);
-
-        __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "FILESTREAM: BAD END");
         return;
     }
 
@@ -43,8 +40,6 @@ void SpeechRecognition::Threads::FileStreamThread::threadFileStream() {
 
     audioData = new Q_AudioData{TERMINATE, NULL};
     melQueue->enqueue(audioData);
-
-    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "FILESTREAM: END");
 }
 
 void SpeechRecognition::Threads::FileStreamThread::start() {

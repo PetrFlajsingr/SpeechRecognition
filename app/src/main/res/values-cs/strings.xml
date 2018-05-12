@@ -8,4 +8,6 @@
     <string name="inactive">Neaktivní</string>
     <string name="threadActivity">Aktivita vláken</string>
     <string name="memoryUsage">Využitá paměť</string>
+    <string name="criticalError">Kritická chyba</string>
+    <string name="will_terminate">Aplikace bude ukončena</string>
 </resources>

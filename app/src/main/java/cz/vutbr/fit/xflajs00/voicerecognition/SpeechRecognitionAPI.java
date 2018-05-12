@@ -28,13 +28,13 @@ public class SpeechRecognitionAPI {
     // TEST
 
     private String cacheDir;
-    public void test(){
-        testNative(cacheDir);
+    public String test(){
+        return testNative(cacheDir);
     }
 
-    private native void testNative(String str);
+    private native String testNative(String str);
     // NATIVE METHODS
-    private native void setCacheDirNative(String cacheDir);
+    private native String setCacheDirNative(String cacheDir);
     private native boolean startRecordingNative();
     private native void stopRecordingNative();
     private native void shutdownNative();
@@ -58,10 +58,15 @@ public class SpeechRecognitionAPI {
     /**
      * Requires cache dir path for RenderScript
      * @param cacheDir cache dir path
+     * @throws Exception when file check fails
      */
-    public SpeechRecognitionAPI(String cacheDir) {
+    public SpeechRecognitionAPI(String cacheDir) throws Exception {
         this.cacheDir = cacheDir;
-        setCacheDirNative(cacheDir);
+
+        String errorMsg = setCacheDirNative(cacheDir);
+
+        if(errorMsg.length() != 0)
+            throw new Exception(errorMsg);
 
         registerCallbacksNative();
     }

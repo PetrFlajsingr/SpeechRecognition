@@ -13,9 +13,11 @@
 #include <list>
 
 namespace SpeechRecognition::Decoder {
-/**
- * Represents one node in the HMM graph.
- */
+    /**
+     * @brief Class representing a node in a graph
+     *
+     * @author Petr Flajšingr, xflajs00@stud.fit.vutbr.cz
+     */
     class GraphNode {
     public:
         // indexes of these vectors correlate

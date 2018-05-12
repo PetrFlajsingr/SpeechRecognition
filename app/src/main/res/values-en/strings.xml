@@ -8,4 +8,6 @@
     <string name="inactive">Inactive</string>
     <string name="threadActivity">Thread activity</string>
     <string name="memoryUsage">Memory usage:</string>
+    <string name="criticalError">Critical error</string>
+    <string name="will_terminate">The application will terminate</string>
 </resources>

@@ -6,6 +6,9 @@
 #define VOICERECOGNITION_NNINITINFO_H
 
 namespace SpeechRecognition::Feature_Extraction {
+    /**
+     * @brief Basic information about size of the neural network
+     */
     struct NNInitInfo {
         unsigned int layerCount;
         unsigned int *neuronCounts;

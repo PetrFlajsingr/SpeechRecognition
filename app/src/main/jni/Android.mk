@@ -23,7 +23,7 @@ LOCAL_SRC_FILES := voicerecognition_Jni.cpp  RSmelfilterbank.rs RSneuralnetwork.
 LOCAL_C_INCLUDES := $(LOCAL_PATH)../cpp/include
 LOCAL_CLANG := true
 
-LOCAL_CFLAGS := -std=c++11 -frtti
+LOCAL_CFLAGS := -std=c++14 -frtti -O3 -ffast-math -DANDROID_ARM_NEON=TRUE
 LOCAL_LDFLAGS := -Wl,-Bsymbolic
 
 LOCAL_LDLIBS := \

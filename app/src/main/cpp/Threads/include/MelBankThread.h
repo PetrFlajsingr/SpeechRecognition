@@ -16,7 +16,12 @@
 namespace SpeechRecognition::Threads {
     using namespace Feature_Extraction;
     using namespace VoiceActivityDetection;
-    
+
+    /**
+     * @brief Class representing a Mel/VAD thread
+     *
+     * @author Petr Flajšingr, xflajs00@stud.fit.vutbr.cz
+     */
     class MelBankThread {
     private:
         RSMelFilterBank *melFilterBank;
@@ -25,13 +30,27 @@ namespace SpeechRecognition::Threads {
 
         JavaCallbacks *callbacks;
 
+        /**
+         * Method to be run in thread. Buffers audio sent from recoder.
+         */
         void threadMelBank();
 
+        /**
+         * Prepares data from buffer - segmentation
+         * @param data buffered data
+         * @param newData output data
+         */
         void prepareAudioData(short *data, short *newData);
 
         bool subsample;
     public:
-        MelBankThread(const char *cacheDir, JavaCallbacks &callbacks, bool subsample);
+        /**
+         * Starts the thread on creation
+         * @param cacheDir cache dir for RenderScript
+         * @param callbacks callbacks to JVM
+         * @param subsample from WAV?
+         */
+        MelBankThread(JavaCallbacks &callbacks, RSMelFilterBank* melFilterBank, bool subsample);
 
         virtual ~MelBankThread();
 

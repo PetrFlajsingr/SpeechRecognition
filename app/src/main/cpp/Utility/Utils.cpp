@@ -97,3 +97,9 @@ void SpeechRecognition::Utility::dumpToFile(std::string path, float **array, uns
     }
     out.close();
 }
+
+bool SpeechRecognition::Utility::doesFileExist(const char *filename) {
+    std::ifstream inFile(filename);
+
+    return inFile.good();
+}

@@ -16,10 +16,19 @@ using namespace android::RSC;
 
 namespace SpeechRecognition::Feature_Extraction {
     using namespace Utility;
+
+    /**
+     * @brief Class handling mel bank filters
+     *
+     * @author Petr Flajšingr, xflajs00@stud.fit.vutbr.cz
+     */
     class RSMelFilterBank : public RSBase {
     private:
         ScriptC_RSmelfilterbank *melRSinstance;
 
+        /**
+         * Prepares allocations for Renderscript.
+         */
         void prepareAllocations();
 
         // Allocations
@@ -31,10 +40,21 @@ namespace SpeechRecognition::Feature_Extraction {
 
         unsigned int elementCount = 0;
     public:
+        /**
+         * Requires cache directory of the application for use in RenderScript
+         * @param cacheDir cache directory of the application
+         */
         RSMelFilterBank(const char *cacheDir);
 
+        /**
+         * Calculates mel bank filters for given data.
+         */
         float *calculateMelBank(kiss_fft_cpx *fftData);
 
+        /**
+         * Normalises provided data
+         * @param data mel bank output
+         */
         void normalise(float *data);
     };
 }

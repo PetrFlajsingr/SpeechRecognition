@@ -9,10 +9,6 @@
 #include <cstdlib>
 #include <android/asset_manager.h>
 
-/**
- * Reads a lexicon from file. DO NOT USE
- * @param path path to lexicon file
- */
 SpeechRecognition::Decoder::AcousticModel::AcousticModel(std::string path) {
     std::ifstream file;
 
@@ -47,11 +43,6 @@ SpeechRecognition::Decoder::AcousticModel::AcousticModel(std::string path) {
     file.close();
 }
 
-/**
- * Creates acoustic model and links it with language model
- * @param path path to file containing acoustic model
- * @param languageModel Language model
- */
 SpeechRecognition::Decoder::AcousticModel::AcousticModel(std::string path,
                                                          SpeechRecognition::Decoder::LanguageModel *languageModel) {
     std::ifstream file;

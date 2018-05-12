@@ -10,6 +10,11 @@
 using namespace android::RSC;
 
 namespace SpeechRecognition::Feature_Extraction {
+    /**
+     * @brief Base class for Renderscript using classes
+     *
+     * @author Petr Flajšingr, xflajs00@stud.fit.vutbr.cz
+     */
     class RSBase {
     protected:
         sp <RS> renderScriptObject;

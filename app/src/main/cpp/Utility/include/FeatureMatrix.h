@@ -8,6 +8,11 @@
 #include <string>
 
 namespace SpeechRecognition::Utility {
+    /**
+     * @brief Class used for storing matrix data
+     *
+     * @author Petr Flajšingr, xflajs00@stud.fit.vutbr.cz
+     */
     class FeatureMatrix {
     private:
         float **featuresMatrix = NULL; //< matrix data
@@ -19,6 +24,11 @@ namespace SpeechRecognition::Utility {
 
         int getHeight() const;
 
+        /**
+         * Allocates memory.
+         * @param framesNum Number of frames
+         * @param frameSize Size of each frame
+         */
         void initialize(int height, int width);
 
         float **getFeaturesMatrix();

@@ -8,10 +8,6 @@
 #include <RSMelFilterBank.h>
 #include <constants.h>
 
-/**
- * Requires cache directory of the application for use in RenderScript
- * @param cacheDir cache directory of the application
- */
 SpeechRecognition::Feature_Extraction::RSMelFilterBank::RSMelFilterBank(const char* cacheDir) {
     this->renderScriptObject = new RS();
     this->renderScriptObject->init(cacheDir);
@@ -20,9 +16,6 @@ SpeechRecognition::Feature_Extraction::RSMelFilterBank::RSMelFilterBank(const ch
     this->prepareAllocations();
 }
 
-/**
- * Prepares allocations for Renderscript.
- */
 void SpeechRecognition::Feature_Extraction::RSMelFilterBank::prepareAllocations() {
     Element::Builder* elBuilder = new Element::Builder(this->renderScriptObject);
     elBuilder->add(Element::F32(this->renderScriptObject), "", FFT_FRAME_LENGTH);
@@ -45,9 +38,6 @@ void SpeechRecognition::Feature_Extraction::RSMelFilterBank::prepareAllocations(
                                                       MEL_BANK_FRAME_LENGTH);
 }
 
-/**
- * Calculates mel bank filters for given data.
- */
 float *SpeechRecognition::Feature_Extraction::RSMelFilterBank::calculateMelBank(kiss_fft_cpx *fftData) {
     fftFrameAllocation->copy1DFrom(fftData);
 

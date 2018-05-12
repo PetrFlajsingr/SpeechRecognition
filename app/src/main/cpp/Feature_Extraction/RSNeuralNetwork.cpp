@@ -11,12 +11,6 @@
 #include <fstream>
 #include <constants.h>
 
-/**
- * Creates objects needed for Renderscript. Loads the neural network from a file given by the first
- * parameter.
- * @param filepath Path to neural network file
- * @param cacheDir cache directory for renderscript
- */
 SpeechRecognition::Feature_Extraction::RSNeuralNetwork::RSNeuralNetwork(std::string filepath, const char *cacheDir) {
     this->loadFromFile(filepath);
 
@@ -27,11 +21,6 @@ SpeechRecognition::Feature_Extraction::RSNeuralNetwork::RSNeuralNetwork(std::str
     this->prepareAllocations();
 }
 
-/**
- * Loads neural network from file. Requires format defined in header.
- * Allocates memory.
- * @param filepath Parth to NN binary file
- */
 void SpeechRecognition::Feature_Extraction::RSNeuralNetwork::loadFromFile(std::string filepath) {
     std::ifstream file;
     file.open(filepath.c_str(), std::ios::in|std::ios::binary);
@@ -120,9 +109,6 @@ void SpeechRecognition::Feature_Extraction::RSNeuralNetwork::loadFromFile(std::s
     }
 }
 
-/**
- * Prepares Renderscript allocations and copies data to them.
- */
 void SpeechRecognition::Feature_Extraction::RSNeuralNetwork::prepareAllocations() {
     // Allocation for means - Renderscript
     sp<Allocation> meansAllocation = Allocation::createSized(this->renderScriptObject,
@@ -205,12 +191,6 @@ void SpeechRecognition::Feature_Extraction::RSNeuralNetwork::prepareAllocations(
     }
 }
 
-/**
- * Prepares input for NN.
- * @param data input data - mel bank results
- * @param index index of middle frame
- * @param out
- */
 float* SpeechRecognition::Feature_Extraction::RSNeuralNetwork::prepareInput(FeatureMatrix *data, int index) {
     const int ROLLING_WINDOW_SIZE = 7;
     float* result = new float[info.inputSize];
@@ -230,18 +210,13 @@ float* SpeechRecognition::Feature_Extraction::RSNeuralNetwork::prepareInput(Feat
     return result;
 }
 
-/**
- * Pass data through network.
- * @param data input data
- * @return clearOutputNode of neural network
- */
 float *SpeechRecognition::Feature_Extraction::RSNeuralNetwork::forward(float *data) {
     dataAllocation->copy1DFrom(data);
-
     iterationAllocation = Allocation::createSized(this->renderScriptObject,
-                                        Element::U32(this->renderScriptObject),
-                                        info.inputSize);
+                                                  Element::U32(this->renderScriptObject),
+                                                  info.inputSize);
     iterationAllocation->copy1DFrom(neuronIterator);
+
 
     this->neuralNetworkRSInstance->bind_data(dataAllocation);
 
@@ -283,11 +258,6 @@ float *SpeechRecognition::Feature_Extraction::RSNeuralNetwork::forward(float *da
     return result;
 }
 
-/**
- * Forwards entire feature matrix.
- * @param data clearOutputNode of mel bank filters
- * @return matrix of neural network outputs
- */
 SpeechRecognition::Utility::FeatureMatrix *SpeechRecognition::Feature_Extraction::RSNeuralNetwork::forwardAll(FeatureMatrix *data) {
     FeatureMatrix* result = new FeatureMatrix();
     result->initialize(data->getHeight(), 46);
@@ -301,9 +271,6 @@ SpeechRecognition::Utility::FeatureMatrix *SpeechRecognition::Feature_Extraction
     return result;
 }
 
-/**
- * Total count of neurons in network. For memory allocation and offset calculation.
- */
 unsigned int SpeechRecognition::Feature_Extraction::RSNeuralNetwork::getTotalNeuronCount() {
     if(totalNeuronCount == 0) {
         for(int i = 0; i < info.layerCount; ++i) {
@@ -313,9 +280,6 @@ unsigned int SpeechRecognition::Feature_Extraction::RSNeuralNetwork::getTotalNeu
     return totalNeuronCount;
 }
 
-/**
- * Total count of weights in network. For memory allocation and offset calculation.
- */
 unsigned int SpeechRecognition::Feature_Extraction::RSNeuralNetwork::getTotalWeightsCount() {
     unsigned int total = info.inputSize * info.neuronCounts[0];
     for(int i = 0; i < info.layerCount - 1; ++i) {

@@ -11,6 +11,12 @@
 #include <BigramFWD.h>
 
 namespace SpeechRecognition::Decoder {
+
+    /**
+     * @brief Class containing information about word in language model
+     *
+     * @author Petr Flajšingr, xflajs00@stud.fit.vutbr.cz
+     */
     class LMWord {
     private:
         static unsigned int idCounter; //< static counter

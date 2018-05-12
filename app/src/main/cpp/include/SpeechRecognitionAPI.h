@@ -20,6 +20,11 @@ namespace SpeechRecognition {
     using namespace Threads;
     using namespace Utility;
 
+    /**
+     * @brief Class providing simple programming interface to use speech recognizer
+     *
+     * @author Petr Flajšingr, xflajs00@stud.fit.vutbr.cz
+     */
     class SpeechRecognitionAPI {
     private:
         bool recorderCreated = false;
@@ -33,9 +38,24 @@ namespace SpeechRecognition {
         void startRecognitionThreads();
 
         ViterbiDecoder* decoder;
+
+        RSMelFilterBank* melFilterBank;
+
+        RSNeuralNetwork* neuralNetwork;
+
+        void checkNecessaryFiles();
     public:
+        /**
+         * Allocates decoder.
+         * @param cacheDir applications cache directory for Renderscript
+         */
         SpeechRecognitionAPI(const char* cacheDir) : cacheDir(cacheDir) {
-            decoder = new ViterbiDecoder("/sdcard/devel/1.5Kbig/lexicon.bin", "/sdcard/devel/1.5Kbig/lm.arpa");
+            checkNecessaryFiles();
+            decoder = new ViterbiDecoder(LEXICON_PATH, LM_PATH);
+
+            melFilterBank = new RSMelFilterBank(cacheDir);
+
+            neuralNetwork = new RSNeuralNetwork(NN_PATH, cacheDir);
         }
 
         virtual ~SpeechRecognitionAPI();
@@ -44,6 +64,11 @@ namespace SpeechRecognition {
 
         void stopRecording();
 
+        /**
+         * Recognizes wav provided via filepath
+         * @param filePath path to file
+         * @return recognized sequence
+         */
         std::string recognizeWav(std::string filePath);
 
         bool isRecording(){

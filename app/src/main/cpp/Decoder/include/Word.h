@@ -10,6 +10,12 @@
 #include "LMWord.h"
 
 namespace SpeechRecognition::Decoder {
+
+    /**
+     * @brief Class representing a word in acoustic model.
+     *
+     * @author Petr Flajšingr, xflajs00@stud.fit.vutbr.cz
+     */
     class Word {
     private:
         static int idCounter;

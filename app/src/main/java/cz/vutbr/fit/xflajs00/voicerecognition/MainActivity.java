@@ -1,10 +1,12 @@
 package cz.vutbr.fit.xflajs00.voicerecognition;
 
 import android.Manifest;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Debug;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -43,12 +45,36 @@ public class MainActivity extends AppCompatActivity implements SpeechRecognition
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // nefunguje request persmission
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, 1);
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.MODIFY_AUDIO_SETTINGS}, 1);
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+        int permissions_code = 42;
+        String[] permissions = {Manifest.permission.RECORD_AUDIO, Manifest.permission.MODIFY_AUDIO_SETTINGS, Manifest.permission.WRITE_EXTERNAL_STORAGE};
 
-        speechAPI = new SpeechRecognitionAPI(this.getCacheDir().toString());
+        ActivityCompat.requestPermissions(this, permissions, permissions_code);
+
+        try {
+            speechAPI = new SpeechRecognitionAPI(this.getCacheDir().toString());
+        } catch (Exception e) {
+            AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
+
+            alertBuilder.setMessage(e.getMessage() + "\n" + getResources().getString(R.string.will_terminate))
+                    .setTitle(R.string.criticalError)
+                    .setCancelable(false)
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+
+                            System.exit(-99);
+                        }
+                    });
+
+            AlertDialog dialog = alertBuilder.create();
+
+            dialog.show();
+
+            e.printStackTrace();
+
+            return;
+        }
         speechAPI.addListener(this);
 
         speechAPI.addDebugListener(this);
@@ -70,7 +96,7 @@ public class MainActivity extends AppCompatActivity implements SpeechRecognition
         decoderThreadTextView = (TextView) findViewById(R.id.decoderThreadTextView);
         memoryUsageTextView = (TextView) findViewById(R.id.memoryUsageTextView);
 
-        //timer.schedule(new memoryTask(), 0, 2000);
+        timer.schedule(new memoryTask(), 0, 2000);
     }
 
     @Override
@@ -109,13 +135,22 @@ public class MainActivity extends AppCompatActivity implements SpeechRecognition
     }
 
 
-    public void createFrames(View view){
+    public void wavButtonOnClick(View view){
         Toast.makeText(getApplicationContext(), "running test", Toast.LENGTH_LONG).show();
         Thread thread = new Thread() {
             @Override
             public void run() {
 
-                 final long start = System.currentTimeMillis();
+                final String time = speechAPI.test();
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        resultTextView.setText(time);
+                    }
+                });
+
+                 /*final long start = System.currentTimeMillis();
                 speechAPI.recognizeWAV("/sdcard/Audio/test1.wav");
                 runOnUiThread(new Runnable() {
                     @Override
@@ -130,7 +165,7 @@ public class MainActivity extends AppCompatActivity implements SpeechRecognition
                         Toast.makeText(getApplicationContext(), "RECOGNITION DONE", Toast.LENGTH_LONG).show();
                     }
                 });
-                /*final String recongized = speechAPI.recognizeWAV("/sdcard/Audio/test1.wav");
+                final String recongized = speechAPI.recognizeWAV("/sdcard/Audio/test1.wav");
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {

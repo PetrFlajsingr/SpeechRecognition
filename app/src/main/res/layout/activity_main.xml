@@ -14,7 +14,7 @@
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginTop="8dp"
-        android:onClick="createFrames"
+        android:onClick="wavButtonOnClick"
         android:text="@string/audioRecording"
         app:layout_constraintBottom_toTopOf="@+id/buttonRecognitionControl"
         app:layout_constraintEnd_toEndOf="parent"

@@ -1,10 +1,15 @@
 //
 // Created by Petr Flajsingr on 30/11/2017.
 //
+//// This file contains constants used across multiple source files in this project
 
 #ifndef VOICERECOGNITION_CONSTANTS_H
 #define VOICERECOGNITION_CONSTANTS_H
 
+
+#include <vector>
+#include <cmath>
+#include <string>
 
 #define APPNAME "cz.vutbr.fit.xflajs00.voicerecognition"
 
@@ -31,5 +36,16 @@ const unsigned int LIVE_STATES_PRUNING_LIMIT = 2000; //< pruning: max count of a
 const float SCALE_FACTOR_LM = 2;
 
 const float WORD_INSERTION_PENALTY = -10;
+
+const std::string LM_PATH = "/sdcard/speechrecognition/lm.arpa";
+
+const std::string LEXICON_PATH = "/sdcard/speechrecognition/lexicon.bin";
+
+const std::string NN_PATH = "/sdcard/speechrecognition/nn.bin";
+
+const std::vector<float> TEMP_PROB = {
+        static_cast<float>(log(0.87)),
+        static_cast<float>(log(0.13))
+};
 
 #endif //VOICERECOGNITION_CONSTANTS_H

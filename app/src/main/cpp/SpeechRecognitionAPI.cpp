@@ -2,7 +2,9 @@
 // Created by Petr Flajsingr on 05/04/2018.
 //
 
-#include "SpeechRecognitionAPI.h"
+#include <Utils.h>
+#include <SpeechRecognitionAPI.h>
+#include <Exceptions.h>
 
 bool SpeechRecognition::SpeechRecognitionAPI::startRecording() {
     if(!recorderCreated){
@@ -26,12 +28,12 @@ void SpeechRecognition::SpeechRecognitionAPI::stopRecording() {
 }
 
 std::string SpeechRecognition::SpeechRecognitionAPI::recognizeWav(std::string filePath) {
-    std::ifstream filestream;
-    filestream.open(filePath);
-    if(filestream.is_open()) {
-        FileStreamThread fileStreamThread(filestream);
-        MelBankThread melBankThread(cacheDir, callbacks, false);
-        NNThread nnThread(cacheDir);
+    std::ifstream fileStream;
+    fileStream.open(filePath);
+    if(fileStream.is_open()) {
+        FileStreamThread fileStreamThread(fileStream);
+        MelBankThread melBankThread(callbacks, melFilterBank, false);
+        NNThread nnThread(neuralNetwork);
         DecoderThread decoderThread(callbacks, decoder);
 
         nnThread.callbacks = &callbacks;
@@ -53,8 +55,8 @@ std::string SpeechRecognition::SpeechRecognitionAPI::recognizeWav(std::string fi
 }
 
 void SpeechRecognition::SpeechRecognitionAPI::startRecognitionThreads() {
-    MelBankThread melBankThread(cacheDir, callbacks, true);
-    NNThread nnThread(cacheDir);
+    MelBankThread melBankThread(callbacks, melFilterBank, true);
+    NNThread nnThread(neuralNetwork);
     DecoderThread decoderThread(callbacks, decoder);
 
     nnThread.callbacks = &callbacks;
@@ -68,10 +70,19 @@ void SpeechRecognition::SpeechRecognitionAPI::startRecognitionThreads() {
     melBankThread.thread.join();
     nnThread.thread.join();
     decoderThread.thread.join();
-
-    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "THREADS END");
 }
 
 SpeechRecognition::SpeechRecognitionAPI::~SpeechRecognitionAPI() {
     delete decoder;
+    delete neuralNetwork;
+    delete melFilterBank;
+}
+
+void SpeechRecognition::SpeechRecognitionAPI::checkNecessaryFiles() {
+    if(!doesFileExist(LM_PATH.c_str()))
+        throw Exceptions::ASRFilesMissingException("Language model is not on device. Path: " + LM_PATH);
+    if(!doesFileExist(LEXICON_PATH.c_str()))
+        throw Exceptions::ASRFilesMissingException("Lexicon is not on device. Path: " + LEXICON_PATH);
+    if(!doesFileExist(NN_PATH.c_str()))
+        throw Exceptions::ASRFilesMissingException("Neural network is not on device. Path: " + NN_PATH);
 }

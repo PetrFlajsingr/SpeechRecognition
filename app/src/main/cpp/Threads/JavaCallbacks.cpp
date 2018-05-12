@@ -7,11 +7,6 @@
 
 JavaVM* SpeechRecognition::Threads::JavaCallbacks::g_VM = NULL;
 
-/**
- * Attach to JVM. If the thread isn't attached the call of Java functions would fail.
- * @param attached
- * @return
- */
 JNIEnv* SpeechRecognition::Threads::JavaCallbacks::AttachJava(bool* attached) {
     if(g_VM == NULL) {
         *attached = false;
@@ -32,9 +27,6 @@ void SpeechRecognition::Threads::JavaCallbacks::DetachJava(){
     g_VM->DetachCurrentThread();
 }
 
-/**
- * Notifies listeners about change of voice activity.
- */
 void SpeechRecognition::Threads::JavaCallbacks::notifyVADChanged(bool activity){
     bool attached;
     JNIEnv* env = AttachJava(&attached);
@@ -51,10 +43,6 @@ void SpeechRecognition::Threads::JavaCallbacks::notifyVADChanged(bool activity){
         DetachJava();
 }
 
-/**
- * Notifies listeners about recognized sequence
- * @param sequence recognized sequence
- */
 void SpeechRecognition::Threads::JavaCallbacks::notifySequenceRecognized(std::string sequence){
     bool attached;
     JNIEnv* env = AttachJava(&attached);
@@ -70,9 +58,6 @@ void SpeechRecognition::Threads::JavaCallbacks::notifySequenceRecognized(std::st
         DetachJava();
 }
 
-/**
- * Notifies listeners about all threads finishing.
- */
 void SpeechRecognition::Threads::JavaCallbacks::notifyRecognitionDone(){
     bool attached;
     JNIEnv* env = AttachJava(&attached);

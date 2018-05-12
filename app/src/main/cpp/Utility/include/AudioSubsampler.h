@@ -8,17 +8,25 @@
 #include <filt.h>
 
 namespace SpeechRecognition::Utility {
-/**
- * Wrapper for static classes handling subsampling to 8kHz sample rate for recognition.
- */
+    /**
+     * @brief Wrapper for static classes handling subsampling to 8kHz sample rate for recognition.
+     *
+     * @author Petr Flajšingr, xflajs00@stud.fit.vutbr.cz
+     */
     class AudioSubsampler {
     private:
-        Filter *lpFIRFilter;
+        Filter *lpFIRFilter; //< low pass filter
     public:
         AudioSubsampler();
 
         virtual ~AudioSubsampler();
 
+        /**
+         * Subsamples given audio data
+         * @param data pcm 16bit little-endian, 48 kHz audio
+         * @param dataLength length of input data
+         * @return subsampled data
+         */
         short *subSample(short *data, int dataLength);
     };
 }

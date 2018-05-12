@@ -4,7 +4,7 @@
 
 #include <WavReader.h>
 
-bool WavReader::readHeader(std::ifstream& stream) {
+bool SpeechRecognition::Utility::WavReader::readHeader(std::ifstream& stream) {
     unsigned int dataRead = FORMAT_OFFSET;
     stream.ignore(FORMAT_OFFSET);
 
@@ -60,11 +60,11 @@ bool WavReader::readHeader(std::ifstream& stream) {
     return true;
 }
 
-std::string WavReader::getErrorMessage() {
+std::string SpeechRecognition::Utility::WavReader::getErrorMessage() {
     return errorMessage;
 }
 
-short *WavReader::wavToPcm(std::ifstream& stream) {
+short *SpeechRecognition::Utility::WavReader::wavToPcm(std::ifstream& stream) {
     if(!readHeader(stream))
         return NULL;
 
@@ -77,6 +77,6 @@ short *WavReader::wavToPcm(std::ifstream& stream) {
     return data;
 }
 
-unsigned int WavReader::getDataSize() {
+unsigned int SpeechRecognition::Utility::WavReader::getDataSize() {
     return dataSize;
 }

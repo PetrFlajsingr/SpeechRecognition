@@ -3,7 +3,7 @@
 //
 
 #include <WordLinkRecord.h>
-
+#include <Bigram.h>
 
 SpeechRecognition::Decoder::WordLinkRecord::WordLinkRecord(
         SpeechRecognition::Decoder::WordLinkRecord *previous, LMWord* word) : previous(previous), word(word) {

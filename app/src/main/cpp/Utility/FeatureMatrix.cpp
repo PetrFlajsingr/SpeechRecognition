@@ -14,11 +14,7 @@ float **SpeechRecognition::Utility::FeatureMatrix::getFeaturesMatrix() {
     return featuresMatrix;
 }
 
-/**
- * Allocates memory.
- * @param framesNum Number of frames
- * @param frameSize Size of each frame
- */
+
 void SpeechRecognition::Utility::FeatureMatrix::initialize(int height, int width) {
     if(featuresMatrix == NULL || this->height < height || this->width < width){
         if(featuresMatrix != NULL){

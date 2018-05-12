@@ -11,29 +11,17 @@ float SpeechRecognition::Feature_Extraction::AudioFrame::hammingCoefficients[AUD
 const double SpeechRecognition::Feature_Extraction::AudioFrame::ALPHA = 0.54;
 const double SpeechRecognition::Feature_Extraction::AudioFrame::BETA = (1 - ALPHA);
 
-/**
- * Applies hamming window to the given data. Length of data is defined by DATA_LENGTH.
- * Saves the data in hammingData array.
- * @param data input data
- */
 void SpeechRecognition::Feature_Extraction::AudioFrame::applyHammingWindow(short* data) {
     for(int i = 0; i < AUDIO_FRAME_LENGTH; ++i){
         hammingData[i] = hammingCoefficients[i] * (data[i]);
     }
 }
 
-/**
- * Allocates memory for first operation (hamming window).
- */
 SpeechRecognition::Feature_Extraction::AudioFrame::AudioFrame() {
     hammingData = new float[AUDIO_FRAME_LENGTH];
     fftData = NULL;
 }
 
-/**
- * Calculates hamming window coefficients.
- * coef(n) = alpha - beta * cos((2*pi*n)/(N - 1))
- */
 void SpeechRecognition::Feature_Extraction::AudioFrame::calculateHammingCoefficients() {
     const double PI_MUL_2 = M_PI*2;
 
@@ -47,13 +35,10 @@ SpeechRecognition::Feature_Extraction::AudioFrame::~AudioFrame() {
     delete[] fftData;
 }
 
-/**
- * Allocates memory for results of FFT. Calculates only first half of the data due to FFT symetry.
- * Deletes no longer necessary audio data.
- * @param cfg configuration for kiss_fftr function
- */
 void SpeechRecognition::Feature_Extraction::AudioFrame::applyFFT(kiss_fftr_cfg *cfg) {
-    this->fftData = new kiss_fft_cpx[FFT_FRAME_LENGTH/2+1];
+    int a = 10;
+    if(a)
+        this->fftData = new kiss_fft_cpx[FFT_FRAME_LENGTH/2+1];
 
     // adding padding to the fft input
     float fftInput[FFT_FRAME_LENGTH];

@@ -10,14 +10,19 @@
 #include "LanguageModel.h"
 
 namespace SpeechRecognition::Decoder {
-/**
- * Contains information about acoustic model.
- */
+    /**
+     * @brief Class representing an acoustic model for recognition
+     *
+     * @author Petr Flajšingr, xflajs00@stud.fit.vutbr.cz
+     */
     class AcousticModel {
     public:
         std::vector<Word> words; //< vector of all words in the model
 
-        // do not use
+        /**
+         * Reads a lexicon from file. DO NOT USE
+         * @param path path to lexicon file
+         */
         AcousticModel(std::string path);
 
         /**

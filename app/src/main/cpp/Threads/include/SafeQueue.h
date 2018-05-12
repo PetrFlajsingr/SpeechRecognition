@@ -14,15 +14,16 @@
 #include <android/log.h>
 
 /**
- * Queue for passing data between worker threads.
- */
+* @brief A template queue to pass data between threads - thread safe
+*
+* @author Petr Flajšingr, xflajs00@stud.fit.vutbr.cz
+*/
 template<typename T> class SafeQueue {
 private:
     std::mutex queueMutex;
     std::condition_variable conditionVariable;
     std::queue<T> queue;
     std::atomic<bool> keep_running;
-
 
 public:
     SafeQueue():keep_running(true){};

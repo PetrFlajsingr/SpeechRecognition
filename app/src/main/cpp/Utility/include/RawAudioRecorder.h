@@ -17,6 +17,11 @@
 #include <SafeQueue.h>
 
 namespace SpeechRecognition::Utility {
+    /**
+     * @brief Class implementing native audio recording using OPENSL library
+     *
+     * @author Petr Flajšingr, xflajs00@stud.fit.vutbr.cz
+     */
     class RawAudioRecorder {
     private:
         static short *recorderBuffer; //< buffer for recorded data
@@ -37,19 +42,44 @@ namespace SpeechRecognition::Utility {
 
         static pthread_mutex_t audioEngineLock;
 
+        /**
+         * Prepares interfaces necessary for recording audio
+         */
         void createEngine();
 
+        /**
+         * Gets called when a queued buffer is full. Prepares the next part of a buffer or stops recording.
+         * @param bq queue of buffers
+         */
         static void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context);
 
     public:
+        /**
+         * Prepares the engine for recording audio.
+         */
         RawAudioRecorder();
 
+        /**
+         * Prepares audio recorder with OPENSL.
+         * Settings: 48 kHz sample rate, little endian, 16 bit, raw data (PCM)
+         * @return true if OK, otherwise false
+         */
         bool createAudioRecorder();
 
+        /**
+         * Destroys all used audio objects and releases allocated memory.
+         */
         virtual ~RawAudioRecorder();
 
+        /**
+         * Starts recording. Allocates the necessary memory, sets the OPENSL parameters.
+         * @param max_length_sec maximum length of recorded audio
+         */
         void startRecording();
 
+        /**
+         * Stops recording when buffer (recordBuffer) is full
+         */
         void stopRecording();
 
         static bool isRecording();

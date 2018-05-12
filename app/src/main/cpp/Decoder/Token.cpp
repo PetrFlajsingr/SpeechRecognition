@@ -14,11 +14,7 @@ SpeechRecognition::Decoder::AcousticModel* SpeechRecognition::Decoder::Token::ac
 SpeechRecognition::Decoder::LanguageModel* SpeechRecognition::Decoder::Token::languageModel;
 std::vector<SpeechRecognition::Decoder::Token*> SpeechRecognition::Decoder::Token::allTokens;
 std::vector<SpeechRecognition::Decoder::Token*> SpeechRecognition::Decoder::Token::livingTokens;
-/**
- * Registers token in static vector for all tokens.
- * Saves index in the vector for fast deletion from the vector.
- * @param currentNode node of graph
- */
+
 SpeechRecognition::Decoder::Token::Token(GraphNode* currentNode, bool output, unsigned int position)
         : output(output), currentNode(currentNode), position(position) {
     if(currentNode->xPos == -1){
@@ -31,10 +27,6 @@ SpeechRecognition::Decoder::Token::Token(GraphNode* currentNode, bool output, un
     allTokens.push_back(this);
 }
 
-/**
- * Step in an algorithm. Clones the token into next states and calculates new likelihood.
- * @param inputVector vector of NN outputs
- */
 float SpeechRecognition::Decoder::Token::passInGraph(float *inputVector) {
     Token* sourceToken = getBestToken(currentNode->predecessorNodes[position]);
 
@@ -59,7 +51,7 @@ float SpeechRecognition::Decoder::Token::passInGraph(float *inputVector) {
         wordLinkRecord = wordLinkRecord->addRecord(toAdd);
         likelihood = sourceToken->likelihood + WORD_INSERTION_PENALTY
                                     + wordLinkRecord->getBigramProbability()
-                                     SCALE_FACTOR_LM;
+                                    * SCALE_FACTOR_LM;
 
     }else {
         Token::livingTokens.push_back(this);
@@ -69,12 +61,6 @@ float SpeechRecognition::Decoder::Token::passInGraph(float *inputVector) {
     return likelihood;
 }
 
-/**
- * Calculates likelihood of next token based on this one.
- * @param inputVector vector of NN outputs
- * @param pathNumber connection number
- * @return new likelihood
- */
 float SpeechRecognition::Decoder::Token::calculateLikelihood(float* inputVector, unsigned int pathNumber, Token* sourceToken) {
     return sourceToken->likelihood
            + inputVector[currentNode->inputVectorIndex]
@@ -92,15 +78,6 @@ SpeechRecognition::Decoder::Token::getBestToken(SpeechRecognition::Decoder::Grap
         return node->bestToken;
 
     return NULL;
-    /*
-    for(auto iterator = node->tokens.begin();
-            iterator != node->tokens.end();
-            iterator++){
-        if((*iterator)->alive)
-            return *iterator;
-    }
-
-    return NULL;*/
 }
 
 void SpeechRecognition::Decoder::Token::deleteAllTokens() {

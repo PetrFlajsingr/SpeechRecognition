@@ -11,8 +11,8 @@
 #include <JavaCallbacks.h>
 #include <android/log.h>
 
-SpeechRecognition::Threads::MelBankThread::MelBankThread(const char* cacheDir, JavaCallbacks& callbacks, bool subsample): thread(&MelBankThread::threadMelBank, this){
-    this->melFilterBank = new RSMelFilterBank(cacheDir);
+SpeechRecognition::Threads::MelBankThread::MelBankThread(JavaCallbacks& callbacks, RSMelFilterBank* melFilterBank, bool subsample): thread(&MelBankThread::threadMelBank, this){
+    this->melFilterBank = melFilterBank;
 
     this->VADetector = new VoiceActivityDetector();
     this->callbacks = &callbacks;
@@ -21,15 +21,10 @@ SpeechRecognition::Threads::MelBankThread::MelBankThread(const char* cacheDir, J
 }
 
 SpeechRecognition::Threads::MelBankThread::~MelBankThread() {
-    delete this->melFilterBank;
     delete this->VADetector;
 }
 
-/**
- * Method to be run in thread. Buffers audio sent from recoder.
- */
 void SpeechRecognition::Threads::MelBankThread::threadMelBank() {
-    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "MEL: START");
     AudioFrame::calculateHammingCoefficients();
     Q_AudioData* data;
     AudioFrame frame;
@@ -53,14 +48,12 @@ void SpeechRecognition::Threads::MelBankThread::threadMelBank() {
     bool notified = false;
     short* subsampledAudio;
     while(inputQueue.dequeue(data)){
-        //unsigned long sTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+        unsigned long sTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
         if(data->type == TERMINATE){
-            //if(VADetector->isActive())
-                nnQueue->enqueue(new Q_MelData{SEQUENCE_INACTIVE, NULL});
+            nnQueue->enqueue(new Q_MelData{SEQUENCE_INACTIVE, NULL});
             nnQueue->enqueue(new Q_MelData{TERMINATE, NULL});
             delete data;
-            __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "MEL: TERMINATE");
             break;
         }
         if(subsample)
@@ -95,10 +88,7 @@ void SpeechRecognition::Threads::MelBankThread::threadMelBank() {
 
         delete[] fftFrame;
 
-
-        melFilterBank->normalise(result);
-        nnQueue->enqueue(new Q_MelData{SEQUENCE_DATA, result});
-        /*VADetector->checkData(result);
+        VADetector->checkData(result);
 
         if(VADetector->isActive()){
             for(auto iterator = VADetector->getBuffer().begin();
@@ -122,23 +112,16 @@ void SpeechRecognition::Threads::MelBankThread::threadMelBank() {
             }
 
             dataCount = 0;
-        }*/
+        }
 
-        //unsigned long nTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-        //totalTime = nTime - startTime;
-        //runTime += nTime - sTime;
-        //counter++;
-        //if(counter % 500 == 0)
-        //    callbacks->notifyMelDone(runTime/(double)totalTime*100);
+        unsigned long nTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+        totalTime = nTime - startTime;
+        runTime += nTime - sTime;
+        counter++;
+        if(counter % 50 == 0)
+            callbacks->notifyMelDone(runTime/(double)totalTime*100);
     }
-
-
-    delete[] newAudioData;
     callbacks->DetachJava();
-
-    unsigned long endTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-
-    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "MEL: END, TIME: %lu", endTime - startTime);
 }
 
 void SpeechRecognition::Threads::MelBankThread::stopThread() {

@@ -4,11 +4,12 @@ cmake_minimum_required(VERSION 3.4.1)
 
 
 # variables for files
-set(DEBUG_MODEL 0)
+set(DEBUG_MODEL 1)
 set(RS_FILES "")
 set(RS_OBJ_FILES "")
 set(RENDER_SCRIPT_HEADERS_PATH ${ANDROID_NDK}/toolchains/renderscript/prebuilt/${ANDROID_HOST_TAG}/platform/rs)
 
+message(STATUS ${ANDROID_NDK})
 # create the rs_libs
 execute_process(COMMAND mkdir -p "${PROJECT_SOURCE_DIR}/src/main/rs_libs/${ANDROID_ABI}")
 
@@ -95,7 +96,7 @@ add_library( # Sets the name of the library.
               ${RS_OBJ_FILES}
               ${RS_FILES}
               src/main/cpp/SpeechRecognitionAPI.cpp
-              src/main/cpp/audio.cpp
+              src/main/cpp/speech_recognition_jni_interface.cpp
 
 
 )

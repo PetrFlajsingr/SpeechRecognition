@@ -8,19 +8,14 @@
 #include <android/log.h>
 
 
-SpeechRecognition::Threads::NNThread::NNThread(const char* cacheDir): thread(&NNThread::threadNN, this) {
-    neuralNetwork = new RSNeuralNetwork("/sdcard/devel/NNnew.bin", cacheDir);
+SpeechRecognition::Threads::NNThread::NNThread(RSNeuralNetwork *neuralNetwork): thread(&NNThread::threadNN, this) {
+    this->neuralNetwork = neuralNetwork;
 }
 
 SpeechRecognition::Threads::NNThread::~NNThread() {
-    delete neuralNetwork;
 }
 
-/**
- * Function to be run in a thread. Takes data from inputQueue.
- */
 void SpeechRecognition::Threads::NNThread::threadNN() {
-    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "NN: START");
     Q_MelData* data;
 
     float nnInput[NN_INPUT_SIZE];
@@ -36,12 +31,11 @@ void SpeechRecognition::Threads::NNThread::threadNN() {
     unsigned long counter = 0;
 
     while(inputQueue.dequeue(data)){
-        //unsigned long sTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+        unsigned long sTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
         if(data->type == TERMINATE){
             decoderQueue->enqueue(new Q_NNData{TERMINATE, NULL});
             delete data;
-            __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "NN: TERMINATE");
             break;
         }else if(data->type == SEQUENCE_DATA){
             active = true;
@@ -61,22 +55,18 @@ void SpeechRecognition::Threads::NNThread::threadNN() {
         }
         delete data;
 
-        //unsigned long nTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-        //totalTime = nTime - startTime;
-        //runTime += nTime - sTime;
-        //counter++;
-        //if(counter % 100 == 0)
-        //    callbacks->notifyNNDone(runTime/(double)totalTime*100);
+        unsigned long nTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+        totalTime = nTime - startTime;
+        runTime += nTime - sTime;
+        counter++;
+        if(counter % 50 == 0)
+            callbacks->notifyNNDone(runTime/(double)totalTime*100);
     }
 
-    //JavaCallbacks::DetachJava();
+    JavaCallbacks::DetachJava();
     unsigned long endTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "NN: END, TIME: %lu", endTime - startTime);
 }
 
-/**
- * Deletion of frame buffer. Called on finishing sequence.
- */
 void SpeechRecognition::Threads::NNThread::deleteBuffer(std::vector<float *> &data) {
     for(auto iterator = data.begin();
             iterator != data.end();){
@@ -85,9 +75,6 @@ void SpeechRecognition::Threads::NNThread::deleteBuffer(std::vector<float *> &da
     }
 }
 
-/**
- * Prepares the input for neural network
- */
 void SpeechRecognition::Threads::NNThread::prepareInput(float *result, std::vector<float *> &data) {
     const int ROLLING_WINDOW_SIZE = 7;
     const int OFFSET = ROLLING_WINDOW_SIZE * 2 + 1;

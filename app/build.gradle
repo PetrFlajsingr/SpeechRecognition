@@ -23,7 +23,7 @@ android {
         renderscriptNdkModeEnabled true
         externalNativeBuild {
             cmake {
-                cppFlags "-std=c++14 -fno-rtti -O3 -fexceptions -ffast-math -DANDROID_ARM_NEON=TRUE"
+                cppFlags "-std=c++17 -fno-rtti -O3 -fexceptions -ffast-math -DANDROID_ARM_NEON=TRUE"
             }
         }
     }
@@ -57,7 +57,7 @@ android {
     defaultConfig {
         externalNativeBuild {
             cmake {
-                abiFilters 'armeabi', 'armeabi-v7a', 'arm64-v8a', 'x86'
+                abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
             }
         }
     }

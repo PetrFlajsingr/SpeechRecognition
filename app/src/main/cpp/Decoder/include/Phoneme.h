@@ -9,9 +9,9 @@
 
 
 namespace SpeechRecognition::Decoder {
-/**
- * phonemes corresponding to their clearOutputNode index in neural network
- */
+    /**
+     * phonemes corresponding to their clearOutputNode index in neural network
+     */
     enum PHONEME {
         AA = 0,
         AE = 1,
@@ -62,9 +62,11 @@ namespace SpeechRecognition::Decoder {
         NONE = -1
     };
 
-/**
- * This class serves mainly for reading data for acoustic model.
- */
+    /**
+     * @brief This class serves mainly for reading data for acoustic model.
+     *
+     * @author Petr Flajšingr, xflajs00@stud.fit.vutbr.cz
+     */
     class Phoneme {
     public:
         static PHONEME stringToPhoneme(std::string phoneme);

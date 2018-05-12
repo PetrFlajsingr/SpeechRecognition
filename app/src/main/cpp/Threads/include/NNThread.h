@@ -15,18 +15,36 @@
 namespace SpeechRecognition::Threads {
     using namespace Feature_Extraction;
 
+    /**
+     * @brief Class representing a neural network thread
+     *
+     * @author Petr Flajšingr, xflajs00@stud.fit.vutbr.cz
+     */
     class NNThread {
     private:
         RSNeuralNetwork *neuralNetwork;
 
+        /**
+         * Method to be run in a thread. Takes data from inputQueue.
+         */
         void threadNN();
 
+        /**
+         * Prepares the input for neural network
+         */
         void prepareInput(float *result, std::vector<float *> &data);
 
+        /**
+         * Deletion of frame buffer. Called on finishing sequence.
+         */
         void deleteBuffer(std::vector<float *> &data);
 
     public:
-        NNThread(const char *cacheDir);
+        /**
+         * Starts thread on creation
+         * @param cacheDir cache dir for Renderscript
+         */
+        NNThread(RSNeuralNetwork *neuralNetwork);
 
         virtual ~NNThread();
 
