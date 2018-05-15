@@ -41,7 +41,8 @@ void SpeechRecognition::Threads::DecoderThread::threadDecoder(){
             first = true;
             result = decoder->getWinner();
             recognitionResult.append(result);
-            callbacks->notifySequenceRecognized(result);
+            if(sendSequenceDone)
+                callbacks->notifySequenceRecognized(result);
             decoder->reset();
         }
         delete data;
@@ -57,7 +58,6 @@ void SpeechRecognition::Threads::DecoderThread::threadDecoder(){
     callbacks->notifyRecognitionDone();
 
     callbacks->DetachJava();
-    unsigned long endTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 }
 
 std::string SpeechRecognition::Threads::DecoderThread::getResult() {

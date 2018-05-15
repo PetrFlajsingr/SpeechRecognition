@@ -30,6 +30,8 @@ namespace SpeechRecognition::Threads {
         void threadDecoder();
 
         std::string recognitionResult = "";
+
+        bool sendSequenceDone = true;
     public:
         std::thread thread;
 
@@ -39,6 +41,10 @@ namespace SpeechRecognition::Threads {
          * @param decoder Decoder for recognition
          */
         DecoderThread(JavaCallbacks &callbacks, ViterbiDecoder* decoder);
+
+        void setSequenceDone(bool value){
+            sendSequenceDone = value;
+        }
 
         virtual ~DecoderThread();
 

@@ -9,8 +9,8 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,6 +18,11 @@ import android.widget.Toast;
 import java.util.Timer;
 import java.util.TimerTask;
 
+/**
+ * Main activity of this demo application
+ *
+ * @author Petr Flajšingr
+ */
 public class MainActivity extends AppCompatActivity implements SpeechRecognitionAPI.ISpeechRecognitionAPICallback, SpeechRecognitionAPI.ISpeechRecognitionAPIDebugCallbacks{
     private boolean recording = false;
 
@@ -33,6 +38,9 @@ public class MainActivity extends AppCompatActivity implements SpeechRecognition
     private TextView nnThreadTextView;
     private TextView decoderThreadTextView;
     private TextView memoryUsageTextView;
+
+    private Button recordingButton;
+    private Button wavButton;
 
     final private Timer timer = new Timer();
 
@@ -96,6 +104,9 @@ public class MainActivity extends AppCompatActivity implements SpeechRecognition
         decoderThreadTextView = (TextView) findViewById(R.id.decoderThreadTextView);
         memoryUsageTextView = (TextView) findViewById(R.id.memoryUsageTextView);
 
+        recordingButton = (Button) findViewById(R.id.buttonRecognitionControl);
+        wavButton = (Button) findViewById(R.id.button);
+
         timer.schedule(new memoryTask(), 0, 2000);
     }
 
@@ -114,6 +125,7 @@ public class MainActivity extends AppCompatActivity implements SpeechRecognition
     // UI control with a button
     public void recordingControl(View view){
         if(!recording){
+            wavButton.setEnabled(false);
             recording = true;
             VADTextView.setVisibility(View.VISIBLE);
             resultTextView.setText("");
@@ -136,46 +148,22 @@ public class MainActivity extends AppCompatActivity implements SpeechRecognition
 
 
     public void wavButtonOnClick(View view){
-        Toast.makeText(getApplicationContext(), "running test", Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(), "Running wav recognition", Toast.LENGTH_LONG).show();
+        wavButton.setEnabled(false);
+        recordingButton.setEnabled(false);
         Thread thread = new Thread() {
             @Override
             public void run() {
-
-                final String time = speechAPI.test();
-
+                final String recognized = speechAPI.recognizeWAV("/sdcard/speechrecognition/test.wav");
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        resultTextView.setText(time);
+                        resultTextView.setText(recognized);
                     }
                 });
-
-                 /*final long start = System.currentTimeMillis();
-                speechAPI.recognizeWAV("/sdcard/Audio/test1.wav");
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        resultTextView.setText(resultTextView.getText() + Long.toString(System.currentTimeMillis() - start));
-                    }
-                });
-
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(getApplicationContext(), "RECOGNITION DONE", Toast.LENGTH_LONG).show();
-                    }
-                });
-                final String recongized = speechAPI.recognizeWAV("/sdcard/Audio/test1.wav");
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        resultTextView.setText(recongized);
-                    }
-                });*/
             }
         };
         thread.start();
-
     }
 
     @Override
@@ -221,6 +209,8 @@ public class MainActivity extends AppCompatActivity implements SpeechRecognition
             public void run() {
                 Toast.makeText(getApplicationContext(), "RECOGNITION DONE", Toast.LENGTH_LONG).show();
                 VADTextView.setVisibility(View.INVISIBLE);
+                wavButton.setEnabled(true);
+                recordingButton.setEnabled(true);
             }
         });
     }
@@ -230,7 +220,7 @@ public class MainActivity extends AppCompatActivity implements SpeechRecognition
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                melThreadTextView.setText(Integer.toString(percentage) + "%");
+                melThreadTextView.setText(String.format("%s%%", Integer.toString(percentage)));
             }
         });
     }
@@ -240,7 +230,7 @@ public class MainActivity extends AppCompatActivity implements SpeechRecognition
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                nnThreadTextView.setText(Integer.toString(percentage) + "%");
+                nnThreadTextView.setText(String.format("%s%%", Integer.toString(percentage)));
             }
         });
     }
@@ -250,7 +240,7 @@ public class MainActivity extends AppCompatActivity implements SpeechRecognition
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                decoderThreadTextView.setText(Integer.toString(percentage) + "%");
+                decoderThreadTextView.setText(String.format("%s%%", Integer.toString(percentage)));
             }
         });
     }

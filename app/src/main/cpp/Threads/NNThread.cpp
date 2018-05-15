@@ -64,7 +64,6 @@ void SpeechRecognition::Threads::NNThread::threadNN() {
     }
 
     JavaCallbacks::DetachJava();
-    unsigned long endTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 }
 
 void SpeechRecognition::Threads::NNThread::deleteBuffer(std::vector<float *> &data) {

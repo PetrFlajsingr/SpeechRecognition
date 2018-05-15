@@ -25,14 +25,8 @@ import java.util.List;
  *
  */
 public class SpeechRecognitionAPI {
-    // TEST
-
     private String cacheDir;
-    public String test(){
-        return testNative(cacheDir);
-    }
 
-    private native String testNative(String str);
     // NATIVE METHODS
     private native String setCacheDirNative(String cacheDir);
     private native boolean startRecordingNative();

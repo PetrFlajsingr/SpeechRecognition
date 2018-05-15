@@ -36,6 +36,8 @@ std::string SpeechRecognition::SpeechRecognitionAPI::recognizeWav(std::string fi
         NNThread nnThread(neuralNetwork);
         DecoderThread decoderThread(callbacks, decoder);
 
+        decoderThread.setSequenceDone(false);
+
         nnThread.callbacks = &callbacks;
 
         fileStreamThread.melQueue = &melBankThread.inputQueue;
